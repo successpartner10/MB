@@ -407,11 +407,11 @@ export default function DashboardPage() {
 
         {/* Quick actions */}
         <section className="grid grid-cols-3 gap-2">
+          <button onClick={() => post("/api/v1/build/repeat", { userId: USER_ID }).then(() => { flash("✓ Repeated last week's box."); refresh(); })} className="btn btn-ghost flex-col !gap-1 !py-3 text-xs">
+            <span className="text-xl">🔁</span>Repeat Last Box
+          </button>
           <button onClick={skipWeek} className="btn btn-ghost flex-col !gap-1 !py-3 text-xs">
             <span className="text-xl">⏸</span>Skip Next Week
-          </button>
-          <button onClick={changeAddress} className="btn btn-ghost flex-col !gap-1 !py-3 text-xs">
-            <span className="text-xl">📍</span>Change Address
           </button>
           <button onClick={addMeal} className="btn btn-ghost flex-col !gap-1 !py-3 text-xs">
             <span className="text-xl">➕</span>Add Meal

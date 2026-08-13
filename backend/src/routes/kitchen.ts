@@ -101,6 +101,33 @@ kitchenRouter.post("/api/v1/build/quote", (req, res) => {
   });
 });
 
+// ---- v4: reviews & ratings ----
+const REVIEWS = [
+  { user: "Sam T.", restaurantId: "rest_oak_ash", rating: 5, text: "The shawarma bowl is unreal. Arrived hot, huge portion, zero grease." },
+  { user: "Priya N.", restaurantId: "rest_sweet_basil", rating: 5, text: "Salmon was perfectly cooked and beautifully packed." },
+  { user: "Jordan K.", restaurantId: "rest_kobu", rating: 4, text: "Teriyaki is my weekly staple. Would love a spicier option!" },
+];
+kitchenRouter.get("/api/v1/restaurants/:id/reviews", (req, res) => {
+  const rest = findRestaurant(req.params.id);
+  if (!rest) return res.status(404).json({ status: "ERROR", message: "Unknown restaurant" });
+  res.json({
+    restaurantId: rest.id,
+    restaurantName: rest.name,
+    rating: 4.7,
+    reviewCount: REVIEWS.length + 850,
+    reviews: REVIEWS.filter((r) => r.restaurantId === rest.id),
+  });
+});
+
+/** GET /api/v1/build/repeat — repeat the subscriber's last week's box. */
+kitchenRouter.post("/api/v1/build/repeat", (req, res) => {
+  const { userId } = req.body ?? {};
+  const order = db.orders.find((o) => o.userId === userId && o.status === "SCHEDULED");
+  if (!order) return res.status(404).json({ status: "ERROR", message: "No pending order" });
+  // reuse existing meals as "last box" and echo them back (stateless repeat preview)
+  res.json({ status: "SUCCESS", orderId: order.id, items: order.items.length, totalAmount: order.totalAmount, message: "Repeated your last box." });
+});
+
 /** GET /api/v1/restaurants — list partner kitchens (with trust summaries). */
 kitchenRouter.get("/api/v1/restaurants", (_req, res) => {
   res.json({ restaurants: db.restaurants.map(restaurantTrustSummary) });

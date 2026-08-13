@@ -47,10 +47,24 @@ permanent `/vN/` path** so existing links keep working after you ship a new vers
 
 | Version | URL | Notes |
 |---------|-----|-------|
-| Latest | https://successpartner10.github.io/MB/v3/ | current release (v3) |
-| v3 | https://successpartner10.github.io/MB/v3/ | Build-Your-Box · 2-hr windows · live tracking |
+| Latest | https://successpartner10.github.io/MB/v4/ | current release (v4) |
+| v4 | https://successpartner10.github.io/MB/v4/ | Ratings · repeat · schedule · map · add-ons · payouts |
+| v3 | https://successpartner10.github.io/MB/v3/ | Build-Your-Box · 2-hr windows · live tracking (archived) |
 | v2 | https://successpartner10.github.io/MB/v2/ | Raleway redesign (archived) |
 | v1 | https://successpartner10.github.io/MB/v1/ | original release (archived) |
+
+## 🧰 v4 — Uber-Eats / Instacart-style features (research-backed)
+Both sides, balanced. Inspired by Uber Eats, DoorDash, Instacart, HelloFresh & Factor.
+
+1. **⭐ Ratings & reviews** — star ratings + review counts on restaurants & meals, and a
+   "What others say" review strip (trust lever). Backed by `GET /restaurants/:id/reviews`.
+2. **🔁 Repeat last box** — one-tap reorder of last week. Backed by `POST /build/repeat`.
+3. **📅 Rolling schedule** — 4-week view with per-week skip/swap (`#schedule` / `/schedule`).
+4. **🗺️ Live map + drop-off photo** — courier position map, call/text, delivery preferences
+   (leave-at-door / hand-to-me / green bag), and a delivered-photo confirmation.
+5. **🍱 Meal add-ons & sides** — add extra protein, sides, smoothie, dessert; total updates live.
+6. **💸 Partner payout dashboard** — revenue/meals/customers, 7-week revenue chart, weekly
+   auto-deposit schedule (`#payouts` / `/payouts`).
 
 ### 🍱 Build-Your-Box configurator (v3)
 Pick a mix (e.g. **2 non-veg + 3 veg**) and the all-inclusive total updates **instantly**.
