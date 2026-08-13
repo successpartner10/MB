@@ -64,15 +64,36 @@ export default function LandingPage() {
           </div>
         </div>
         <nav className="flex gap-2">
-          <Link href="/dashboard" className="btn btn-ghost">Subscriber Dashboard</Link>
-          <Link href="/kitchen" className="btn btn-ghost">Kitchen Portal</Link>
+          <Link href="/dashboard" className="btn btn-ghost">My Meals</Link>
+          <Link href="/kitchen" className="btn btn-ghost border-slate-800 bg-slate-900 text-white hover:bg-slate-800">
+            Restaurant owners →
+          </Link>
         </nav>
       </header>
+
+      {/* 3 big steps — the only things the user needs to do */}
+      <section className="mb-8 grid gap-3 sm:grid-cols-3">
+        {[
+          { n: "1", t: "Register", d: "One-tap Apple Pay / Google Pay. No forms, no passwords." },
+          { n: "2", t: "Choose", d: "Pick your kitchen & meals — you see who cooks your food." },
+          { n: "3", t: "Get delivery", d: "One box, one bill, one weekly delivery. All-inclusive." },
+        ].map((s) => (
+          <div key={s.n} className="flex items-start gap-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <div className="grid h-14 w-14 flex-none place-items-center rounded-2xl bg-brand-600 text-3xl font-black text-white shadow-lg shadow-brand-600/30">
+              {s.n}
+            </div>
+            <div>
+              <div className="text-lg font-extrabold">{s.t}</div>
+              <div className="mt-0.5 text-sm text-slate-500">{s.d}</div>
+            </div>
+          </div>
+        ))}
+      </section>
 
       <section className="grid gap-6 lg:grid-cols-2">
         <div>
           <h1 className="text-4xl font-black leading-tight tracking-tight sm:text-5xl">
-            Chef-prepared meals. <span className="text-brand-600">Zero decision fatigue.</span>
+            Chef-prepared meals. <span className="text-brand-600">3 easy steps.</span>
           </h1>
           <p className="mt-4 max-w-xl text-slate-600">
             A curated weekly menu delivered across Toronto. One flat all-inclusive price —
@@ -139,10 +160,20 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* Distinct entry for restaurant owners */}
+      <section className="mt-10 flex flex-wrap items-center justify-between gap-4 rounded-3xl bg-slate-900 px-7 py-6 text-white">
+        <div>
+          <div className="text-xs font-bold uppercase tracking-wider text-slate-400">Own a kitchen?</div>
+          <div className="mt-1 text-xl font-extrabold">Run your restaurant on Minimal Bites</div>
+          <div className="text-sm text-slate-300">Set up your profile & menu, fulfill committed weekly orders, get paid automatically.</div>
+        </div>
+        <Link href="/kitchen" className="btn bg-amber-500 text-slate-900 hover:bg-amber-400">Restaurant owners →</Link>
+      </section>
+
       <footer className="mt-12 border-t border-slate-200 pt-6 text-center text-xs text-slate-400">
-        Minimal Bites — Technical prototype (Next.js + Express). Explore the{" "}
-        <Link href="/dashboard" className="font-semibold text-brand-600">Subscriber Dashboard</Link> and{" "}
-        <Link href="/kitchen" className="font-semibold text-brand-600">Kitchen Partner Portal</Link>.
+        Minimal Bites — Technical prototype (Next.js + Express).{" "}
+        <Link href="/dashboard" className="font-semibold text-brand-600">Subscriber Dashboard</Link> ·{" "}
+        <Link href="/kitchen" className="font-semibold text-slate-600">Restaurant Partner Portal</Link>.
       </footer>
     </main>
   );

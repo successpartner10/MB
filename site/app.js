@@ -1,8 +1,58 @@
 /* ============================================================================
-   Minimal Bites — self-contained static PWA demo
-   Data embedded here mirrors the live Express + PostgreSQL API responses so the
-   site works fully offline and on GitHub Pages (no backend needed).
+   Minimal Bites — static PWA (Raleway · Apple-clean · retina · SVG icons)
+   Two distinct products:
+     • Subscriber app  (home + dashboard) — light, green, consumer
+     • Partner portal  (#partners, #kitchen) — dark, amber, business
+   Reached separately: the home page links "Restaurant owners →" to #partners.
    ========================================================================== */
+
+/* ---------- SVG icon set (line icons, currentColor, retina-crisp) ---------- */
+const P = "M9 12l2 2 4-4"; // not used directly, kept as flavor
+function ico(name, cls = "") {
+  const stroke = `stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" fill="none"`;
+  const S = `<svg class="ic ${cls}" viewBox="0 0 24 24" ${stroke} aria-hidden="true">`;
+  const E = `</svg>`;
+  const paths = {
+    chef: `<path d="M12 3a3 3 0 0 0-3 3c0 .8.3 1.5.8 2H7.5a2 2 0 0 0 0 4h9a2 2 0 0 0 0-4h-2.3a3 3 0 0 0 .8-2 3 3 0 0 0-3-3z"/><path d="M8 15h8l-1 5H9z"/><path d="M10 13v2M14 13v2"/>`,
+    sparkle: `<path d="M12 3l1.6 4.4L18 9l-4.4 1.6L12 15l-1.6-4.4L6 9l4.4-1.6z"/><path d="M18 15l.8 2.2L21 18l-2.2.8L18 21l-.8-2.2L15 18l2.2-.8z"/>`,
+    bolt: `<path d="M13 3L5 13h5l-1 8 8-10h-5z"/>`,
+    tap: `<path d="M7 11a5 5 0 0 1 10 0v2"/><path d="M9 11v3a3 3 0 0 0 6 0v-3"/><path d="M10 20h4"/>`,
+    factory: `<path d="M3 21V9l5 3V9l5 3V9l5 3v9z"/><path d="M7 17h2M12 17h2M17 17h2"/><path d="M8 21v-3M16 21v-3"/>`,
+    calendar: `<rect x="4" y="5" width="16" height="16" rx="2"/><path d="M8 3v4M16 3v4M4 10h16"/><path d="M12 14l1.5 1.5L17 12"/>`,
+    pin: `<path d="M12 21s-6-5.2-6-10a6 6 0 1 1 12 0c0 4.8-6 10-6 10z"/><circle cx="12" cy="11" r="2.2"/>`,
+    pause: `<rect x="7" y="5" width="3.4" height="14" rx="1.4"/><rect x="13.6" y="5" width="3.4" height="14" rx="1.4"/>`,
+    plus: `<path d="M12 5v14M5 12h14"/>`,
+    swap: `<path d="M7 8h11l-3-3M17 16H6l3 3"/><path d="M7 8l-1 1-1-1M18 16l-1-1-1 1" opacity="0"/>`,
+    arrows: `<path d="M8 9h11l-3-3"/><path d="M16 15H5l3 3"/><path d="M7 6.5l-2 2.5 2 2.5M17 12.5l2-2.5-2-2.5" opacity="0"/>`,
+    clock: `<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>`,
+    gear: `<circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 0 0-.1-1.2l2-1.5-2-3.4-2.3 1a7 7 0 0 0-2-1.2L14.3 3h-4l-.3 2.7a7 7 0 0 0-2 1.2l-2.3-1-2 3.4 2 1.5A7 7 0 0 0 5.6 12a7 7 0 0 0 .1 1.2l-2 1.5 2 3.4 2.3-1a7 7 0 0 0 2 1.2l.3 2.7h4l.3-2.7a7 7 0 0 0 2-1.2l2.3 1 2-3.4-2-1.5c.06-.4.1-.8.1-1.2z"/>`,
+    pot: `<path d="M4 10h16v2a8 8 0 0 1-16 0z"/><path d="M12 10V5M8 7l-1.5-2M16 7l1.5-2"/>`,
+    box: `<path d="M4 8l8-4 8 4v9l-8 4-8-4z"/><path d="M4 8l8 4 8-4M12 12v9"/>`,
+    truck: `<path d="M3 6h11v10H3z"/><path d="M14 9h4l3 3v4h-7"/><circle cx="7" cy="18" r="1.8"/><circle cx="17" cy="18" r="1.8"/><path d="M7 18h3M14 18h3"/>`,
+    printer: `<path d="M7 8V3h10v5"/><rect x="4" y="8" width="16" height="8" rx="1.5"/><path d="M7 14h10v7H7z"/>`,
+    download: `<path d="M12 3v11M8 10l4 4 4-4"/><path d="M4 19h16"/>`,
+    store: `<path d="M4 10l1.5-5h13L20 10M4 10v9h16v-9"/><path d="M4 10h16"/><path d="M9 13h6v6H9z"/>`,
+    menu: `<path d="M4 6h16M4 12h16M4 18h16"/><path d="M10 6v6"/><circle cx="12" cy="4" r="1"/>`,
+    chart: `<path d="M4 20V10M10 20V4M16 20v-7M20 20H3"/>`,
+    wallet: `<rect x="3" y="7" width="18" height="13" rx="2"/><path d="M3 11h18M16 15h2"/><path d="M6 7V6a2 2 0 0 1 2-2h7"/>`,
+    shield: `<path d="M12 3l7 3v5c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6z"/><path d="M9 12l2 2 4-4"/>`,
+    arrow: `<path d="M5 12h14M14 7l5 5-5 5"/>`,
+    arrowLeft: `<path d="M19 12H5M10 7l-5 5 5 5"/>`,
+    check: `<path d="M5 12l5 5 9-11"/>`,
+    home: `<path d="M4 11l8-7 8 7v9a1 1 0 0 1-1 1h-5v-6h-4v6H5a1 1 0 0 1-1-1z"/>`,
+  };
+  return S + (paths[name] || `<circle cx="12" cy="12" r="8"/>`) + E;
+}
+
+const BADGE_COLOR = {
+  HIGH_PROTEIN: "bg-rose-100 text-rose-700",
+  GLUTEN_FREE: "bg-amber-100 text-amber-700",
+  VEGETARIAN: "bg-emerald-100 text-emerald-700",
+  VEGAN: "bg-lime-100 text-lime-700",
+  KETO: "bg-violet-100 text-violet-700",
+  BALANCED: "bg-sky-100 text-sky-700",
+  STANDARD: "bg-slate-100 text-slate-600",
+};
 
 const RESTAURANTS = [
   { id: "rest_oak_ash", name: "Oak & Ash Kitchen", cuisine: "Grill & bowls", neighborhood: "Downtown / Bay", postalPrefixes: ["M5J", "M5K"], hygieneRating: 4.9, healthScore: 100, verified: true, description: "Wood-fire grill and protein-forward bowls. Verified by Toronto DineSafe (100/100).", minWeeklyDishes: 3 },
@@ -15,35 +65,14 @@ const DATA = {
   restaurants: RESTAURANTS,
   dashboard: {
     userId: "usr_99812",
-    user: {
-      fullName: "Aria Chen",
-      phone: "+1 416 555 0198",
-      dietaryBadges: ["HIGH_PROTEIN", "GLUTEN_FREE"],
-      dropoffPreference: "CONCIERGE",
-    },
+    user: { fullName: "Aria Chen", phone: "+1 416 555 0198", dietaryBadges: ["HIGH_PROTEIN", "GLUTEN_FREE"], dropoffPreference: "CONCIERGE" },
     subscription: {
-      id: "sub_77123",
-      planTier: "MEALS_6",
-      deliveryDay: "TUESDAY_PM",
-      deliveryLabel: "TUESDAY PM",
-      window: "5:00 PM - 7:00 PM",
-      isPaused: false,
-      perMeal: 13,
-      boxMode: "MIXED",
-      preferredRestaurant: null,
+      id: "sub_77123", planTier: "MEALS_6", deliveryDay: "TUESDAY_PM", deliveryLabel: "TUESDAY PM",
+      window: "5:00 PM - 7:00 PM", isPaused: false, perMeal: 13, boxMode: "MIXED", preferredRestaurant: null,
     },
-    address: {
-      street: "120 Bay St",
-      unit: "Suite 1402",
-      city: "Toronto",
-      province: "ON",
-      postalCode: "M5J 2R8",
-    },
+    address: { street: "120 Bay St", unit: "Suite 1402", city: "Toronto", province: "ON", postalCode: "M5J 2R8" },
     order: {
-      id: "ord_aria_20260818",
-      deliveryDate: "2026-08-18T17:00:00.000Z",
-      status: "SCHEDULED",
-      totalAmount: 78,
+      id: "ord_aria_20260818", deliveryDate: "2026-08-18T17:00:00.000Z", status: "SCHEDULED", totalAmount: 78,
       cutoffAt: "2026-08-16T23:59:59.000Z",
       items: [
         { slot: 1, mealId: "meal_shawarma_1", restaurantId: "rest_oak_ash", title: "Grilled Chicken Shawarma Bowl", calories: 580, proteinGrams: 48, badges: ["HIGH_PROTEIN"] },
@@ -80,20 +109,16 @@ const DATA = {
   productionMatrix: {
     deliveryDate: "2026-08-18",
     source: "postgresql/prisma (static snapshot)",
-    totalMealsToCook: 266,
-    totalPacked: 180,
+    totalMealsToCook: 266, totalPacked: 180,
     dishes: [
-      { mealId: "meal_shawarma_1", restaurantId: "rest_oak_ash", title: "Grilled Chicken Shawarma Bowl", calories: 580, badges: ["HIGH_PROTEIN"], totalQuantity: 140, packedQuantity: 80 },
-      { mealId: "meal_salmon_2", restaurantId: "rest_sweet_basil", title: "Lemon Herb Atlantic Salmon", calories: 520, badges: ["GLUTEN_FREE"], totalQuantity: 85, packedQuantity: 85 },
-      { mealId: "meal_teriyaki_3", restaurantId: "rest_kobu", title: "Beef Teriyaki & Jasmine Rice", calories: 610, badges: ["BALANCED"], totalQuantity: 25, packedQuantity: 0 },
-      { mealId: "meal_falafel_4", restaurantId: "rest_sweet_basil", title: "Mediterranean Falafel Plate", calories: 480, badges: ["VEGETARIAN"], totalQuantity: 15, packedQuantity: 15 },
-      { mealId: "meal_steak_5", restaurantId: "rest_oak_ash", title: "Chili Lime Steak & Sweet Potato", calories: 640, badges: ["HIGH_PROTEIN"], totalQuantity: 1, packedQuantity: 0 },
+      { mealId: "meal_shawarma_1", restaurantId: "rest_oak_ash", title: "Grilled Chicken Shawarma Bowl", totalQuantity: 140, packedQuantity: 80 },
+      { mealId: "meal_salmon_2", restaurantId: "rest_sweet_basil", title: "Lemon Herb Atlantic Salmon", totalQuantity: 85, packedQuantity: 85 },
+      { mealId: "meal_teriyaki_3", restaurantId: "rest_kobu", title: "Beef Teriyaki & Jasmine Rice", totalQuantity: 25, packedQuantity: 0 },
+      { mealId: "meal_falafel_4", restaurantId: "rest_sweet_basil", title: "Mediterranean Falafel Plate", totalQuantity: 15, packedQuantity: 15 },
     ],
     routes: [
-      { postalPrefix: "M5J", boxCount: 30 },
-      { postalPrefix: "M5V", boxCount: 35 },
-      { postalPrefix: "M5K", boxCount: 28 },
-      { postalPrefix: "M5H", boxCount: 22 },
+      { postalPrefix: "M5J", boxCount: 30 }, { postalPrefix: "M5V", boxCount: 35 },
+      { postalPrefix: "M5K", boxCount: 28 }, { postalPrefix: "M5H", boxCount: 22 },
     ],
     courier: { M5V: 30, M5J: 30 },
   },
@@ -105,195 +130,150 @@ const TIERS = [
   { id: "MEALS_8", meals: 8, perMeal: 12, total: 96, desc: "Best per-meal value" },
 ];
 
-const BADGE_COLOR = {
-  HIGH_PROTEIN: "bg-rose-100 text-rose-700",
-  GLUTEN_FREE: "bg-amber-100 text-amber-700",
-  VEGETARIAN: "bg-emerald-100 text-emerald-700",
-  VEGAN: "bg-lime-100 text-lime-700",
-  KETO: "bg-violet-100 text-violet-700",
-  BALANCED: "bg-sky-100 text-sky-700",
-  STANDARD: "bg-slate-100 text-slate-600",
-};
-
 /* ---------- helpers ---------- */
-const esc = (s) =>
-  String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 function badgeHtml(label) {
   const k = label.toUpperCase().replace(/[\s-]/g, "_");
   return `<span class="chip ${BADGE_COLOR[k] || BADGE_COLOR.STANDARD}">${esc(label)}</span>`;
 }
-
-function fmtDate(iso) {
-  try {
-    return new Date(iso).toLocaleDateString("en-CA", { weekday: "long", month: "short", day: "numeric" });
-  } catch {
-    return iso;
-  }
-}
-function fmtWindow(iso) {
-  try {
-    return new Date(iso).toLocaleDateString("en-CA", { weekday: "long", month: "short", day: "numeric" }) + " · 5:00 PM - 7:00 PM";
-  } catch {
-    return iso;
-  }
-}
+function fmtDate(iso) { try { return new Date(iso).toLocaleDateString("en-CA", { weekday: "long", month: "short", day: "numeric" }); } catch { return iso; } }
 function timeLeft(iso) {
-  const cutoff = new Date(iso).getTime();
-  const diff = Math.max(0, cutoff - Date.now());
-  const days = Math.floor(diff / 86400000);
-  const hours = Math.floor((diff % 86400000) / 3600000);
+  const diff = Math.max(0, new Date(iso).getTime() - Date.now());
+  const days = Math.floor(diff / 86400000), hours = Math.floor((diff % 86400000) / 3600000);
   return `${days} Day${days === 1 ? "" : "s"} ${hours} Hour${hours === 1 ? "" : "s"}`;
 }
-function money(n) {
-  return "$" + Number(n).toFixed(2);
+function money(n) { return "$" + Number(n).toFixed(2); }
+function trustHtml(r) {
+  return `<span class="trust-badge">${r.hygieneRating}★</span><span class="trust-sub">DineSafe ${r.healthScore}/100${r.verified ? " · verified" : ""}</span>`;
 }
-
-/* ---------- toast ---------- */
 function flash(msg) {
   const t = document.getElementById("toast");
-  t.textContent = msg;
-  t.classList.add("show");
-  clearTimeout(t._tm);
-  t._tm = setTimeout(() => t.classList.remove("show"), 2400);
+  t.textContent = msg; t.classList.add("show");
+  clearTimeout(t._tm); t._tm = setTimeout(() => t.classList.remove("show"), 2400);
 }
 
 /* ---------- router ---------- */
-const routes = {
-  "": renderLanding,
-  dashboard: renderDashboard,
-  kitchen: renderKitchen,
-};
-
-function currentRoute() {
-  const h = location.hash.replace(/^#\/?/, "").split("?")[0];
-  return routes[h] ? h : "";
-}
+const routes = { "": renderHome, dashboard: renderDashboard, partners: renderPartners, kitchen: renderKitchen };
+function currentRoute() { const h = location.hash.replace(/^#\/?/, "").split("?")[0]; return routes[h] ? h : ""; }
 function navigate() {
   const r = currentRoute();
-  document.querySelectorAll("[data-nav]").forEach((a) => {
-    a.classList.toggle("active", a.dataset.nav === r);
-  });
+  document.querySelectorAll("[data-nav]").forEach((a) => a.classList.toggle("active", a.dataset.nav === r));
   const app = document.getElementById("app");
+  app.className = (r === "partners" || r === "kitchen") ? "partner" : "consumer";
   app.innerHTML = routes[r]();
   window.scrollTo(0, 0);
 }
 
-/* ==================== LANDING ==================== */
-function renderLanding() {
+/* ==================== SUBSCRIBER · HOME ==================== */
+function renderHome() {
   let selected = "MEALS_6";
-  const tierBtns = TIERS.map(
-    (t) => `<button class="tier ${t.id === selected ? "selected" : ""}" data-tier="${t.id}" onclick="selectTier(this,'${t.id}')">
+  const tierBtns = TIERS.map((t) => `<button class="tier ${t.id === selected ? "selected" : ""}" data-tier="${t.id}" onclick="selectTier(this,'${t.id}')">
       <div class="tier-meals">${t.meals} meals/wk</div>
       <div class="tier-price">$${t.perMeal}<span>/meal</span></div>
       <div class="tier-total">${money(t.total)}/wk all-in</div>
       <div class="tier-desc">${t.desc}</div>
-    </button>`
-  ).join("");
+    </button>`).join("");
+
+  const steps = [
+    ["1", "Register", "One-tap Apple Pay / Google Pay. No forms, no passwords.", "bolt"],
+    ["2", "Choose", "Pick your kitchen & meals — you see who cooks your food.", "tap"],
+    ["3", "Get delivery", "One box, one bill, one weekly delivery. All-inclusive.", "truck"],
+  ].map(([n, t, d, ic]) => `
+    <div class="step">
+      <div class="step-num">${n}</div>
+      <div class="step-body">
+        <div class="step-head">${ico(ic)}<span>${t}</span></div>
+        <div class="step-d">${d}</div>
+      </div>
+    </div>`).join("");
 
   const features = [
-    ["🧠", "Zero Choice Fatigue", "6–10 curated chef-prepared meals weekly. No 50-item menus."],
-    ["💸", "Zero Fee Surprise", "Flat $12–$14/meal. Taxes, shipping & service included. Always."],
-    ["⚡", "Passwordless Onboarding", "Apple Pay / Google Pay creates your account & address in one tap."],
-    ["👆", "1-Tap Subscription Controls", "Skip, pause, swap or change your window without exit surveys."],
-    ["🏭", "Kitchen Batch Aggregation", "Partners get 'Cook 140x Shawarma Bowls', not 140 separate tickets."],
-    ["🗓️", "Auto-Selection Engine", "Forgot to choose? Dietary-badge-aware meals are picked for you."],
-  ].map(([i, t, d]) => `<div class="feature"><div class="feat-ico">${i}</div><div class="feat-t">${t}</div><div class="feat-d">${d}</div></div>`).join("");
+    ["chef", "Zero Choice Fatigue", "6–10 curated chef-prepared meals weekly."],
+    ["sparkle", "Zero Fee Surprise", "Flat $12–$14/meal. Fees included, always."],
+    ["bolt", "Passwordless", "Wallet tap creates your account & address."],
+    ["tap", "1-Tap Controls", "Skip, pause, swap — no exit surveys."],
+    ["factory", "Kitchen Aggregation", "Partners get batch totals, not 140 tickets."],
+    ["calendar", "Auto-Selection", "Forgot to choose? Meals picked from your diet."],
+  ].map(([ic, t, d]) => `<div class="feature"><div class="feat-ic">${ico(ic)}</div><div class="feat-t">${t}</div><div class="feat-d">${d}</div></div>`).join("");
 
   return `
-    <header class="topbar">
-      <div class="brand"><span class="logo">MB</span><div><b>Minimal Bites</b><span class="sub">Zero-friction meals · GTA</span></div></div>
-      <nav>
-        <a data-nav="dashboard" href="#dashboard" class="navbtn ghost">Subscriber Dashboard</a>
-        <a data-nav="kitchen" href="#kitchen" class="navbtn ghost">Kitchen Portal</a>
-      </nav>
-    </header>
+    <div class="consumer-shell">
+      <header class="topbar">
+        <a href="#" class="brand">${ico("home")}<div><b>Minimal Bites</b><span class="sub">Zero-friction meals · GTA</span></div></a>
+        <nav class="consumer-nav">
+          <a href="#dashboard" class="navbtn ghost">${ico("tap")}<span>My Meals</span></a>
+          <a href="#partners" class="navbtn link">${ico("store")}<span>Restaurant owners</span></a>
+        </nav>
+      </header>
 
-    <section class="steps-wrap">
-      <div class="steps-head">How it works — just 3 steps</div>
-      <div class="steps">
-        <div class="step"><span class="step-num">1</span><div><div class="step-t">Register</div><div class="step-d">One-tap Apple Pay / Google Pay. No forms, no passwords — your account &amp; address are created automatically.</div></div></div>
-        <div class="step"><span class="step-num">2</span><div><div class="step-t">Choose</div><div class="step-d">Pick your kitchen (know who cooks your food &amp; their hygiene score) or let us curate. Pick your meals, 1-tap.</div></div></div>
-        <div class="step"><span class="step-num">3</span><div><div class="step-t">Get delivery</div><div class="step-d">One box, one bill, one predictable weekly delivery. All-inclusive — no surprise fees, ever.</div></div></div>
-      </div>
-    </section>
+      <section class="hero">
+        <div class="hero-title">
+          <div class="eyebrow">Just 3 things. That's it.</div>
+          <h1>Chef-prepared meals.<br/><span class="accent">3 easy steps.</span></h1>
+          <p>Register, choose, get weekly delivery. No forms. No surprise fees. Know exactly who cooks your food — and their hygiene score.</p>
+        </div>
 
-    <section class="hero">
-      <div class="hero-left">
-        <h1>Chef-prepared meals. <span class="accent">Zero decision fatigue.</span></h1>
-        <p>A curated weekly menu delivered across Toronto. One flat all-inclusive price — taxes, delivery and service fees are already in the number you see. No forms, no passwords, no exit surveys.</p>
+        <div class="steps hero-steps">${steps}</div>
+
         <div class="tiers">${tierBtns}</div>
         <div class="card checkout">
           <div class="kicker">Live demo — <code>POST /api/v1/auth/wallet-checkout</code></div>
-          <p>One call creates the account, extracts the address from the wallet token, charges Stripe and selects your meals.</p>
-          <button class="btn primary big" onclick="simulateCheckout()">Apple Pay / Google Pay — subscribe</button>
+          <button class="btn primary big" onclick="simulateCheckout()">${ico("wallet")}<span>Apple Pay / Google Pay — subscribe</span></button>
           <pre id="checkout-result" hidden></pre>
         </div>
-      </div>
-      <div class="hero-right"><div class="featgrid">${features}</div></div>
-    </section>
-    <footer class="foot">Minimal Bites — PWA prototype · Install me for offline use · View on GitHub</footer>`;
+      </section>
+
+      <section class="features">
+        <div class="featgrid">${features}</div>
+      </section>
+
+      <section class="for-partners">
+        <div class="fp-icon">${ico("store")}</div>
+        <div>
+          <div class="kicker">Own a kitchen?</div>
+          <div class="fp-t">Run your restaurant on Minimal Bites</div>
+          <div class="fp-d">Set up your profile & menu, fulfill committed weekly orders, get paid automatically.</div>
+        </div>
+        <a href="#partners" class="btn dark">${ico("arrow")}<span>Restaurant owners →</span></a>
+      </section>
+
+      <footer class="foot">Minimal Bites — offline-capable PWA · Install for home-screen use</footer>
+    </div>`;
 }
 
-function selectTier(el, id) {
-  document.querySelectorAll(".tier").forEach((b) => b.classList.remove("selected"));
-  el.classList.add("selected");
-}
+function selectTier(el, id) { document.querySelectorAll(".tier").forEach((b) => b.classList.remove("selected")); el.classList.add("selected"); }
 function simulateCheckout() {
   const tier = document.querySelector(".tier.selected")?.dataset.tier || "MEALS_6";
   const t = TIERS.find((x) => x.id === tier);
-  const res = {
-    status: "SUCCESS",
-    userId: "usr_" + Math.random().toString(36).slice(2, 8),
-    subscriptionId: "sub_" + Math.random().toString(36).slice(2, 8),
-    totalChargedCAD: t.total,
-    nextDeliveryDate: "2026-08-18T17:00:00.000Z",
-    cutoffAt: "2026-08-16T23:59:59.000Z",
-    shippingAddress: { street: "120 Bay St", unit: "Suite 1402", postalCode: "M5J 2R8", city: "Toronto" },
-    mealsSelected: t.meals,
-  };
+  const res = { status: "SUCCESS", userId: "usr_" + Math.random().toString(36).slice(2, 8), subscriptionId: "sub_" + Math.random().toString(36).slice(2, 8), totalChargedCAD: t.total, nextDeliveryDate: "2026-08-18T17:00:00.000Z", cutoffAt: "2026-08-16T23:59:59.000Z", shippingAddress: { street: "120 Bay St", unit: "Suite 1402", postalCode: "M5J 2R8", city: "Toronto" }, mealsSelected: t.meals };
   const pre = document.getElementById("checkout-result");
-  pre.hidden = false;
-  pre.textContent = JSON.stringify(res, null, 2);
+  pre.hidden = false; pre.textContent = JSON.stringify(res, null, 2);
   flash(`✓ Charged ${money(t.total)} · ${t.meals} meals selected · all-inclusive`);
 }
 
-/* ==================== DASHBOARD ==================== */
+/* ==================== SUBSCRIBER · DASHBOARD ==================== */
 let kitchenFilter = "all";
 function renderDashboard() {
   const d = DATA.dashboard;
   const { order, subscription, address, user } = d;
-  const perMeal = subscription.perMeal;
-  const total = order.totalAmount;
+  const perMeal = subscription.perMeal, total = order.totalAmount;
   const planCount = { MEALS_4: "4 meals", MEALS_6: "6 meals", MEALS_8: "8 meals" }[subscription.planTier];
+  const kitchens = []; const seen = {};
+  order.items.forEach((it) => { if (it.restaurantId && !seen[it.restaurantId]) { seen[it.restaurantId] = true; kitchens.push({ id: it.restaurantId, name: restName(it.restaurantId) }); } });
+  const visible = kitchenFilter === "all" ? order.items : order.items.filter((it) => it.restaurantId === kitchenFilter);
+  const filterChips = kitchens.length > 1 ? `<div class="kitchen-filters">
+      <button class="chip ${kitchenFilter === "all" ? "on" : ""}" onclick="setKitchenFilter('all')">All kitchens</button>
+      ${kitchens.map((k) => `<button class="chip ${kitchenFilter === k.id ? "on" : ""}" onclick="setKitchenFilter('${k.id}')">${esc(k.name)}</button>`).join("")}</div>` : "";
 
-  // unique kitchens across this week's meals
-  const kitchens = [];
-  const seen = {};
-  order.items.forEach((it) => {
-    if (it.restaurantId && !seen[it.restaurantId]) {
-      seen[it.restaurantId] = true;
-      kitchens.push({ id: it.restaurantId, name: restName(it.restaurantId) });
-    }
-  });
-  const visibleItems = kitchenFilter === "all" ? order.items : order.items.filter((it) => it.restaurantId === kitchenFilter);
-
-  const filterChips = kitchens.length > 1
-    ? `<div class="kitchen-filters">
-        <button class="chip ${kitchenFilter === "all" ? "on" : ""}" onclick="setKitchenFilter('all')">All kitchens</button>
-        ${kitchens.map((k) => `<button class="chip ${kitchenFilter === k.id ? "on" : ""}" onclick="setKitchenFilter('${k.id}')">${esc(k.name)}</button>`).join("")}
-      </div>`
-    : "";
-
-  const items = visibleItems.map((it, i) => `
+  const items = visible.map((it) => `
     <div class="card meal">
       <div class="meal-top">
         <div>
-          <div class="meal-title"><span class="slot">${i + 1}</span> ${esc(it.title)}</div>
-          ${it.restaurantId ? `<div class="meal-rest">prepared by ${esc(restName(it.restaurantId))}</div>` : ""}
-          <div class="meal-meta">${it.badges.map(badgeHtml).join("")}<span class="chip bg-slate-100 text-slate-600">${it.calories} Cal / ${it.proteinGrams}g protein</span></div>
+          <div class="meal-title"><span class="slot">${it.slot}</span> ${esc(it.title)}</div>
+          ${it.restaurantId ? `<div class="meal-rest">${ico("chef")} prepared by ${esc(restName(it.restaurantId))}</div>` : ""}
+          <div class="meal-meta">${it.badges.map(badgeHtml).join("")}<span class="chip bg-slate-100 text-slate-600">${it.calories} Cal · ${it.proteinGrams}g protein</span></div>
         </div>
-        <button class="btn ghost sm" onclick="renderSwap(${it.slot})">🔄 Swap</button>
+        <button class="btn ghost sm" onclick="renderSwap(${it.slot})">${ico("swap")} Swap</button>
       </div>
       <div id="swap-${it.slot}"></div>
     </div>`).join("");
@@ -301,258 +281,221 @@ function renderDashboard() {
   return `
     <div class="mobile">
       <header class="topbar">
-        <div class="brand"><span class="logo">MB</span><div><b>Minimal Bites</b></div></div>
-        <a href="#dashboard" class="navbtn ghost">👤 ${esc(user.fullName.split(" ")[0])}</a>
+        <a href="#" class="brand">${ico("home")}<div><b>Minimal Bites</b></div></a>
+        <a href="#partners" class="navbtn link sm">${ico("store")}<span>Restaurant owners</span></a>
       </header>
 
       <section class="card block">
-        <div class="kicker">Next Delivery</div>
-        <div class="h2">${fmtWindow(order.deliveryDate)}</div>
-        <div class="muted">📍 ${esc(address.street)}${address.unit ? ", " + esc(address.unit) : ""} (${esc(user.dropoffPreference.replace("_", " "))} drop-off)</div>
-        <div class="cutoff">⏳ Edit cutoff: ${timeLeft(order.cutoffAt)} left</div>
+        <div class="kicker">${ico("truck")} Next delivery</div>
+        <div class="h2">${fmtDate(order.deliveryDate)} · ${subscription.window}</div>
+        <div class="muted">${ico("pin")} ${esc(address.street)}${address.unit ? ", " + esc(address.unit) : ""} · ${esc(user.dropoffPreference.replace("_", " "))}</div>
+        <div class="cutoff">${ico("clock")} Edit cutoff: ${timeLeft(order.cutoffAt)} left</div>
       </section>
 
-      <section class="card block">
-        ${kitchenCard(d.subscription)}
-      </section>
+      <section class="card block">${kitchenCard(subscription)}</section>
 
-      <div class="row-between"><div class="h3">Your ${planCount} this week</div><div class="accent bold">${money(total)} all-inclusive</div></div>
+      <div class="row-between"><div class="h3">Your ${planCount} this week</div><div class="accent bold">${money(total)} all-in</div></div>
       ${filterChips}
       <div class="meals">${items}</div>
 
       <div class="actions">
-        <button class="btn ghost col" onclick="flash('✓ Week skipped — no charge.')"><span class="big">⏸</span>Skip Next Week</button>
-        <button class="btn ghost col" onclick="flash('✓ Address updated to 100 King St W.')"><span class="big">📍</span>Change Address</button>
-        <button class="btn ghost col" onclick="flash('✓ Added meal · new total ' + money(${total + perMeal}))"><span class="big">➕</span>Add Meal</button>
+        <button class="btn ghost col" onclick="flash('✓ Week skipped — no charge.')">${ico("pause")}<span>Skip week</span></button>
+        <button class="btn ghost col" onclick="flash('✓ Address updated to 100 King St W.')">${ico("pin")}<span>Address</span></button>
+        <button class="btn ghost col" onclick="flash('✓ Added meal · new total ' + money(${total + perMeal}))">${ico("plus")}<span>Add meal</span></button>
       </div>
 
       <section class="card block">
-        <div class="kicker">Billing summary</div>
+        <div class="kicker">${ico("wallet")} Billing summary</div>
         <div class="billrow"><span>${order.items.length} meals × ${money(perMeal)}/ea</span><span class="bold">${money(total)}</span></div>
         <div class="billrow"><span>Delivery, service fees &amp; taxes</span><span class="accent bold">INCLUDED ($0.00)</span></div>
-        <div class="autocharge">Auto-charging ${money(total)} on ${fmtDate(order.cutoffAt)} at 11:59 PM.</div>
+        <div class="autocharge">${ico("clock")} Auto-charging ${money(total)} on ${fmtDate(order.cutoffAt)} at 11:59 PM.</div>
       </section>
     </div>
     <div class="mobnav">
-      <a data-nav="dashboard" href="#dashboard" class="active">🍽️ This Week</a>
-      <a href="#dashboard" onclick="flash('Schedule coming soon')">📅 Schedule</a>
-      <a href="#dashboard" onclick="flash('Settings coming soon')">⚙️ Settings</a>
+      <a data-nav="dashboard" href="#dashboard" class="active">${ico("home")}<span>This Week</span></a>
+      <a href="#dashboard" onclick="flash('Schedule coming soon')">${ico("calendar")}<span>Schedule</span></a>
+      <a href="#dashboard" onclick="flash('Settings coming soon')">${ico("gear")}<span>Settings</span></a>
     </div>`;
-}
-
-function renderSwap(slot) {
-  const d = DATA.dashboard;
-  const item = d.order.items.find((x) => x.slot === slot);
-  if (!item) return;
-  const current = item.mealId;
-  const opts = DATA.meals
-    .map((m) => `<button class="swap-opt ${m.id === current ? "on" : ""}" onclick="doSwap(${slot},'${m.id}')">${esc(m.title)}<span class="muted">${m.calories} Cal · ${esc(restName(m.restaurantId))}</span></button>`)
-    .join("");
-  document.getElementById("swap-" + slot).innerHTML =
-    `<div class="kicker" style="margin-top:10px">Choose a replacement:</div><div class="swap-grid">${opts}</div>`;
-}
-function doSwap(slot, id) {
-  const d = DATA.dashboard;
-  const item = d.order.items.find((x) => x.slot === slot);
-  if (!item) return;
-  const m = DATA.meals.find((x) => x.id === id);
-  if (!m) return;
-  item.mealId = id;
-  item.restaurantId = m.restaurantId;
-  item.title = m.title;
-  item.calories = m.calories;
-  item.proteinGrams = m.proteinGrams;
-  item.badges = m.badges;
-  flash("✓ Meal swapped.");
-  navigate();
-}
-
-function setKitchenFilter(id) {
-  kitchenFilter = id;
-  navigate();
-}
-
-// Box mode: restaurant-first (trust + full-week commitment) vs curated variety.
-function setBoxMode(mode, restId) {
-  const sub = DATA.dashboard.subscription;
-  sub.boxMode = mode;
-  sub.preferredRestaurant = mode === "SINGLE_RESTAURANT" ? RESTAURANTS.find((r) => r.id === restId) : null;
-  // In restaurant-first mode, rebuild the week from that kitchen's menu.
-  if (mode === "SINGLE_RESTAURANT") {
-    const menu = DATA.meals.filter((m) => m.restaurantId === restId);
-    if (menu.length) {
-      DATA.dashboard.order.items = DATA.dashboard.order.items.map((it, i) => {
-        const m = menu[i % menu.length];
-        return { slot: it.slot, mealId: m.id, restaurantId: m.restaurantId, title: m.title, calories: m.calories, proteinGrams: m.proteinGrams, badges: m.badges };
-      });
-    }
-  }
-  flash(mode === "SINGLE_RESTAURANT"
-    ? `✓ Your whole weekly box is now from ${(sub.preferredRestaurant || {}).name}.`
-    : "✓ Your box is now curated variety across kitchens.");
-  navigate();
-}
-
-function trustHtml(r) {
-  return `<span class="trust-badge">${r.hygieneRating}★</span><span class="trust-sub">DineSafe ${r.healthScore}/100${r.verified ? " · verified" : ""}</span>`;
 }
 
 function kitchenCard(sub) {
   if (sub.boxMode === "SINGLE_RESTAURANT" && sub.preferredRestaurant) {
     const r = sub.preferredRestaurant;
-    return `<div class="row-between" style="margin:0 0 6px"><div class="kicker">Your Kitchen</div>
-        <button class="btn ghost sm" onclick="setBoxMode('MIXED',null)">Switch to variety</button></div>
+    return `<div class="row-between" style="margin:0 0 6px"><div class="kicker">${ico("chef")} Your kitchen</div>
+        <button class="btn ghost sm" onclick="setBoxMode('MIXED',null)">Variety</button></div>
       <div class="kitchen-line"><span class="k-avatar">${esc(r.name[0])}</span>
         <div><div class="bold">${esc(r.name)}</div><div class="trust-row">${trustHtml(r)}</div>
         <div class="muted sm">${esc(r.neighborhood)} · full-week box committed</div></div></div>
-      <p class="muted sm">All 6 meals are prepared by this kitchen. They know you're committed for the full week, so every delivery is a complete, predictable order.</p>`;
+      <p class="muted sm">All ${DATA.dashboard.order.items.length} meals from this kitchen. They know you're committed for the full week.</p>`;
   }
-  return `<div class="row-between" style="margin:0 0 6px"><div class="kicker">Your Kitchen</div>
-      <button class="btn ghost sm" onclick="toggleKitchenPick()">🍴 Choose a kitchen</button></div>
-    <p class="muted sm">Currently <b>curated variety</b> — meals from several kitchens, each labeled.</p>
+  return `<div class="row-between" style="margin:0 0 6px"><div class="kicker">${ico("chef")} Your kitchen</div>
+      <button class="btn ghost sm" onclick="toggleKitchenPick()">${ico("swap")} Choose</button></div>
+    <p class="muted sm">Currently <b>curated variety</b> — every meal labeled with its kitchen.</p>
     <div id="kitchen-pick" hidden>
       <div class="kicker" style="margin:10px 0 6px">Commit your whole weekly box to one kitchen:</div>
       ${DATA.restaurants.map((r) => `<button class="kitchen-opt" onclick="setBoxMode('SINGLE_RESTAURANT','${r.id}')">
           <span class="k-avatar">${esc(r.name[0])}</span><div><div class="bold">${esc(r.name)}</div>
           <div class="trust-row">${trustHtml(r)}</div>
-          <div class="muted sm">${esc(r.cuisine)} · ${esc(r.neighborhood)}</div></div>
-        </button>`).join("")}
+          <div class="muted sm">${esc(r.cuisine)} · ${esc(r.neighborhood)}</div></div></button>`).join("")}
     </div>`;
 }
-function toggleKitchenPick() {
-  const el = document.getElementById("kitchen-pick");
-  if (el) el.hidden = !el.hidden;
-}
-
-/* ==================== KITCHEN ==================== */
-let kitchenSel = "all";
-function setKitchenSel(id) {
-  kitchenSel = id;
+function toggleKitchenPick() { const el = document.getElementById("kitchen-pick"); if (el) el.hidden = !el.hidden; }
+function setKitchenFilter(id) { kitchenFilter = id; navigate(); }
+function setBoxMode(mode, restId) {
+  const sub = DATA.dashboard.subscription;
+  sub.boxMode = mode;
+  sub.preferredRestaurant = mode === "SINGLE_RESTAURANT" ? RESTAURANTS.find((r) => r.id === restId) : null;
+  if (mode === "SINGLE_RESTAURANT") {
+    const menu = DATA.meals.filter((m) => m.restaurantId === restId);
+    if (menu.length) DATA.dashboard.order.items = DATA.dashboard.order.items.map((it, i) => {
+      const m = menu[i % menu.length];
+      return { slot: it.slot, mealId: m.id, restaurantId: m.restaurantId, title: m.title, calories: m.calories, proteinGrams: m.proteinGrams, badges: m.badges };
+    });
+  }
+  flash(mode === "SINGLE_RESTAURANT" ? `✓ Your whole weekly box is now from ${(sub.preferredRestaurant || {}).name}.` : "✓ Your box is now curated variety.");
   navigate();
 }
-function renderKitchen() {
-  const pm = DATA.productionMatrix;
-  const filteredDishes = kitchenSel === "all" ? pm.dishes : pm.dishes.filter((d) => d.restaurantId === kitchenSel);
-  const kitchenName = kitchenSel === "all" ? "All partner kitchens" : restName(kitchenSel);
-  const totalForKitchen = filteredDishes.reduce((s, d) => s + d.totalQuantity, 0);
-  const packedForKitchen = filteredDishes.reduce((s, d) => s + d.packedQuantity, 0);
-  const outForKitchen = Object.values(pm.courier).reduce((s, n) => s + n, 0);
-  const cooking = totalForKitchen - packedForKitchen - outForKitchen;
+function renderSwap(slot) {
+  const item = DATA.dashboard.order.items.find((x) => x.slot === slot); if (!item) return;
+  const opts = DATA.meals.map((m) => `<button class="swap-opt ${m.id === item.mealId ? "on" : ""}" onclick="doSwap(${slot},'${m.id}')">${esc(m.title)}<span class="muted">${m.calories} Cal · ${esc(restName(m.restaurantId))}</span></button>`).join("");
+  document.getElementById("swap-" + slot).innerHTML = `<div class="kicker" style="margin-top:10px">Choose a replacement:</div><div class="swap-grid">${opts}</div>`;
+}
+function doSwap(slot, id) {
+  const item = DATA.dashboard.order.items.find((x) => x.slot === slot); const m = DATA.meals.find((x) => x.id === id);
+  if (!item || !m) return;
+  Object.assign(item, { mealId: id, restaurantId: m.restaurantId, title: m.title, calories: m.calories, proteinGrams: m.proteinGrams, badges: m.badges });
+  flash("✓ Meal swapped."); navigate();
+}
 
-  const rows = filteredDishes.map((d) => {
-    const pct = d.totalQuantity ? Math.round((d.packedQuantity / d.totalQuantity) * 100) : 0;
-    const state = pct >= 100 ? "DONE" : pct > 0 ? "PACKED" : "READY";
-    return `<tr>
-      <td class="qty">${d.totalQuantity}x</td>
-      <td class="name">${esc(d.title)}</td>
-      <td>${(d.badges.length ? d.badges : ["STANDARD"]).map(badgeHtml).join("")}</td>
-      <td>
-        <div class="pack">
-          <div class="bar"><div class="fill" style="width:${pct}%"></div></div>
-          <span>${d.packedQuantity}/${d.totalQuantity} ${state}</span>
-          <button class="link" onclick="flash('🖨️ Thermal labels sent to label printer for ${esc(d.title)}')">🖨️ Print Labels</button>
-        </div>
-      </td>
-    </tr>`;
-  }).join("");
-
-  const cookingItems = filteredDishes.filter((d) => d.packedQuantity < d.totalQuantity)
-    .map((d) => `<li>${d.totalQuantity - d.packedQuantity}x ${short(d.title)}</li>`).join("") || `<li class="muted">Nothing cooking</li>`;
-  const packedItems = filteredDishes.filter((d) => d.packedQuantity > 0)
-    .map((d) => `<li>${d.packedQuantity}x ${short(d.title)}</li>`).join("");
-  // routes relevant to this kitchen (by its served postal prefixes)
-  const servedPrefixes = kitchenSel === "all" ? pm.routes.map((r) => r.postalPrefix) : (DATA.restaurants.find((r) => r.id === kitchenSel) || {}).postalPrefixes || [];
-  const routeItems = pm.routes.filter((r) => servedPrefixes.includes(r.postalPrefix)).map((r) => {
-    const shipped = pm.courier[r.postalPrefix] || 0;
-    return `<li>Route ${r.postalPrefix} — ${r.boxCount} boxes${shipped ? ` <span class="accent">(${shipped} shipped)</span>` : ""}</li>`;
-  }).join("");
-
-  const kitchenSelect = `
-    <label class="btn ghost">🏠 Kitchen
-      <select onchange="setKitchenSel(this.value)">
-        <option value="all" ${kitchenSel === "all" ? "selected" : ""}>All partner kitchens</option>
-        ${DATA.restaurants.map((r) => `<option value="${r.id}" ${kitchenSel === r.id ? "selected" : ""}>${esc(r.name)} · ${esc(r.neighborhood)}</option>`).join("")}
-      </select>
-    </label>`;
-
-  const commitmentBanner = kitchenSel !== "all"
-    ? `<section class="commit-banner">
-        <div><span class="cmt-label">Committed customers</span><span class="cmt-num">${committedCountFor(kitchenSel)}</span><span class="cmt-sub">signed up for a full week from you</span></div>
-        <div><span class="cmt-label">Guaranteed weekly meals</span><span class="cmt-num">${committedMealsFor(kitchenSel)}</span><span class="cmt-sub">predictable volume to plan &amp; cook</span></div>
-        <div><span class="cmt-label">Weekly portions (all orders)</span><span class="cmt-num">${totalForKitchen}</span><span class="cmt-sub">Tue 5–7PM · full-week routing</span></div>
-      </section>`
-    : "";
+/* ==================== PARTNER · PORTAL (distinct product) ==================== */
+function renderPartners() {
+  const steps = [
+    ["1", "Set up", "Profile, menu & delivery zones. Publish your hygiene score.", "store"],
+    ["2", "Fulfill orders", "Committed weekly volume + one consolidated prep list.", "pot"],
+    ["3", "Get paid", "Automatic weekly payout for every confirmed meal.", "wallet"],
+  ].map(([n, t, d, ic]) => `<div class="pstep"><span class="pstep-num">${n}</span><div class="pstep-body"><div class="pstep-t">${ico(ic)} ${t}</div><div class="pstep-d">${d}</div></div></div>`).join("");
 
   return `
-    <header class="topbar">
-      <div class="brand"><span class="logo dark">MB</span><div><b>Minimal Bites</b><span class="sub">Kitchen Partner Portal · ${esc(kitchenName)}</span></div></div>
-      <a href="#dashboard" class="navbtn ghost">Subscriber →</a>
-    </header>
+    <div class="partner-shell">
+      <header class="p-topbar">
+        <div class="p-brand">${ico("store")}<div><b>Minimal Bites</b><span>for restaurant partners</span></div></div>
+        <nav class="p-nav">
+          <a href="#partners" class="p-navbtn active" data-nav="partners">${ico("home")} Overview</a>
+          <a href="#kitchen" class="p-navbtn" data-nav="kitchen">${ico("pot")} Kitchen Dashboard</a>
+        </nav>
+        <a href="#" class="btn p-outline sm">${ico("arrowLeft")} Back to eaters</a>
+      </header>
 
-    <section class="steps-wrap kitchen-steps">
-      <div class="steps-head">Your business — just 3 steps</div>
-      <div class="steps">
-        <div class="step"><span class="step-num">1</span><div><div class="step-t">Set up</div><div class="step-d">Business profile, menu &amp; delivery zones. Tell subscribers your hygiene score.</div></div></div>
-        <div class="step"><span class="step-num">2</span><div><div class="step-t">Fulfill orders</div><div class="step-d">See committed weekly volume &amp; one consolidated prep list. Cook in batches, not chaos.</div></div></div>
-        <div class="step"><span class="step-num">3</span><div><div class="step-t">Get paid</div><div class="step-d">Automatic weekly payout (every Thursday) for every meal you confirmed &amp; cooked.</div></div></div>
+      <section class="p-hero">
+        <div class="eyebrow dark">Get on the GTA's zero-friction meal box</div>
+        <h1>Run your kitchen on Minimal Bites</h1>
+        <p>We bring you committed weekly customers, consolidated batch orders, and automatic payouts. You just cook.</p>
+      </section>
+
+      <section class="p-steps"><div class="p-label">It's 3 steps to your first payout</div>${steps}</section>
+
+      <section class="p-cta">
+        <div class="p-cta-left">
+          <div class="p-label">Start now — no login needed for this demo</div>
+          <div class="p-cta-t">Open the Kitchen Dashboard</div>
+          <div class="p-cta-d">See your production matrix, committed weekly volume, and courier kanban.</div>
+        </div>
+        <a href="#kitchen" class="btn p-primary">${ico("pot")} Open Kitchen Dashboard ${ico("arrow")}</a>
+      </section>
+
+      <footer class="p-foot">Minimal Bites for Partners — a separate product for restaurant owners</footer>
+    </div>`;
+}
+
+/* ==================== PARTNER · KITCHEN DASHBOARD ==================== */
+let kitchenSel = "all";
+function setKitchenSel(id) { kitchenSel = id; navigate(); }
+function renderKitchen() {
+  const pm = DATA.productionMatrix;
+  const dishes = kitchenSel === "all" ? pm.dishes : pm.dishes.filter((d) => d.restaurantId === kitchenSel);
+  const kitchenName = kitchenSel === "all" ? "All partner kitchens" : restName(kitchenSel);
+  const totalForKitchen = dishes.reduce((s, d) => s + d.totalQuantity, 0);
+  const packedForKitchen = dishes.reduce((s, d) => s + d.packedQuantity, 0);
+  const out = Object.values(pm.courier).reduce((s, n) => s + n, 0);
+  const cooking = totalForKitchen - packedForKitchen - out;
+
+  const rows = dishes.map((d) => {
+    const pct = d.totalQuantity ? Math.round((d.packedQuantity / d.totalQuantity) * 100) : 0;
+    const state = pct >= 100 ? "DONE" : pct > 0 ? "PACKED" : "READY";
+    return `<tr><td class="qty">${d.totalQuantity}x</td><td class="name">${esc(d.title)}</td>
+      <td>${restName(d.restaurantId) === d.title ? "" : `<span class="p-muted">${esc(restName(d.restaurantId))}</span>`}</td>
+      <td><div class="pack"><div class="bar"><div class="fill" style="width:${pct}%"></div></div>
+        <span>${d.packedQuantity}/${d.totalQuantity} ${state}</span>
+        <button class="link" onclick="flash('Labels sent to printer')">${ico("printer")} Print</button></div></td></tr>`;
+  }).join("");
+
+  const kitchenSelect = `<label class="btn p-outline sm">${ico("store")} Kitchen
+      <select onchange="setKitchenSel(this.value)">
+        <option value="all" ${kitchenSel === "all" ? "selected" : ""}>All partner kitchens</option>
+        ${DATA.restaurants.map((r) => `<option value="${r.id}" ${kitchenSel === r.id ? "selected" : ""}>${esc(r.name)}</option>`).join("")}
+      </select></label>`;
+
+  const commitment = kitchenSel !== "all"
+    ? `<section class="commit-banner">
+        <div><span class="cmt-label">Committed customers</span><span class="cmt-num">${committedCountFor(kitchenSel)}</span><span class="cmt-sub">signed up for a full week</span></div>
+        <div><span class="cmt-label">Guaranteed weekly meals</span><span class="cmt-num">${committedMealsFor(kitchenSel)}</span><span class="cmt-sub">predictable volume</span></div>
+        <div><span class="cmt-label">Weekly portions</span><span class="cmt-num">${totalForKitchen}</span><span class="cmt-sub">Tue 5–7PM · full-week routing</span></div>
+      </section>` : "";
+
+  return `
+    <div class="partner-shell">
+      <header class="p-topbar">
+        <div class="p-brand">${ico("store")}<div><b>Minimal Bites</b><span>kitchen partner portal</span></div></div>
+        <nav class="p-nav">
+          <a href="#partners" class="p-navbtn" data-nav="partners">${ico("home")} Overview</a>
+          <a href="#kitchen" class="p-navbtn active" data-nav="kitchen">${ico("pot")} Kitchen Dashboard</a>
+        </nav>
+        <a href="#" class="btn p-outline sm">${ico("arrowLeft")} Back to eaters</a>
+      </header>
+
+      <section class="p-filters">
+        ${kitchenSelect}
+        <button class="btn p-outline sm">${ico("calendar")} Tue, Aug 18 ▼</button>
+        <button class="btn p-outline sm">${ico("clock")} 5–7 PM ▼</button>
+        <button class="btn p-outline sm">${ico("chart")} Aggregated prep list ▼</button>
+      </section>
+
+      ${commitment}
+
+      <section class="p-table-card">
+        <div class="p-table-head"><span class="bold">${ico("pot")} Production Summary · ${esc(kitchenName)}</span><span class="p-sum">${totalForKitchen} MEALS</span></div>
+        <table><thead><tr><th>Qty</th><th>Dish</th><th>Kitchen</th><th>Packing</th></tr></thead><tbody>${rows}</tbody></table>
+      </section>
+
+      <div class="kanban">
+        <div class="lane"><div class="lane-h">${ico("pot")}<span>In Cooking</span><span class="pill slate">${Math.max(0, cooking)}</span></div>
+          <ul>${dishes.filter((d) => d.packedQuantity < d.totalQuantity).map((d) => `<li>${d.totalQuantity - d.packedQuantity}x ${short(d.title)}</li>`).join("") || `<li class="muted">Nothing cooking</li>`}</ul></div>
+        <div class="lane"><div class="lane-h">${ico("box")}<span>Packed & Labeled</span><span class="pill brand">${packedForKitchen}</span></div>
+          <ul>${dishes.filter((d) => d.packedQuantity > 0).map((d) => `<li>${d.packedQuantity}x ${short(d.title)}</li>`).join("")}</ul></div>
+        <div class="lane"><div class="lane-h">${ico("truck")}<span>Out With Courier</span><span class="pill sky">${out}</span></div>
+          <ul>${pm.routes.map((r) => `<li>Route ${r.postalPrefix} — ${r.boxCount} boxes${pm.courier[r.postalPrefix] ? ` <span class="accent">(${pm.courier[r.postalPrefix]} shipped)</span>` : ""}</li>`).join("")}</ul></div>
       </div>
-    </section>
 
-    <div class="filters">
-      ${kitchenSelect}
-      <button class="btn ghost">📅 Date: Tuesday, Aug 18 ▼</button>
-      <button class="btn ghost">🕐 Window: 5PM–7PM ▼</button>
-      <button class="btn ghost">🧮 View: Aggregated Prep List ▼</button>
-    </div>
+      <section class="p-controls card">
+        <div class="p-label">Batch controls</div>
+        <div class="controls">
+          <button class="btn p-primary" onclick="flash('Thermal labels printing…')">${ico("printer")} Print all Tuesday labels</button>
+          <button class="btn p-outline" onclick="flash('All dishes marked PACKED.')">${ico("check")} Mark all packed</button>
+          <button class="btn p-outline" onclick="flash('Route shipped to courier.')">${ico("truck")} Ship next route</button>
+          <button class="btn p-outline" onclick="exportMatrix()">${ico("download")} Export dish totals</button>
+        </div>
+      </section>
 
-    ${commitmentBanner}
-
-    <section class="card table-card">
-      <div class="table-head"><span class="bold">🏭 Production Summary · ${esc(kitchenName)}</span><span class="sum">${totalForKitchen} MEALS TOTAL</span></div>
-      <table><thead><tr><th>Qty</th><th>Meal dish name</th><th>Dietary badges</th><th>Packing status</th></tr></thead><tbody>${rows}</tbody></table>
-    </section>
-
-    <div class="kanban">
-      <div class="lane"><div class="lane-h"><span>🍳 In Cooking</span><span class="pill slate">${Math.max(0, cooking)}</span></div><ul>${cookingItems}</ul></div>
-      <div class="lane"><div class="lane-h"><span>📦 Packed &amp; Labeled</span><span class="pill brand">${packedForKitchen}</span></div><ul>${packedItems}</ul></div>
-      <div class="lane"><div class="lane-h"><span>🚚 Out With Courier</span><span class="pill sky">${outForKitchen}</span></div><ul>${routeItems}</ul></div>
-    </div>
-
-    <section class="card block">
-      <div class="kicker">Batch controls</div>
-      <div class="controls">
-        <button class="btn primary" onclick="flash('🖨️ All Tuesday thermal labels printing…')">🖨️ Print All Thermal Labels</button>
-        <button class="btn ghost" onclick="flash('✅ All dishes marked PACKED (batch kanban updated).')">✅ Mark All Packed</button>
-        <button class="btn ghost" onclick="flash('🚚 Route shipped to courier.')">🚚 Ship Next Route</button>
-        <button class="btn ghost" onclick="exportMatrix()">📥 Export Dish Totals</button>
-      </div>
-      <p class="muted sm">Tip: this snapshot mirrors the live <code>production-matrix</code> endpoint backed by PostgreSQL + Prisma.</p>
-    </section>
-    <footer class="foot">Kitchen Partner Portal — aggregated batch totals, not chaotic order tickets.</footer>`;
+      <footer class="p-foot">Kitchen partner portal — aggregate batch totals, not chaotic order tickets.</footer>
+    </div>`;
 }
-
-// Static commitment demo: Aria commits her 6-meal box to the selected kitchen.
-function committedCountFor(restId) {
-  return DATA.dashboard.subscription.boxMode === "SINGLE_RESTAURANT" &&
-    DATA.dashboard.subscription.preferredRestaurant?.id === restId ? 1 : 0;
-}
-function committedMealsFor(restId) {
-  return committedCountFor(restId) * 6;
-}
-
+function committedCountFor(restId) { return DATA.dashboard.subscription.boxMode === "SINGLE_RESTAURANT" && DATA.dashboard.subscription.preferredRestaurant?.id === restId ? 1 : 0; }
+function committedMealsFor(restId) { return committedCountFor(restId) * 6; }
 function exportMatrix() {
   const blob = new Blob([JSON.stringify(DATA.productionMatrix, null, 2)], { type: "application/json" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = "production-matrix-2026-08-18.json";
-  a.click();
-  URL.revokeObjectURL(url);
-  flash("📥 Exported dish totals to JSON.");
+  const url = URL.createObjectURL(blob); const a = document.createElement("a"); a.href = url; a.download = "production-matrix.json"; a.click(); URL.revokeObjectURL(url); flash("Exported dish totals.");
 }
-function short(s) {
-  return s.length > 26 ? s.slice(0, 26) + "…" : s;
-}
+function short(s) { return s.length > 26 ? s.slice(0, 26) + "…" : s; }
 
 /* ---------- boot ---------- */
 window.addEventListener("hashchange", navigate);
@@ -568,9 +511,7 @@ window.toggleKitchenPick = toggleKitchenPick;
 window.flash = flash;
 window.exportMatrix = exportMatrix;
 
-// register service worker (guarded for all environments)
 if (navigator && navigator.serviceWorker && typeof navigator.serviceWorker.register === "function") {
   navigator.serviceWorker.register("sw.js").catch(() => {});
 }
-
 navigate();
