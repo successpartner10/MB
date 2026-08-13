@@ -6,9 +6,11 @@ import Badge from "@/components/Badge";
 import {
   getProductionMatrix,
   getRestaurants,
+  getCommitment,
   post,
   type ProductionMatrix,
   type Restaurant,
+  type Commitment,
 } from "@/lib/api";
 
 type DragKind = "dish" | "route";
@@ -16,6 +18,7 @@ type DragKind = "dish" | "route";
 export default function KitchenPage() {
   const [matrix, setMatrix] = useState<ProductionMatrix | null>(null);
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
+  const [commitment, setCommitment] = useState<Commitment | null>(null);
   const [restaurantId, setRestaurantId] = useState<string>("");
   const [loading, setLoading] = useState(true);
   const [drag, setDrag] = useState<{ kind: DragKind; id: string } | null>(null);
@@ -23,6 +26,15 @@ export default function KitchenPage() {
   const load = useCallback(async () => {
     const m = await getProductionMatrix(undefined, restaurantId || undefined);
     setMatrix(m);
+    if (restaurantId) {
+      try {
+        setCommitment(await getCommitment(restaurantId));
+      } catch {
+        setCommitment(null);
+      }
+    } else {
+      setCommitment(null);
+    }
     return m;
   }, [restaurantId]);
 
@@ -151,6 +163,27 @@ export default function KitchenPage() {
         <p className="mt-2 text-xs text-slate-500">
           Showing production for <b>{matrix.restaurantName}</b> only — other partner kitchens' orders are hidden here.
         </p>
+      )}
+
+      {/* Full-week commitment signal — predictable, routable volume */}
+      {commitment && (
+        <section className="mt-3 grid gap-3 rounded-2xl border border-emerald-200 bg-emerald-50 p-4 sm:grid-cols-3">
+          <div>
+            <div className="text-xs font-bold uppercase tracking-wide text-emerald-700">Committed customers</div>
+            <div className="text-2xl font-black text-emerald-800">{commitment.committedCustomers}</div>
+            <div className="text-xs text-emerald-600">signed up for a full week from you</div>
+          </div>
+          <div>
+            <div className="text-xs font-bold uppercase tracking-wide text-emerald-700">Guaranteed weekly meals</div>
+            <div className="text-2xl font-black text-emerald-800">{commitment.committedMeals}</div>
+            <div className="text-xs text-emerald-600">predictable volume to plan & cook</div>
+          </div>
+          <div>
+            <div className="text-xs font-bold uppercase tracking-wide text-emerald-700">Weekly portions (all orders)</div>
+            <div className="text-2xl font-black text-emerald-800">{commitment.weeklyPortions}</div>
+            <div className="text-xs text-emerald-600">{commitment.deliveryWindow} · full-week routing</div>
+          </div>
+        </section>
       )}
 
       {/* Production summary table */}

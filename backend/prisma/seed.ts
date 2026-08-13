@@ -97,7 +97,14 @@ async function main() {
         create: { street: "120 Bay St", unit: "Suite 1402", city: "Toronto", province: "ON", postalCode: "M5J 2R8", buzzerCode: "1402" },
       },
       subscription: {
-        create: { id: "sub_77123", planTier: "MEALS_6", deliveryDay: "TUESDAY_PM", isPaused: false, currentPeriodEnd: cutoff },
+        create: {
+          id: "sub_77123",
+          planTier: "MEALS_6",
+          deliveryDay: "TUESDAY_PM",
+          isPaused: false,
+          boxMode: "MIXED",
+          currentPeriodEnd: cutoff,
+        },
       },
     },
   });

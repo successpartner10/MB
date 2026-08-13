@@ -29,6 +29,8 @@ const DATA = {
       window: "5:00 PM - 7:00 PM",
       isPaused: false,
       perMeal: 13,
+      boxMode: "MIXED",
+      preferredRestaurant: null,
     },
     address: {
       street: "120 Bay St",
@@ -291,6 +293,10 @@ function renderDashboard() {
         <div class="cutoff">⏳ Edit cutoff: ${timeLeft(order.cutoffAt)} left</div>
       </section>
 
+      <section class="card block">
+        ${kitchenCard(d.subscription)}
+      </section>
+
       <div class="row-between"><div class="h3">Your ${planCount} this week</div><div class="accent bold">${money(total)} all-inclusive</div></div>
       ${filterChips}
       <div class="meals">${items}</div>
@@ -347,6 +353,51 @@ function setKitchenFilter(id) {
   navigate();
 }
 
+// Box mode: restaurant-first (trust + full-week commitment) vs curated variety.
+function setBoxMode(mode, restId) {
+  const sub = DATA.dashboard.subscription;
+  sub.boxMode = mode;
+  sub.preferredRestaurant = mode === "SINGLE_RESTAURANT" ? RESTAURANTS.find((r) => r.id === restId) : null;
+  // In restaurant-first mode, rebuild the week from that kitchen's menu.
+  if (mode === "SINGLE_RESTAURANT") {
+    const menu = DATA.meals.filter((m) => m.restaurantId === restId);
+    if (menu.length) {
+      DATA.dashboard.order.items = DATA.dashboard.order.items.map((it, i) => {
+        const m = menu[i % menu.length];
+        return { slot: it.slot, mealId: m.id, restaurantId: m.restaurantId, title: m.title, calories: m.calories, proteinGrams: m.proteinGrams, badges: m.badges };
+      });
+    }
+  }
+  flash(mode === "SINGLE_RESTAURANT"
+    ? `✓ Your whole weekly box is now from ${(sub.preferredRestaurant || {}).name}.`
+    : "✓ Your box is now curated variety across kitchens.");
+  navigate();
+}
+
+function kitchenCard(sub) {
+  if (sub.boxMode === "SINGLE_RESTAURANT" && sub.preferredRestaurant) {
+    const r = sub.preferredRestaurant;
+    return `<div class="row-between" style="margin:0 0 6px"><div class="kicker">Your Kitchen</div>
+        <button class="btn ghost sm" onclick="setBoxMode('MIXED',null)">Switch to variety</button></div>
+      <div class="kitchen-line"><span class="k-avatar">${esc(r.name[0])}</span>
+        <div><div class="bold">${esc(r.name)}</div><div class="muted sm">${esc(r.neighborhood)} · full-week box committed</div></div></div>
+      <p class="muted sm">All 6 meals are prepared by this kitchen. They know you're committed for the full week, so every delivery is a complete, predictable order.</p>`;
+  }
+  return `<div class="row-between" style="margin:0 0 6px"><div class="kicker">Your Kitchen</div>
+      <button class="btn ghost sm" onclick="toggleKitchenPick()">🍴 Choose a kitchen</button></div>
+    <p class="muted sm">Currently <b>curated variety</b> — meals from several kitchens, each labeled.</p>
+    <div id="kitchen-pick" hidden>
+      <div class="kicker" style="margin:10px 0 6px">Commit your whole weekly box to one kitchen:</div>
+      ${DATA.restaurants.map((r) => `<button class="kitchen-opt" onclick="setBoxMode('SINGLE_RESTAURANT','${r.id}')">
+          <span class="k-avatar">${esc(r.name[0])}</span><div><div class="bold">${esc(r.name)}</div><div class="muted sm">${esc(r.cuisine)} · ${esc(r.neighborhood)}</div></div>
+        </button>`).join("")}
+    </div>`;
+}
+function toggleKitchenPick() {
+  const el = document.getElementById("kitchen-pick");
+  if (el) el.hidden = !el.hidden;
+}
+
 /* ==================== KITCHEN ==================== */
 let kitchenSel = "all";
 function setKitchenSel(id) {
@@ -398,6 +449,14 @@ function renderKitchen() {
       </select>
     </label>`;
 
+  const commitmentBanner = kitchenSel !== "all"
+    ? `<section class="commit-banner">
+        <div><span class="cmt-label">Committed customers</span><span class="cmt-num">${committedCountFor(kitchenSel)}</span><span class="cmt-sub">signed up for a full week from you</span></div>
+        <div><span class="cmt-label">Guaranteed weekly meals</span><span class="cmt-num">${committedMealsFor(kitchenSel)}</span><span class="cmt-sub">predictable volume to plan &amp; cook</span></div>
+        <div><span class="cmt-label">Weekly portions (all orders)</span><span class="cmt-num">${totalForKitchen}</span><span class="cmt-sub">Tue 5–7PM · full-week routing</span></div>
+      </section>`
+    : "";
+
   return `
     <header class="topbar">
       <div class="brand"><span class="logo dark">MB</span><div><b>Minimal Bites</b><span class="sub">Kitchen Partner Portal · ${esc(kitchenName)}</span></div></div>
@@ -409,6 +468,8 @@ function renderKitchen() {
       <button class="btn ghost">🕐 Window: 5PM–7PM ▼</button>
       <button class="btn ghost">🧮 View: Aggregated Prep List ▼</button>
     </div>
+
+    ${commitmentBanner}
 
     <section class="card table-card">
       <div class="table-head"><span class="bold">🏭 Production Summary · ${esc(kitchenName)}</span><span class="sum">${totalForKitchen} MEALS TOTAL</span></div>
@@ -434,6 +495,15 @@ function renderKitchen() {
     <footer class="foot">Kitchen Partner Portal — aggregated batch totals, not chaotic order tickets.</footer>`;
 }
 
+// Static commitment demo: Aria commits her 6-meal box to the selected kitchen.
+function committedCountFor(restId) {
+  return DATA.dashboard.subscription.boxMode === "SINGLE_RESTAURANT" &&
+    DATA.dashboard.subscription.preferredRestaurant?.id === restId ? 1 : 0;
+}
+function committedMealsFor(restId) {
+  return committedCountFor(restId) * 6;
+}
+
 function exportMatrix() {
   const blob = new Blob([JSON.stringify(DATA.productionMatrix, null, 2)], { type: "application/json" });
   const url = URL.createObjectURL(blob);
@@ -457,6 +527,8 @@ window.renderSwap = renderSwap;
 window.doSwap = doSwap;
 window.setKitchenFilter = setKitchenFilter;
 window.setKitchenSel = setKitchenSel;
+window.setBoxMode = setBoxMode;
+window.toggleKitchenPick = toggleKitchenPick;
 window.flash = flash;
 window.exportMatrix = exportMatrix;
 

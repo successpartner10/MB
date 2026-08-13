@@ -40,6 +40,11 @@ enum OrderStatus {
   SKIPPED
 }
 
+enum BoxMode {
+  SINGLE_RESTAURANT
+  MIXED
+}
+
 model User {
   id                String            @id @default(uuid())
   phone             String            @unique
@@ -69,16 +74,18 @@ model Address {
 }
 
 model Subscription {
-  id                   String      @id @default(uuid())
-  userId               String      @unique
-  user                 User        @relation(fields: [userId], references: [id])
-  planTier             PlanTier    @default(MEALS_6)
-  deliveryDay          DeliveryDay @default(TUESDAY_PM)
-  isPaused             Boolean     @default(false)
-  stripeSubscriptionId String?     @unique
-  currentPeriodEnd     DateTime
-  createdAt            DateTime    @default(now())
-  updatedAt            DateTime    @updatedAt
+  id                    String      @id @default(uuid())
+  userId                String      @unique
+  user                  User        @relation(fields: [userId], references: [id])
+  planTier              PlanTier    @default(MEALS_6)
+  deliveryDay           DeliveryDay @default(TUESDAY_PM)
+  isPaused              Boolean     @default(false)
+  boxMode               BoxMode     @default(MIXED)
+  preferredRestaurantId String?
+  stripeSubscriptionId  String?     @unique
+  currentPeriodEnd      DateTime
+  createdAt             DateTime    @default(now())
+  updatedAt             DateTime    @updatedAt
 }
 
 model Restaurant {

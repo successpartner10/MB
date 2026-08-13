@@ -37,14 +37,29 @@ backend and no network** — open `docs/index.html` or the offline zip anywhere.
 
 ---
 
-## 🏪 Multi-restaurant model
+## 🏪 Multi-restaurant model & restaurant-first ordering
 
-**One curated box for the subscriber; many partner kitchens behind it.**
+**Two box modes** answer the subscriber-trust + kitchen-commitment problem:
 
-The subscriber still gets **one box, one order, one delivery, one bill** — they never
-pick a restaurant (that would be choice fatigue). But the meals inside their box are
-**prepared by different partner kitchens**. Each kitchen logs in and sees **only its
-own** consolidated production sheet.
+- **Option A — "Pick a Kitchen" (restaurant-first, DEFAULT for trust):**
+  The subscriber browses partner kitchens and chooses **one**. Their whole weekly
+  box (6–8 meals) comes **entirely from that kitchen**. Every meal is from a known,
+  chosen, trusted kitchen. Each kitchen sees exactly how many customers are
+  **committed for a full week** → predictable, routable volume.
+- **Option B — "Curated Mixed Box" (variety):**
+  The multi-kitchen curated box, but opt-in and fully transparent — every meal is
+  labeled with its kitchen, and a **by-kitchen filter** lets the user group meals.
+
+Both modes keep **one box, one order, one delivery, one bill**.
+
+### Kitchen commitment (the "full week, not 1–2 orders" guarantee)
+When a subscriber picks a restaurant, their subscription becomes a **standing weekly
+commitment** to that kitchen. The kitchen portal shows a commitment banner:
+- **Committed customers** — subscribers signed up for a full week from this kitchen.
+- **Guaranteed weekly meals** — predictable volume to plan, cook, and route.
+- **Weekly portions (all orders)** — total incl. mixed-box contributions.
+
+The delivery is always a **complete week**, never a sporadic 1–2 meal drop.
 
 | Partner kitchen | Neighborhood | Signature dishes | Serves |
 |-----------------|--------------|------------------|--------|
@@ -52,18 +67,22 @@ own** consolidated production sheet.
 | **Sweet Basil** | Harbourfront | Salmon, Falafel, Caesar Bowl | M5V, M5J |
 | **Kobu Noodle & Rice** | Financial District | Teriyaki, Pad Thai | M5K, M5H |
 
-**User-facing:** each meal card shows *"prepared by {kitchen}"* + a **"by kitchen"
-filter** chip row — but billing/delivery stay fully unified.
+**User-facing:** a **"Your Kitchen" card** on the dashboard. In Mixed mode it shows a
+*"Choose a kitchen"* picker; in restaurant-first mode it shows the committed kitchen +
+*"Switch to variety"*. Each meal card shows *"prepared by {kitchen}"* + a **"by kitchen"
+filter** chip row.
 
-**Kitchen-facing:** the portal has a **kitchen selector** (`?restaurantId=`). Each
-partner sees only its dishes and its routes. E.g. **Oak & Ash** sees 141 meals
-(140× Shawarma + 1× Steak); **Sweet Basil** sees 100 (85× Salmon + 15× Falafel);
-**Kobu** sees 25× Teriyaki. The `production-matrix` API supports
-`?restaurantId=rest_oak_ash`.
+**Kitchen-facing:** the portal has a **kitchen selector** (`?restaurantId=`) + the
+**commitment banner**. Each partner sees only its dishes, its routes, and its committed
+weekly volume. E.g. **Oak & Ash** sees 141 portions; **Sweet Basil** sees 100;
+**Kobu** sees 25. API: `GET /production-matrix?restaurantId=rest_oak_ash`,
+`GET /restaurants/:id/commitment`, `GET /restaurants/:id` (menu).
 
-**Data model:** a `Restaurant` table (name, cuisine, neighborhood, served postal
-prefixes); `Meal.restaurantId` → `Restaurant`. Mirrored in Prisma schema, in-memory
-store, the API, both UIs, and PostgreSQL (migration `add_restaurants` applied).
+**Data model:** `Restaurant` table (name, cuisine, neighborhood, served postal
+prefixes); `Meal.restaurantId` → `Restaurant`; `Subscription.boxMode`
+(`SINGLE_RESTAURANT` | `MIXED`) + `preferredRestaurantId`. Mirrored in the in-memory
+store, the API, both UIs, and the static PWA. (PostgreSQL schema updated; see
+migrations `add_restaurants` + subscription box-mode fields.)
 
 ---
 

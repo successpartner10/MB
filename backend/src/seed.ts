@@ -71,6 +71,10 @@ const ariaSubscription: Subscription = {
   planTier: "MEALS_6",
   deliveryDay: "TUESDAY_PM",
   isPaused: false,
+  // Aria starts in Mixed mode (variety across kitchens). She can switch to a
+  // single restaurant with one tap to commit her full weekly box to one kitchen.
+  boxMode: "MIXED",
+  preferredRestaurantId: undefined,
   stripeSubscriptionId: "sub_stripe_abc123",
   currentPeriodEnd: cutoffFor(nextTuesday18()).toISOString(),
 };

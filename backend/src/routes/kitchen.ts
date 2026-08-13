@@ -19,6 +19,57 @@ kitchenRouter.get("/api/v1/restaurants", (_req, res) => {
   res.json({ restaurants: db.restaurants });
 });
 
+/** GET /api/v1/restaurants/:id — kitchen profile + its full menu. */
+kitchenRouter.get("/api/v1/restaurants/:id", (req, res) => {
+  const rest = findRestaurant(req.params.id);
+  if (!rest) return res.status(404).json({ status: "ERROR", message: "Unknown restaurant" });
+  res.json({
+    restaurant: rest,
+    menu: db.meals.filter((m) => m.isActive && m.restaurantId === rest.id),
+  });
+});
+
+/** GET /api/v1/restaurants/:id/commitment — weekly committed customers & meals. */
+kitchenRouter.get("/api/v1/restaurants/:id/commitment", (req, res) => {
+  const rest = findRestaurant(req.params.id);
+  if (!rest) return res.status(404).json({ status: "ERROR", message: "Unknown restaurant" });
+
+  const mealIds = new Set(
+    db.meals.filter((m) => m.restaurantId === rest.id).map((m) => m.id)
+  );
+  const activeOrders = db.orders.filter((o) =>
+    ["SCHEDULED", "PREPARING", "PACKED", "OUT_FOR_DELIVERY"].includes(o.status)
+  );
+
+  // restaurant-first committed subscribers
+  const committedSubs = db.subscriptions.filter(
+    (s) => s.boxMode === "SINGLE_RESTAURANT" && s.preferredRestaurantId === rest.id
+  );
+  const committedCustomers = committedSubs.length;
+  const committedMeals = committedSubs.reduce((sum, s) => {
+    const tier = s.planTier;
+    return sum + { MEALS_4: 4, MEALS_6: 6, MEALS_8: 8 }[tier]!;
+  }, 0);
+
+  // total portions this kitchen must cook this week (across all box modes)
+  const weeklyPortions = activeOrders.reduce((sum, o) => {
+    for (const it of o.items) {
+      const m = findMeal(it.mealId);
+      if (m && m.restaurantId === rest.id) sum += it.quantity;
+    }
+    return sum;
+  }, 0);
+
+  res.json({
+    restaurantId: rest.id,
+    restaurantName: rest.name,
+    committedCustomers, // subscribers who chose this kitchen
+    committedMeals, // guaranteed full-week portions (predictable volume)
+    weeklyPortions, // total portions this week incl. mixed-box orders
+    deliveryWindow: "Tue 5PM-7PM",
+  });
+});
+
 /**
  * GET /api/v1/kitchen/production-matrix?date=YYYY-MM-DD&restaurantId=...
  * Aggregates all active orders (optionally scoped to one restaurant).

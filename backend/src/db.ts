@@ -24,6 +24,9 @@ export type OrderStatus =
   | "DELIVERED"
   | "SKIPPED";
 
+/** How a subscriber's weekly box is built. */
+export type BoxMode = "SINGLE_RESTAURANT" | "MIXED";
+
 export interface Restaurant {
   id: string;
   name: string;
@@ -62,6 +65,10 @@ export interface Subscription {
   planTier: PlanTier;
   deliveryDay: DeliveryDay;
   isPaused: boolean;
+  /** How the box is built: all meals from one kitchen, or curated variety. */
+  boxMode: BoxMode;
+  /** Required when boxMode === SINGLE_RESTAURANT. */
+  preferredRestaurantId?: string;
   stripeSubscriptionId?: string;
   currentPeriodEnd: string;
 }
@@ -272,4 +279,33 @@ export function ordersFor(userId: string) {
   return db.orders
     .filter((o) => o.userId === userId)
     .sort((a, b) => (a.deliveryDate < b.deliveryDate ? -1 : 1));
+}
+
+/**
+ * Build a FULL box of exactly `count` meals.
+ * - restaurantId given → only that kitchen's menu (restaurant-first mode).
+ * - Ranked by dietary-badge match, then protein.
+ * - If the eligible menu has fewer items than the box size, items cycle so the
+ *   box is never partially empty (a subscriber always gets a complete week).
+ */
+export function selectBoxMeals(
+  count: number,
+  badges: string[],
+  restaurantId?: string
+): string[] {
+  let menu = db.meals.filter((m) => m.isActive);
+  if (restaurantId) menu = menu.filter((m) => m.restaurantId === restaurantId);
+  if (menu.length === 0) return [];
+
+  const scored = [...menu].sort((a, b) => {
+    const sa = a.badges.filter((x) => badges.includes(x)).length;
+    const sb = b.badges.filter((x) => badges.includes(x)).length;
+    return sb - sa || b.proteinGrams - a.proteinGrams;
+  });
+
+  const result: string[] = [];
+  for (let i = 0; i < count; i++) {
+    result.push(scored[i % scored.length].id);
+  }
+  return result;
 }

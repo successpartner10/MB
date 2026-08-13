@@ -39,6 +39,8 @@ export interface DashboardPayload {
     window: string;
     isPaused: boolean;
     perMeal: number;
+    boxMode: string;
+    preferredRestaurant: { id: string; name: string; neighborhood: string } | null;
   } | null;
   address: {
     street: string;
@@ -116,6 +118,21 @@ export async function getRestaurants(): Promise<Restaurant[]> {
   return j.restaurants;
 }
 
+export interface Commitment {
+  restaurantId: string;
+  restaurantName: string;
+  committedCustomers: number;
+  committedMeals: number;
+  weeklyPortions: number;
+  deliveryWindow: string;
+}
+
+export async function getCommitment(restaurantId: string): Promise<Commitment> {
+  const r = await fetch(`/api/v1/restaurants/${restaurantId}/commitment`);
+  if (!r.ok) throw new Error("Failed to load commitment");
+  return r.json();
+}
+
 export async function getProductionMatrix(
   date?: string,
   restaurantId?: string
@@ -136,4 +153,11 @@ export async function post(path: string, body: unknown) {
     body: JSON.stringify(body),
   });
   return r.json();
+}
+
+export async function chooseRestaurant(userId: string, restaurantId: string) {
+  return post("/api/v1/subscription/choose-restaurant", { userId, restaurantId });
+}
+export async function chooseMixed(userId: string) {
+  return post("/api/v1/subscription/choose-mixed", { userId });
 }

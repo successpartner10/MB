@@ -7,7 +7,7 @@
 
 import { Router } from "express";
 import { z } from "zod";
-import { db, uid, type DeliveryDay, type DropoffPreference } from "../db.js";
+import { db, uid, selectBoxMeals, type DeliveryDay, type DropoffPreference } from "../db.js";
 import { priceForTier, type PlanTier } from "../lib/pricing.js";
 import { cutoffFor, nextDeliveryDate, toIso } from "../lib/delivery.js";
 
@@ -40,6 +40,9 @@ const CheckoutSchema = z.object({
   email: z.string().optional(),
   fullName: z.string().optional().default("Wallet Customer"),
   mealIds: z.array(z.string()).optional(), // optional curated picks; else auto-select
+  // Restaurant-first: provide restaurantId to build the whole weekly box from
+  // one kitchen (trust + predictable weekly volume for that kitchen).
+  restaurantId: z.string().optional(),
 });
 
 authRouter.post("/api/v1/auth/wallet-checkout", (req, res) => {
@@ -98,22 +101,36 @@ authRouter.post("/api/v1/auth/wallet-checkout", (req, res) => {
     instructions: addr.instructions,
   });
 
-  // 4) Create subscription.
+  // 4) Resolve box mode. If a restaurant is chosen, the whole weekly box is
+  //    committed to that kitchen (restaurant-first / trust mode). Otherwise the
+  //    box is a curated Mixed variety across kitchens.
   const subscriptionId = uid("sub");
   const delivery = nextDeliveryDate(b.deliveryDay as DeliveryDay);
+  const restaurant = b.restaurantId ? db.restaurants.find((r) => r.id === b.restaurantId) : undefined;
+  if (b.restaurantId && !restaurant) {
+    return res.status(404).json({ status: "ERROR", message: "Unknown restaurantId" });
+  }
+  const boxMode = restaurant ? "SINGLE_RESTAURANT" : "MIXED";
   db.subscriptions.push({
     id: subscriptionId,
     userId,
     planTier: b.planTier as PlanTier,
     deliveryDay: b.deliveryDay as DeliveryDay,
     isPaused: false,
+    boxMode,
+    preferredRestaurantId: restaurant?.id,
     stripeSubscriptionId: `sub_stripe_${uid()}`,
     currentPeriodEnd: toIso(cutoffFor(delivery)),
   });
 
-  // 5) Auto-select meals (respect dietary badges) OR use provided picks.
+  // 5) Auto-select meals. If restaurant-first, fill the whole box from that
+  //    kitchen's menu (respect dietary badges); else curated variety across.
   const price = priceForTier(b.planTier as PlanTier);
-  const chosen = pickMeals(b.mealIds, b.dietaryBadges, price.mealCount);
+  // selectBoxMeals always returns a FULL box of exactly `count` meals (cycling
+  // a kitchen's menu if it has fewer items than the plan size).
+  const chosen = b.mealIds?.length
+    ? b.mealIds
+    : selectBoxMeals(price.mealCount, b.dietaryBadges, restaurant?.id);
 
   // 6) Charge via Stripe (mocked).
   const charge = mockStripeCharge(b.paymentToken, price.totalCAD);
@@ -144,29 +161,11 @@ authRouter.post("/api/v1/auth/wallet-checkout", (req, res) => {
       city: addr.city,
       province: addr.province,
     },
+    boxMode,
+    restaurant: restaurant ? { id: restaurant.id, name: restaurant.name } : null,
     mealsSelected: chosen.length,
   });
 });
-
-/** Auto-selection fallback engine (Section 6 Rule 3). */
-function pickMeals(
-  explicit: string[] | undefined,
-  badges: string[],
-  count: number
-): string[] {
-  const active = db.meals.filter((m) => m.isActive);
-  if (explicit && explicit.length > 0) {
-    const picks = explicit.map((id) => active.find((m) => m.id === id)).filter(Boolean);
-    return picks.map((m) => m!.id);
-  }
-  // rank by how many requested badges the meal satisfies
-  const scored = [...active].sort((a, b) => {
-    const sa = a.badges.filter((x) => badges.includes(x)).length;
-    const sb = b.badges.filter((x) => badges.includes(x)).length;
-    return sb - sa || b.proteinGrams - a.proteinGrams;
-  });
-  return scored.slice(0, count).map((m) => m.id);
-}
 
 function mockStripeCharge(token: string, amountCAD: number) {
   return {

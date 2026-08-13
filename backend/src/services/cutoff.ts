@@ -5,7 +5,7 @@
 // matrix for the week. Skipped orders are never charged.
 // ============================================================================
 
-import { db, findMeal } from "../db.js";
+import { db, findMeal, selectBoxMeals } from "../db.js";
 import { priceForQuantity } from "../lib/pricing.js";
 import { cutoffFor } from "../lib/delivery.js";
 
@@ -28,11 +28,16 @@ export function processCutoff(): CutoffResult {
     if (order.status !== "SCHEDULED") continue;
 
     // Auto-select meals for any empty order (user never opened the app).
+    // Respects the subscription's box mode: restaurant-first users get a full
+    // box from their chosen kitchen.
     if (order.items.length === 0) {
       const user = db.users.find((u) => u.id === order.userId);
+      const sub = db.subscriptions.find((s) => s.userId === order.userId);
       const badges = user?.dietaryBadges ?? [];
-      const count = order.items.length || estimateMealCount(order.userId);
-      const picks = autoSelect(badges, count);
+      const count = estimateMealCount(order.userId);
+      const restId =
+        sub?.boxMode === "SINGLE_RESTAURANT" ? sub.preferredRestaurantId : undefined;
+      const picks = selectBoxMeals(count, badges, restId);
       order.items = picks.map((m, i) => ({ id: `oc_${i}`, mealId: m, quantity: 1 }));
       order.totalAmount = order.totalAmount || priceForQuantity("MEALS_6", picks.length);
       mealsAutoSelected += picks.length;
@@ -63,16 +68,6 @@ function estimateMealCount(userId: string): number {
   const sub = db.subscriptions.find((s) => s.userId === userId);
   const tier = sub?.planTier ?? "MEALS_6";
   return { MEALS_4: 4, MEALS_6: 6, MEALS_8: 8 }[tier] ?? 6;
-}
-
-function autoSelect(badges: string[], count: number): string[] {
-  const active = db.meals.filter((m) => m.isActive);
-  const scored = [...active].sort((a, b) => {
-    const sa = a.badges.filter((x) => badges.includes(x)).length;
-    const sb = b.badges.filter((x) => badges.includes(x)).length;
-    return sb - sa || b.proteinGrams - a.proteinGrams;
-  });
-  return scored.slice(0, count).map((m) => m.id);
 }
 
 function mockCharge(orderId: string, amountCAD: number) {

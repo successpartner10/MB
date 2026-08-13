@@ -3,7 +3,17 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import Badge from "@/components/Badge";
-import { getDashboard, getMeals, post, type DashboardPayload, type Meal } from "@/lib/api";
+import {
+  getDashboard,
+  getMeals,
+  getRestaurants,
+  post,
+  chooseRestaurant,
+  chooseMixed,
+  type DashboardPayload,
+  type Meal,
+  type Restaurant,
+} from "@/lib/api";
 
 const USER_ID = "usr_99812";
 
@@ -36,6 +46,8 @@ export default function DashboardPage() {
   const [toast, setToast] = useState("");
   const [swapOpen, setSwapOpen] = useState<number | null>(null);
   const [kitchenFilter, setKitchenFilter] = useState<string>("all");
+  const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
+  const [chooseOpen, setChooseOpen] = useState(false);
 
   async function refresh() {
     const d = await getDashboard(USER_ID);
@@ -46,14 +58,28 @@ export default function DashboardPage() {
   useEffect(() => {
     (async () => {
       try {
-        const [d, m] = await Promise.all([refresh(), getMeals()]);
+        const [d, m, r] = await Promise.all([refresh(), getMeals(), getRestaurants()]);
         setData(d);
         setMeals(m.filter((x) => x.isActive));
+        setRestaurants(r.filter((x) => x.isActive));
       } finally {
         setLoading(false);
       }
     })();
   }, []);
+
+  async function pickKitchen(restaurantId: string) {
+    await chooseRestaurant(USER_ID, restaurantId);
+    flash("✓ Your whole weekly box is now from this kitchen.");
+    setChooseOpen(false);
+    await refresh();
+  }
+  async function backToMixed() {
+    await chooseMixed(USER_ID);
+    flash("✓ Your box is now curated variety across kitchens.");
+    setChooseOpen(false);
+    await refresh();
+  }
 
   function flash(msg: string) {
     setToast(msg);
@@ -166,6 +192,73 @@ export default function DashboardPage() {
           <div className="mt-2 inline-flex items-center gap-1 rounded-full bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-700">
             ⏳ Edit cutoff: {cutoffLeft} left
           </div>
+        </section>
+
+        {/* Your kitchen — trust + full-week commitment */}
+        <section className="card p-4">
+          {subscription?.boxMode === "SINGLE_RESTAURANT" && subscription.preferredRestaurant ? (
+            <>
+              <div className="flex items-center justify-between gap-2">
+                <div className="text-xs font-bold uppercase tracking-wide text-slate-400">
+                  Your Kitchen (all meals from one kitchen)
+                </div>
+                <button onClick={backToMixed} className="btn btn-ghost !px-2.5 !py-1 text-xs">
+                  Switch to variety
+                </button>
+              </div>
+              <div className="mt-1.5 flex items-center gap-2">
+                <span className="grid h-9 w-9 place-items-center rounded-full bg-brand-100 text-brand-700 font-black">
+                  {subscription.preferredRestaurant.name[0]}
+                </span>
+                <div>
+                  <div className="font-bold">{subscription.preferredRestaurant.name}</div>
+                  <div className="text-xs text-slate-500">
+                    {subscription.preferredRestaurant.neighborhood} · full-week box committed
+                  </div>
+                </div>
+              </div>
+              <p className="mt-2 text-xs text-slate-500">
+                All {planCount} are prepared by this kitchen. They know you're committed for the full
+                week, so every delivery is a complete, predictable order.
+              </p>
+            </>
+          ) : (
+            <>
+              <div className="flex items-center justify-between gap-2">
+                <div className="text-xs font-bold uppercase tracking-wide text-slate-400">
+                  Your Kitchen
+                </div>
+                <button onClick={() => setChooseOpen((v) => !v)} className="btn btn-ghost !px-2.5 !py-1 text-xs">
+                  {chooseOpen ? "Cancel" : "🍴 Choose a kitchen"}
+                </button>
+              </div>
+              <p className="mt-1.5 text-sm text-slate-600">
+                Currently <b>curated variety</b> — meals from several kitchens, each labeled.
+              </p>
+              {chooseOpen && (
+                <div className="mt-3 space-y-2 border-t border-slate-100 pt-3">
+                  <div className="text-xs font-semibold text-slate-400">
+                    Commit your whole weekly box to one kitchen for full transparency & predictable delivery:
+                  </div>
+                  {restaurants.map((r) => (
+                    <button
+                      key={r.id}
+                      onClick={() => pickKitchen(r.id)}
+                      className="flex w-full items-center gap-3 rounded-xl border border-slate-200 px-3 py-2.5 text-left hover:border-brand-500"
+                    >
+                      <span className="grid h-9 w-9 place-items-center rounded-full bg-brand-100 text-brand-700 font-black">
+                        {r.name[0]}
+                      </span>
+                      <div>
+                        <div className="font-semibold">{r.name}</div>
+                        <div className="text-xs text-slate-500">{r.cuisine} · {r.neighborhood}</div>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </>
+          )}
         </section>
 
         {/* Meals */}

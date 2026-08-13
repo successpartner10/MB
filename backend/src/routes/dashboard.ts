@@ -6,7 +6,16 @@
 
 import { Router } from "express";
 import { z } from "zod";
-import { db, findAddress, findMeal, findSubscription, ordersFor } from "../db.js";
+import {
+  db,
+  findAddress,
+  findMeal,
+  findSubscription,
+  findRestaurant,
+  ordersFor,
+  selectBoxMeals,
+  type BoxMode,
+} from "../db.js";
 import { priceForQuantity } from "../lib/pricing.js";
 import { cutoffFor, nextDeliveryDate, toIso, windowLabel } from "../lib/delivery.js";
 
@@ -24,6 +33,9 @@ dashboardRouter.get("/api/v1/dashboard/:userId", (req, res) => {
   const addr = findAddress(userId);
   const orders = ordersFor(userId).filter((o) => o.status === "SCHEDULED");
   const upcoming = orders[0];
+  const preferred = sub?.preferredRestaurantId
+    ? findRestaurant(sub.preferredRestaurantId)
+    : undefined;
 
   const items = upcoming
     ? upcoming.items.map((it, idx) => {
@@ -61,6 +73,10 @@ dashboardRouter.get("/api/v1/dashboard/:userId", (req, res) => {
           window: windowLabel(sub.deliveryDay),
           isPaused: sub.isPaused,
           perMeal: priceForQuantity(sub.planTier, 1),
+          boxMode: sub.boxMode,
+          preferredRestaurant: preferred
+            ? { id: preferred.id, name: preferred.name, neighborhood: preferred.neighborhood }
+            : null,
         }
       : null,
     address: addr
@@ -172,6 +188,63 @@ dashboardRouter.post("/api/v1/subscription/change-address", (req, res) => {
     Object.assign(addr, b.data);
   }
   res.json({ status: "SUCCESS", address: addr });
+});
+
+// ---------------------------------------------------------------------------
+// Restaurant-first control: commit the whole weekly box to ONE kitchen.
+// This is the trust + predictable-weekly-volume feature the subscriber asked for.
+// ---------------------------------------------------------------------------
+const chooseRestaurantBody = z.object({
+  userId: z.string(),
+  restaurantId: z.string(),
+});
+dashboardRouter.post("/api/v1/subscription/choose-restaurant", (req, res) => {
+  const b = chooseRestaurantBody.safeParse(req.body);
+  if (!b.success) return res.status(400).json({ status: "ERROR", errors: b.error.flatten() });
+  const sub = findSubscription(b.data.userId);
+  if (!sub) return res.status(404).json({ status: "ERROR", message: "No subscription" });
+  const restaurant = findRestaurant(b.data.restaurantId);
+  if (!restaurant || !restaurant.isActive)
+    return res.status(404).json({ status: "ERROR", message: "Unknown restaurant" });
+
+  // switch the subscription to restaurant-first
+  sub.boxMode = "SINGLE_RESTAURANT" as BoxMode;
+  sub.preferredRestaurantId = restaurant.id;
+
+  // rebuild the current week's order entirely from that kitchen's menu
+  const pending = ordersFor(b.data.userId).find((o) => o.status === "SCHEDULED");
+  if (pending) {
+    const tier = sub.planTier as "MEALS_4" | "MEALS_6" | "MEALS_8";
+    const count = { MEALS_4: 4, MEALS_6: 6, MEALS_8: 8 }[tier] ?? 6;
+    const user = db.users.find((u) => u.id === b.data.userId);
+    // full box from this kitchen only (cycles menu if smaller than plan size)
+    const picks = selectBoxMeals(count, user?.dietaryBadges ?? [], restaurant.id);
+    pending.items = picks.map((id, i) => ({ id: `oi_${i}`, mealId: id, quantity: 1 }));
+    pending.totalAmount = priceForQuantity(sub.planTier, picks.length);
+  }
+
+  res.json({
+    status: "SUCCESS",
+    boxMode: "SINGLE_RESTAURANT",
+    restaurant: { id: restaurant.id, name: restaurant.name, neighborhood: restaurant.neighborhood },
+    message: `Your whole weekly box is now from ${restaurant.name}.`,
+  });
+});
+
+// Switch back to a curated Mixed box (variety across kitchens).
+const chooseMixedBody = z.object({ userId: z.string() });
+dashboardRouter.post("/api/v1/subscription/choose-mixed", (req, res) => {
+  const b = chooseMixedBody.safeParse(req.body);
+  if (!b.success) return res.status(400).json({ status: "ERROR" });
+  const sub = findSubscription(b.data.userId);
+  if (!sub) return res.status(404).json({ status: "ERROR", message: "No subscription" });
+  sub.boxMode = "MIXED" as BoxMode;
+  sub.preferredRestaurantId = undefined;
+  res.json({
+    status: "SUCCESS",
+    boxMode: "MIXED",
+    message: "Your box is now curated variety across partner kitchens.",
+  });
 });
 
 const windowBody = z.object({ userId: z.string(), deliveryDay: z.enum(["SUNDAY_AM","SUNDAY_PM","TUESDAY_AM","TUESDAY_PM"]) });
