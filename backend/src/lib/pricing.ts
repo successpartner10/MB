@@ -63,6 +63,12 @@ export const MEAL_PRICES: Record<string, number> = {
 export function mealPrice(mealId: string): number {
   return MEAL_PRICES[mealId] ?? MEAL_BASE_PRICE;
 }
+export function mealPriceOf(m?: { price?: number }): number {
+  return m && m.price != null ? m.price : 13;
+}
+export function mealTypeOf(m?: { type?: "veg" | "nonveg" }): "veg" | "nonveg" {
+  return m?.type ?? "nonveg";
+}
 
 /** Veg vs non-veg classification for the configurator's category counters. */
 export const VEG_MEALS: string[] = ["meal_falafel_4", "meal_halloumi_13", "meal_yakisoba_17", "meal_teriyakitofu_18"];

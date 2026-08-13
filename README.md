@@ -226,7 +226,14 @@ it needs no DB server, but `backend/prisma` is production-ready.
 | POST | `/api/v1/subscription/add-meal` | Add a meal (re-priced per-meal) |
 | POST | `/api/v1/subscription/change-address` | 1-tap address change |
 | POST | `/api/v1/subscription/change-window` | 1-tap delivery window change |
+| POST | `/api/v1/subscription/cadence` | Set weekly / biweekly / monthly cadence |
+| POST | `/api/v1/subscription/pause-cadence` | Pause an upcoming week (≤3 days before) |
 | GET | `/api/v1/meals` | Active menu |
+| GET | `/api/v1/catalog` | Full v5 dataset (restaurants, dishes, users) |
+| GET | `/api/v1/fleet` | Live owner delivery board (all orders out) |
+| GET | `/api/v1/partner/pricing` | $200/mo + 10% membership model |
+| GET | `/api/v1/dinesafe` | Live DineSafe inspection status (nightly sync) |
+| GET | `/api/v1/tracking/demo` | Indian Desire → CN Tower live tracking |
 
 ## 💰 Business rules (Section 6)
 

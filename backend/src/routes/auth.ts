@@ -43,6 +43,9 @@ const CheckoutSchema = z.object({
   // Restaurant-first: provide restaurantId to build the whole weekly box from
   // one kitchen (trust + predictable weekly volume for that kitchen).
   restaurantId: z.string().optional(),
+  // v5: order cadence + fulfillment mode (delivery | pickup)
+  cadence: z.enum(["weekly", "biweekly", "monthly"]).optional().default("weekly"),
+  mode: z.enum(["delivery", "pickup"]).optional().default("delivery"),
 });
 
 authRouter.post("/api/v1/auth/wallet-checkout", (req, res) => {
@@ -119,6 +122,7 @@ authRouter.post("/api/v1/auth/wallet-checkout", (req, res) => {
     isPaused: false,
     boxMode,
     preferredRestaurantId: restaurant?.id,
+    cadence: b.cadence,
     stripeSubscriptionId: `sub_stripe_${uid()}`,
     currentPeriodEnd: toIso(cutoffFor(delivery)),
   });

@@ -42,6 +42,12 @@ export interface Restaurant {
    *  A kitchen must have >= this many active menu items to be eligible. */
   minWeeklyDishes: number;
   verified: boolean;
+  // ---- v5 trust / fulfillment ----
+  dineSafe: "unconditional" | "conditional"; // live inspection status
+  google: number; // Google rating (>=3.5 floor)
+  reviews: number; // Google review count
+  pickup: boolean; // offers pickup option
+  radius: number; // delivery radius km
 }
 
 export interface Address {
@@ -77,6 +83,8 @@ export interface Subscription {
   boxMode: BoxMode;
   /** Required when boxMode === SINGLE_RESTAURANT. */
   preferredRestaurantId?: string;
+  /** v5: weekly | biweekly | monthly */
+  cadence: "weekly" | "biweekly" | "monthly";
   stripeSubscriptionId?: string;
   currentPeriodEnd: string;
 }
@@ -86,6 +94,8 @@ export interface Meal {
   title: string;
   description: string;
   restaurantId: string; // which partner kitchen prepares it
+  price: number; // all-inclusive per-meal price CAD
+  type: "veg" | "nonveg";
   calories: number;
   proteinGrams: number;
   carbsGrams: number;
@@ -135,24 +145,31 @@ export const db: DB = {
 };
 
 // ---- partner restaurants ----
+// (The full 15-restaurant v5 catalog lives in catalog.ts via seedCatalog().
+//  These 3 seed restaurants keep the original demo/Aria flow working.)
 export const seedRestaurants: Restaurant[] = [
   {
     id: "rest_oak_ash",
     name: "Oak & Ash Kitchen",
-    cuisine: "Grill & bowls",
+    cuisine: "American grill",
     neighborhood: "Downtown / Bay",
     postalPrefixes: ["M5J", "M5K"],
     isActive: true,
-    hygieneRating: 4.9,
+    hygieneRating: 4.8,
     healthScore: 100,
-    description: "Wood-fire grill and protein-forward bowls. Verified by Toronto DineSafe (100/100).",
+    description: "Wood-fire grill and protein-forward bowls. Verified by Toronto DineSafe.",
     minWeeklyDishes: 3,
     verified: true,
+    dineSafe: "unconditional",
+    google: 4.8,
+    reviews: 1284,
+    pickup: true,
+    radius: 6,
   },
   {
     id: "rest_sweet_basil",
     name: "Sweet Basil",
-    cuisine: "Mediterranean & veg",
+    cuisine: "Mediterranean",
     neighborhood: "Harbourfront",
     postalPrefixes: ["M5V", "M5J"],
     isActive: true,
@@ -161,23 +178,34 @@ export const seedRestaurants: Restaurant[] = [
     description: "Mediterranean and plant-forward plates. DineSafe pass (98).",
     minWeeklyDishes: 3,
     verified: true,
+    dineSafe: "unconditional",
+    google: 4.7,
+    reviews: 863,
+    pickup: true,
+    radius: 6,
   },
   {
     id: "rest_kobu",
     name: "Kobu Noodle & Rice",
-    cuisine: "Asian bowls",
+    cuisine: "Japanese",
     neighborhood: "Financial District",
     postalPrefixes: ["M5K", "M5H"],
     isActive: true,
     hygieneRating: 4.6,
-    healthScore: 96,
-    description: "Noodle and rice bowls with clean, balanced sauces. DineSafe pass (96).",
-    minWeeklyDishes: 2,
+    healthScore: 91,
+    description: "Noodle and rice bowls. NOTE: currently Conditional DineSafe pass.",
+    minWeeklyDishes: 3,
     verified: true,
+    dineSafe: "conditional",
+    google: 4.6,
+    reviews: 702,
+    pickup: true,
+    radius: 5,
   },
 ];
 
-export const seedMeals: Meal[] = [
+// Legacy 18 meals (price/type are filled by seed.ts via SEED_PRICE defaults).
+export const seedMeals: Omit<Meal, "price" | "type">[] = [
   {
     id: "meal_shawarma_1",
     title: "Grilled Chicken Shawarma Bowl",
@@ -437,6 +465,11 @@ export function restaurantTrustSummary(r: Restaurant) {
     description: r.description,
     minWeeklyDishes: r.minWeeklyDishes,
     menuCount: activeMenuCount(r.id),
+    dineSafe: r.dineSafe ?? "unconditional",
+    google: r.google ?? 4.5,
+    reviews: r.reviews ?? 0,
+    pickup: r.pickup ?? true,
+    radius: r.radius ?? 6,
   };
 }
 export function ordersFor(userId: string) {

@@ -14,7 +14,30 @@ import {
   type Address,
   type Subscription,
 } from "./db.js";
+import { seedCatalog } from "./catalog.js";
 import { TIER_PRICING } from "./lib/pricing.js";
+
+// price/type defaults for the legacy 18 seed meals (v5 fields)
+const SEED_PRICE: Record<string, { price: number; type: "veg" | "nonveg" }> = {
+  meal_shawarma_1: { price: 13, type: "nonveg" },
+  meal_salmon_2: { price: 14, type: "nonveg" },
+  meal_teriyaki_3: { price: 13, type: "nonveg" },
+  meal_falafel_4: { price: 12, type: "veg" },
+  meal_steak_5: { price: 14, type: "nonveg" },
+  meal_padthai_6: { price: 14, type: "nonveg" },
+  meal_caesar_7: { price: 13, type: "nonveg" },
+  meal_chili_8: { price: 12, type: "nonveg" },
+  meal_brisket_9: { price: 14, type: "nonveg" },
+  meal_harissa_10: { price: 13, type: "nonveg" },
+  meal_skewer_11: { price: 13, type: "nonveg" },
+  meal_kofte_12: { price: 13, type: "nonveg" },
+  meal_halloumi_13: { price: 13, type: "veg" },
+  meal_zaatar_14: { price: 13, type: "nonveg" },
+  meal_tunapoke_15: { price: 14, type: "nonveg" },
+  meal_kungpao_16: { price: 13, type: "nonveg" },
+  meal_yakisoba_17: { price: 12, type: "veg" },
+  meal_teriyakitofu_18: { price: 12, type: "veg" },
+};
 
 const DAY_MS = 86_400_000;
 
@@ -75,6 +98,7 @@ const ariaSubscription: Subscription = {
   // single restaurant with one tap to commit her full weekly box to one kitchen.
   boxMode: "MIXED",
   preferredRestaurantId: undefined,
+  cadence: "weekly",
   stripeSubscriptionId: "sub_stripe_abc123",
   currentPeriodEnd: cutoffFor(nextTuesday18()).toISOString(),
 };
@@ -197,10 +221,17 @@ export function seedAll() {
   db.addresses = [ariaAddress];
   db.subscriptions = [ariaSubscription];
   db.restaurants = seedRestaurants;
-  db.meals = seedMeals;
+  // attach v5 price/type to the legacy meals, then load the full v5 catalog
+  db.meals = seedMeals.map((m) => {
+    const d = SEED_PRICE[m.id];
+    return d ? { ...m, price: d.price, type: d.type } : { ...m, price: 13, type: "nonveg" as const };
+  });
   db.orders = [ariaOrder];
   db.packing = { meal_shawarma_1: 80, meal_salmon_2: 85, meal_teriyaki_3: 0, meal_falafel_4: 15 };
   db.courier = { M5V: 30, M5J: 30 };
+
+  // add the full v5 catalog (15 restaurants, 128 dishes, 24 users) additively
+  seedCatalog();
 
   const extras = buildExtraOrders();
   db.orders.push(...extras);

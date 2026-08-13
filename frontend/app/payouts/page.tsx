@@ -9,15 +9,16 @@ export default function PayoutsPage() {
   const [k, setK] = useState("Oak & Ash Kitchen");
   const kitchens = ["Oak & Ash Kitchen", "Sweet Basil", "Kobu Noodle & Rice"];
   const data = {
-    "Oak & Ash Kitchen": { week: "$6,140", meals: 472, cust: 68 },
-    "Sweet Basil": { week: "$4,020", meals: 309, cust: 47 },
-    "Kobu Noodle & Rice": { week: "$3,120", meals: 240, cust: 38 },
-  }[k] ?? { week: "$0", meals: 0, cust: 0 };
+    "Oak & Ash Kitchen": { orders: 3250, meals: 250, cust: 38 },
+    "Sweet Basil": { orders: 2600, meals: 200, cust: 31 },
+    "Kobu Noodle & Rice": { orders: 1900, meals: 146, cust: 24 },
+  }[k] ?? { orders: 0, meals: 0, cust: 0 };
+  const fee = 200 + Math.round(data.orders * 0.1);
 
   return (
     <div className="mx-auto max-w-4xl px-5 py-6">
       <header className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 pb-4">
-        <div className="font-extrabold tracking-tight">Minimal Bites — Partner Payouts</div>
+        <div className="font-extrabold tracking-tight">Supper Club Direct — Partner Payouts</div>
         <Link href="/kitchen" className="btn btn-ghost text-sm">← Kitchen</Link>
       </header>
 
@@ -30,16 +31,17 @@ export default function PayoutsPage() {
       </div>
 
       <section className="mt-5 rounded-3xl bg-gradient-to-br from-teal-600 to-teal-700 p-6 text-white">
-        <div className="text-xs font-bold uppercase tracking-wider opacity-85">Net payout · this week</div>
-        <div className="text-5xl font-black">{data.week}</div>
-        <div className="mt-1 text-sm opacity-90">Deposited Thu, Aug 20 · +18% vs last month</div>
+        <div className="text-xs font-bold uppercase tracking-wider opacity-85">Your fee this month</div>
+        <div className="text-5xl font-black">${fee}</div>
+        <div className="mt-1 text-sm opacity-90">$200 flat + 10% of ${data.orders.toLocaleString()} in app orders · first week free</div>
       </section>
 
       <section className="mt-5 grid gap-4 md:grid-cols-2">
         <div className="card p-4">
-          <div className="text-xs font-bold uppercase tracking-wide text-slate-400">Revenue & volume</div>
+          <div className="text-xs font-bold uppercase tracking-wide text-slate-400">Fee breakdown</div>
           {[
-            ["Gross revenue (this week)", data.week],
+            ["Flat membership", "$200"],
+            ["10% of app orders", `$${Math.round(data.orders * 0.1)}`],
             ["Meals sold", String(data.meals)],
             ["Committed customers", String(data.cust)],
           ].map(([l, v]) => (
@@ -62,7 +64,7 @@ export default function PayoutsPage() {
         </div>
       </section>
 
-      <p className="mt-4 text-xs text-slate-400">Automatic weekly payout every Thursday for every meal you confirmed & cooked.</p>
+      <p className="mt-4 text-xs text-slate-400">Predictable: flat $200 + 10% of the orders we bring. No 25% commission. Never.</p>
     </div>
   );
 }
