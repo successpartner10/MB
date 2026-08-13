@@ -96,6 +96,14 @@ button { font: inherit; cursor: pointer; }
 .fp-d { font-size: 13px; color: #cbd5e1; margin-top: 2px; }
 .for-partners .btn { margin-left: auto; }
 .foot { text-align: center; padding: 28px; color: #94a3b8; font-size: 12.5px; }
+.ver-line { display: inline-flex; align-items: center; gap: 8px; }
+.ver-line.p { color: #64748b; }
+.ver-badge { background: var(--brand); color: #fff; padding: 2px 9px; border-radius: 999px; font-size: 11px; font-weight: 800; }
+.ver-line.p .ver-badge { background: #f59e0b; color: #0b1020; }
+.ver-older { color: #94a3b8; text-decoration: underline; text-underline-offset: 2px; }
+.ver-line.p .ver-older { color: #64748b; }
+.ver-older:hover { color: var(--brand); }
+.ver-line.p .ver-older:hover { color: #fbbf24; }
 
 /* ---------- dashboard mobile ---------- */
 .mobile { max-width: 480px; margin: 0 auto; padding: 0 16px 92px; }

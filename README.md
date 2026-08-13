@@ -39,7 +39,21 @@ must also offer a **minimum of distinct weekly dishes** to be eligible for a box
 | GitHub repository | https://github.com/successpartner10/MB |
 | Landing + wallet-checkout demo | `/#` (root) |
 | Subscriber dashboard | `/#dashboard` |
-| Kitchen partner portal | `/#kitchen` |
+| Restaurant partner portal | `/#partners` · Kitchen dashboard `/#kitchen` |
+
+### 🔖 Versioning (persistent URLs — old links never break)
+`/` always serves the **latest** release. Each release is also **archived at a
+permanent `/vN/` path** so existing links keep working after you ship a new version.
+
+| Version | URL | Notes |
+|---------|-----|-------|
+| Latest | https://successpartner10.github.io/MB/ | current release (v2) |
+| v2 | https://successpartner10.github.io/MB/v2/ | frozen copy of current build |
+| v1 | https://successpartner10.github.io/MB/v1/ | earlier release (original design) |
+
+To publish a new version: bump `VERSION` in `site/app.js`, copy the current build
+to a new `docs/vN/`, and update `/`. Old `/vN/` folders are left untouched.
+A top-level `/` index links all releases.
 
 The GitHub Pages site is a **fully offline-capable installable PWA** served from
 the `docs/` folder (main branch). It embeds the demo data so it works with **no

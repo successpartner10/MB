@@ -8,6 +8,13 @@
 
 /* ---------- SVG icon set (line icons, currentColor, retina-crisp) ---------- */
 const P = "M9 12l2 2 4-4"; // not used directly, kept as flavor
+
+/* ---------- versioning ----------
+   Stable, persistent version URLs. `/` always serves the latest release;
+   each release is also archived at a permanent `/vN/` path so old links never
+   break. Bump VERSION and archive the old build when publishing a new release. */
+const VERSION = "v2";
+const VERSION_LINK = 'v1/'; // relative link to the previous stable release
 function ico(name, cls = "") {
   const stroke = `stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" fill="none"`;
   const S = `<svg class="ic ${cls}" viewBox="0 0 24 24" ${stroke} aria-hidden="true">`;
@@ -146,6 +153,11 @@ function money(n) { return "$" + Number(n).toFixed(2); }
 function trustHtml(r) {
   return `<span class="trust-badge">${r.hygieneRating}★</span><span class="trust-sub">DineSafe ${r.healthScore}/100${r.verified ? " · verified" : ""}</span>`;
 }
+function versionBadge(kind) {
+  const v = `<span class="ver-badge">${VERSION} · latest</span>`;
+  const older = `<a class="ver-older" href="${VERSION_LINK}">older version</a>`;
+  return `<span class="ver-line ${kind === "partner" ? "p" : ""}">Minimal Bites ${v} ${older} · offline-capable PWA</span>`;
+}
 function flash(msg) {
   const t = document.getElementById("toast");
   t.textContent = msg; t.classList.add("show");
@@ -237,7 +249,7 @@ function renderHome() {
         <a href="#partners" class="btn dark">${ico("arrow")}<span>Restaurant owners →</span></a>
       </section>
 
-      <footer class="foot">Minimal Bites — offline-capable PWA · Install for home-screen use</footer>
+      <footer class="foot">${versionBadge()}</footer>
     </div>`;
 }
 
@@ -403,7 +415,7 @@ function renderPartners() {
         <a href="#kitchen" class="btn p-primary">${ico("pot")} Open Kitchen Dashboard ${ico("arrow")}</a>
       </section>
 
-      <footer class="p-foot">Minimal Bites for Partners — a separate product for restaurant owners</footer>
+      <footer class="p-foot">Minimal Bites for Partners — a separate product for restaurant owners · ${versionBadge("partner")}</footer>
     </div>`;
 }
 
