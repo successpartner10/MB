@@ -34,6 +34,14 @@ export interface Restaurant {
   neighborhood: string;
   postalPrefixes: string[]; // delivery zones this kitchen serves
   isActive: boolean;
+  // ---- trust profile ----
+  hygieneRating: number; // e.g. 4.8 / 5
+  healthScore: number; // 0-100 (Toronto DineSafe-equivalent proxy)
+  description: string;
+  /** Minimum distinct weekly dishes a kitchen must offer to serve a box plan.
+   *  A kitchen must have >= this many active menu items to be eligible. */
+  minWeeklyDishes: number;
+  verified: boolean;
 }
 
 export interface Address {
@@ -135,6 +143,11 @@ export const seedRestaurants: Restaurant[] = [
     neighborhood: "Downtown / Bay",
     postalPrefixes: ["M5J", "M5K"],
     isActive: true,
+    hygieneRating: 4.9,
+    healthScore: 100,
+    description: "Wood-fire grill and protein-forward bowls. Verified by Toronto DineSafe (100/100).",
+    minWeeklyDishes: 3,
+    verified: true,
   },
   {
     id: "rest_sweet_basil",
@@ -143,6 +156,11 @@ export const seedRestaurants: Restaurant[] = [
     neighborhood: "Harbourfront",
     postalPrefixes: ["M5V", "M5J"],
     isActive: true,
+    hygieneRating: 4.7,
+    healthScore: 98,
+    description: "Mediterranean and plant-forward plates. DineSafe pass (98).",
+    minWeeklyDishes: 3,
+    verified: true,
   },
   {
     id: "rest_kobu",
@@ -151,6 +169,11 @@ export const seedRestaurants: Restaurant[] = [
     neighborhood: "Financial District",
     postalPrefixes: ["M5K", "M5H"],
     isActive: true,
+    hygieneRating: 4.6,
+    healthScore: 96,
+    description: "Noodle and rice bowls with clean, balanced sauces. DineSafe pass (96).",
+    minWeeklyDishes: 2,
+    verified: true,
   },
 ];
 
@@ -251,6 +274,126 @@ export const seedMeals: Meal[] = [
     badges: ["HIGH_PROTEIN"],
     isActive: true,
   },
+  {
+    id: "meal_brisket_9",
+    title: "Smoked Brisket Mac Bowl",
+    description: "Slow-smoked brisket, creamy mac, charred corn, BBQ glaze.",
+    restaurantId: "rest_oak_ash",
+    calories: 620,
+    proteinGrams: 46,
+    carbsGrams: 58,
+    fatGrams: 22,
+    badges: ["HIGH_PROTEIN"],
+    isActive: true,
+  },
+  {
+    id: "meal_harissa_10",
+    title: "Harissa Chicken & Quinoa",
+    description: "Harissa-roasted chicken, fluffy quinoa, roasted carrots, tahini.",
+    restaurantId: "rest_oak_ash",
+    calories: 560,
+    proteinGrams: 45,
+    carbsGrams: 46,
+    fatGrams: 18,
+    badges: ["HIGH_PROTEIN", "GLUTEN_FREE"],
+    isActive: true,
+  },
+  {
+    id: "meal_skewer_11",
+    title: "Miso-Glazed Chicken Skewers",
+    description: "Charred chicken skewers, miso glaze, sesame slaw, jasmine rice.",
+    restaurantId: "rest_oak_ash",
+    calories: 540,
+    proteinGrams: 43,
+    carbsGrams: 44,
+    fatGrams: 16,
+    badges: ["HIGH_PROTEIN"],
+    isActive: true,
+  },
+  {
+    id: "meal_kofte_12",
+    title: "Turkish Kofte & Bulgur",
+    description: "Herb-spiced kofte, cracked bulgur, yogurt-tahini, cucumber salad.",
+    restaurantId: "rest_sweet_basil",
+    calories: 520,
+    proteinGrams: 38,
+    carbsGrams: 46,
+    fatGrams: 20,
+    badges: ["GLUTEN_FREE"],
+    isActive: true,
+  },
+  {
+    id: "meal_halloumi_13",
+    title: "Grilled Halloumi & Greens",
+    description: "Seared halloumi, roasted squash, farro, lemon-herb vinaigrette.",
+    restaurantId: "rest_sweet_basil",
+    calories: 490,
+    proteinGrams: 24,
+    carbsGrams: 42,
+    fatGrams: 24,
+    badges: ["VEGETARIAN"],
+    isActive: true,
+  },
+  {
+    id: "meal_zaatar_14",
+    title: "Za'atar Chicken & Couscous",
+    description: "Za'atar-crusted chicken, pearl couscous, minted tomato salad.",
+    restaurantId: "rest_sweet_basil",
+    calories: 550,
+    proteinGrams: 41,
+    carbsGrams: 50,
+    fatGrams: 18,
+    badges: ["BALANCED"],
+    isActive: true,
+  },
+  {
+    id: "meal_tunapoke_15",
+    title: "Spicy Tuna Poke Bowl",
+    description: "Ahi tuna, spicy mayo, sushi rice, avocado, pickled ginger.",
+    restaurantId: "rest_kobu",
+    calories: 510,
+    proteinGrams: 38,
+    carbsGrams: 52,
+    fatGrams: 16,
+    badges: ["HIGH_PROTEIN"],
+    isActive: true,
+  },
+  {
+    id: "meal_kungpao_16",
+    title: "Kung Pao Chicken Bowl",
+    description: "Wok-fried chicken, roasted peanuts, bell pepper, jasmine rice.",
+    restaurantId: "rest_kobu",
+    calories: 600,
+    proteinGrams: 42,
+    carbsGrams: 58,
+    fatGrams: 20,
+    badges: ["BALANCED"],
+    isActive: true,
+  },
+  {
+    id: "meal_yakisoba_17",
+    title: "Veggie Yakisoba",
+    description: "Stir-fried noodles, cabbage, carrot, scallion, yakisoba sauce.",
+    restaurantId: "rest_kobu",
+    calories: 470,
+    proteinGrams: 20,
+    carbsGrams: 70,
+    fatGrams: 14,
+    badges: ["VEGETARIAN"],
+    isActive: true,
+  },
+  {
+    id: "meal_teriyakitofu_18",
+    title: "Teriyaki Tofu & Rice",
+    description: "Crispy tofu, teriyaki glaze, steamed greens, brown rice.",
+    restaurantId: "rest_kobu",
+    calories: 450,
+    proteinGrams: 26,
+    carbsGrams: 54,
+    fatGrams: 14,
+    badges: ["VEGETARIAN", "GLUTEN_FREE"],
+    isActive: true,
+  },
 ];
 
 export const uid = (prefix = "id") =>
@@ -274,6 +417,27 @@ export function findRestaurant(id: string) {
 export function restaurantForMeal(mealId: string) {
   const m = findMeal(mealId);
   return m ? findRestaurant(m.restaurantId) : undefined;
+}
+
+/** Count of a kitchen's active menu items (distinct dishes it can cook). */
+export function activeMenuCount(restaurantId: string): number {
+  return db.meals.filter((m) => m.isActive && m.restaurantId === restaurantId).length;
+}
+
+/** Trust summary surfaced to the subscriber when choosing a kitchen. */
+export function restaurantTrustSummary(r: Restaurant) {
+  return {
+    id: r.id,
+    name: r.name,
+    cuisine: r.cuisine,
+    neighborhood: r.neighborhood,
+    hygieneRating: r.hygieneRating,
+    healthScore: r.healthScore,
+    verified: r.verified,
+    description: r.description,
+    minWeeklyDishes: r.minWeeklyDishes,
+    menuCount: activeMenuCount(r.id),
+  };
 }
 export function ordersFor(userId: string) {
   return db.orders

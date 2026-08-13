@@ -14,6 +14,7 @@ import {
   findRestaurant,
   ordersFor,
   selectBoxMeals,
+  activeMenuCount,
   type BoxMode,
 } from "../db.js";
 import { priceForQuantity } from "../lib/pricing.js";
@@ -75,7 +76,14 @@ dashboardRouter.get("/api/v1/dashboard/:userId", (req, res) => {
           perMeal: priceForQuantity(sub.planTier, 1),
           boxMode: sub.boxMode,
           preferredRestaurant: preferred
-            ? { id: preferred.id, name: preferred.name, neighborhood: preferred.neighborhood }
+            ? {
+                id: preferred.id,
+                name: preferred.name,
+                neighborhood: preferred.neighborhood,
+                hygieneRating: preferred.hygieneRating,
+                healthScore: preferred.healthScore,
+                verified: preferred.verified,
+              }
             : null,
         }
       : null,
@@ -206,6 +214,21 @@ dashboardRouter.post("/api/v1/subscription/choose-restaurant", (req, res) => {
   const restaurant = findRestaurant(b.data.restaurantId);
   if (!restaurant || !restaurant.isActive)
     return res.status(404).json({ status: "ERROR", message: "Unknown restaurant" });
+
+  // Eligibility: a kitchen must offer enough distinct weekly dishes to build a
+  // complete box for this plan (trust + full-week commitment requirement).
+  const planSize = { MEALS_4: 4, MEALS_6: 6, MEALS_8: 8 }[
+    sub.planTier as "MEALS_4" | "MEALS_6" | "MEALS_8"
+  ] ?? 6;
+  const menuCount = activeMenuCount(restaurant.id);
+  const required = Math.max(restaurant.minWeeklyDishes, planSize);
+  if (menuCount < required) {
+    return res.status(409).json({
+      status: "ERROR",
+      code: "KITCHEN_MENU_TOO_SMALL",
+      message: `${restaurant.name} currently offers ${menuCount} weekly dishes, but a ${planSize}-meal box needs at least ${required}. We'll notify you when their menu grows, or pick another kitchen.`,
+    });
+  }
 
   // switch the subscription to restaurant-first
   sub.boxMode = "SINGLE_RESTAURANT" as BoxMode;

@@ -138,6 +138,25 @@ export default function KitchenPage() {
         <Link href="/" className="btn btn-ghost text-sm">← Back</Link>
       </header>
 
+      {/* Your business — big numbered 3 steps */}
+      <section className="mt-4 grid gap-3 sm:grid-cols-3">
+        {[
+          { n: "1", t: "Set up", d: "Business profile, menu & delivery zones. Publish your hygiene score." },
+          { n: "2", t: "Fulfill orders", d: "See committed weekly volume + one consolidated prep list. Batch-cook, not chaos." },
+          { n: "3", t: "Get paid", d: "Automatic weekly payout (every Thursday) for every meal you confirmed & cooked." },
+        ].map((s) => (
+          <div key={s.n} className="card flex items-start gap-3 p-4">
+            <div className="grid h-12 w-12 flex-none place-items-center rounded-xl bg-brand-600 text-2xl font-black text-white shadow-md shadow-brand-600/30">
+              {s.n}
+            </div>
+            <div>
+              <div className="font-bold">{s.t}</div>
+              <div className="mt-0.5 text-xs leading-snug text-slate-500">{s.d}</div>
+            </div>
+          </div>
+        ))}
+      </section>
+
       {/* Kitchen selector + filters */}
       <div className="mt-4 flex flex-wrap items-center gap-2">
         <label className="btn btn-ghost text-sm !px-2">

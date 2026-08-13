@@ -5,9 +5,9 @@
    ========================================================================== */
 
 const RESTAURANTS = [
-  { id: "rest_oak_ash", name: "Oak & Ash Kitchen", cuisine: "Grill & bowls", neighborhood: "Downtown / Bay", postalPrefixes: ["M5J", "M5K"] },
-  { id: "rest_sweet_basil", name: "Sweet Basil", cuisine: "Mediterranean & veg", neighborhood: "Harbourfront", postalPrefixes: ["M5V", "M5J"] },
-  { id: "rest_kobu", name: "Kobu Noodle & Rice", cuisine: "Asian bowls", neighborhood: "Financial District", postalPrefixes: ["M5K", "M5H"] },
+  { id: "rest_oak_ash", name: "Oak & Ash Kitchen", cuisine: "Grill & bowls", neighborhood: "Downtown / Bay", postalPrefixes: ["M5J", "M5K"], hygieneRating: 4.9, healthScore: 100, verified: true, description: "Wood-fire grill and protein-forward bowls. Verified by Toronto DineSafe (100/100).", minWeeklyDishes: 3 },
+  { id: "rest_sweet_basil", name: "Sweet Basil", cuisine: "Mediterranean & veg", neighborhood: "Harbourfront", postalPrefixes: ["M5V", "M5J"], hygieneRating: 4.7, healthScore: 98, verified: true, description: "Mediterranean and plant-forward plates. DineSafe pass (98).", minWeeklyDishes: 3 },
+  { id: "rest_kobu", name: "Kobu Noodle & Rice", cuisine: "Asian bowls", neighborhood: "Financial District", postalPrefixes: ["M5K", "M5H"], hygieneRating: 4.6, healthScore: 96, verified: true, description: "Noodle and rice bowls with clean, balanced sauces. DineSafe pass (96).", minWeeklyDishes: 3 },
 ];
 const restName = (id) => (RESTAURANTS.find((r) => r.id === id) || {}).name || "Partner kitchen";
 
@@ -65,6 +65,16 @@ const DATA = {
     { id: "meal_padthai_6", restaurantId: "rest_kobu", title: "Shrimp Pad Thai", calories: 590, proteinGrams: 33, badges: ["GLUTEN_FREE"] },
     { id: "meal_caesar_7", restaurantId: "rest_sweet_basil", title: "Roasted Chicken Caesar Bowl", calories: 540, proteinGrams: 44, badges: ["BALANCED"] },
     { id: "meal_chili_8", restaurantId: "rest_oak_ash", title: "Turkey Chili & Brown Rice", calories: 470, proteinGrams: 36, badges: ["HIGH_PROTEIN"] },
+    { id: "meal_brisket_9", restaurantId: "rest_oak_ash", title: "Smoked Brisket Mac Bowl", calories: 620, proteinGrams: 46, badges: ["HIGH_PROTEIN"] },
+    { id: "meal_harissa_10", restaurantId: "rest_oak_ash", title: "Harissa Chicken & Quinoa", calories: 560, proteinGrams: 45, badges: ["HIGH_PROTEIN", "GLUTEN_FREE"] },
+    { id: "meal_skewer_11", restaurantId: "rest_oak_ash", title: "Miso-Glazed Chicken Skewers", calories: 540, proteinGrams: 43, badges: ["HIGH_PROTEIN"] },
+    { id: "meal_kofte_12", restaurantId: "rest_sweet_basil", title: "Turkish Kofte & Bulgur", calories: 520, proteinGrams: 38, badges: ["GLUTEN_FREE"] },
+    { id: "meal_halloumi_13", restaurantId: "rest_sweet_basil", title: "Grilled Halloumi & Greens", calories: 490, proteinGrams: 24, badges: ["VEGETARIAN"] },
+    { id: "meal_zaatar_14", restaurantId: "rest_sweet_basil", title: "Za'atar Chicken & Couscous", calories: 550, proteinGrams: 41, badges: ["BALANCED"] },
+    { id: "meal_tunapoke_15", restaurantId: "rest_kobu", title: "Spicy Tuna Poke Bowl", calories: 510, proteinGrams: 38, badges: ["HIGH_PROTEIN"] },
+    { id: "meal_kungpao_16", restaurantId: "rest_kobu", title: "Kung Pao Chicken Bowl", calories: 600, proteinGrams: 42, badges: ["BALANCED"] },
+    { id: "meal_yakisoba_17", restaurantId: "rest_kobu", title: "Veggie Yakisoba", calories: 470, proteinGrams: 20, badges: ["VEGETARIAN"] },
+    { id: "meal_teriyakitofu_18", restaurantId: "rest_kobu", title: "Teriyaki Tofu & Rice", calories: 450, proteinGrams: 26, badges: ["VEGETARIAN", "GLUTEN_FREE"] },
   ],
 
   productionMatrix: {
@@ -198,6 +208,15 @@ function renderLanding() {
         <a data-nav="kitchen" href="#kitchen" class="navbtn ghost">Kitchen Portal</a>
       </nav>
     </header>
+
+    <section class="steps-wrap">
+      <div class="steps-head">How it works — just 3 steps</div>
+      <div class="steps">
+        <div class="step"><span class="step-num">1</span><div><div class="step-t">Register</div><div class="step-d">One-tap Apple Pay / Google Pay. No forms, no passwords — your account &amp; address are created automatically.</div></div></div>
+        <div class="step"><span class="step-num">2</span><div><div class="step-t">Choose</div><div class="step-d">Pick your kitchen (know who cooks your food &amp; their hygiene score) or let us curate. Pick your meals, 1-tap.</div></div></div>
+        <div class="step"><span class="step-num">3</span><div><div class="step-t">Get delivery</div><div class="step-d">One box, one bill, one predictable weekly delivery. All-inclusive — no surprise fees, ever.</div></div></div>
+      </div>
+    </section>
 
     <section class="hero">
       <div class="hero-left">
@@ -374,13 +393,18 @@ function setBoxMode(mode, restId) {
   navigate();
 }
 
+function trustHtml(r) {
+  return `<span class="trust-badge">${r.hygieneRating}★</span><span class="trust-sub">DineSafe ${r.healthScore}/100${r.verified ? " · verified" : ""}</span>`;
+}
+
 function kitchenCard(sub) {
   if (sub.boxMode === "SINGLE_RESTAURANT" && sub.preferredRestaurant) {
     const r = sub.preferredRestaurant;
     return `<div class="row-between" style="margin:0 0 6px"><div class="kicker">Your Kitchen</div>
         <button class="btn ghost sm" onclick="setBoxMode('MIXED',null)">Switch to variety</button></div>
       <div class="kitchen-line"><span class="k-avatar">${esc(r.name[0])}</span>
-        <div><div class="bold">${esc(r.name)}</div><div class="muted sm">${esc(r.neighborhood)} · full-week box committed</div></div></div>
+        <div><div class="bold">${esc(r.name)}</div><div class="trust-row">${trustHtml(r)}</div>
+        <div class="muted sm">${esc(r.neighborhood)} · full-week box committed</div></div></div>
       <p class="muted sm">All 6 meals are prepared by this kitchen. They know you're committed for the full week, so every delivery is a complete, predictable order.</p>`;
   }
   return `<div class="row-between" style="margin:0 0 6px"><div class="kicker">Your Kitchen</div>
@@ -389,7 +413,9 @@ function kitchenCard(sub) {
     <div id="kitchen-pick" hidden>
       <div class="kicker" style="margin:10px 0 6px">Commit your whole weekly box to one kitchen:</div>
       ${DATA.restaurants.map((r) => `<button class="kitchen-opt" onclick="setBoxMode('SINGLE_RESTAURANT','${r.id}')">
-          <span class="k-avatar">${esc(r.name[0])}</span><div><div class="bold">${esc(r.name)}</div><div class="muted sm">${esc(r.cuisine)} · ${esc(r.neighborhood)}</div></div>
+          <span class="k-avatar">${esc(r.name[0])}</span><div><div class="bold">${esc(r.name)}</div>
+          <div class="trust-row">${trustHtml(r)}</div>
+          <div class="muted sm">${esc(r.cuisine)} · ${esc(r.neighborhood)}</div></div>
         </button>`).join("")}
     </div>`;
 }
@@ -462,6 +488,16 @@ function renderKitchen() {
       <div class="brand"><span class="logo dark">MB</span><div><b>Minimal Bites</b><span class="sub">Kitchen Partner Portal · ${esc(kitchenName)}</span></div></div>
       <a href="#dashboard" class="navbtn ghost">Subscriber →</a>
     </header>
+
+    <section class="steps-wrap kitchen-steps">
+      <div class="steps-head">Your business — just 3 steps</div>
+      <div class="steps">
+        <div class="step"><span class="step-num">1</span><div><div class="step-t">Set up</div><div class="step-d">Business profile, menu &amp; delivery zones. Tell subscribers your hygiene score.</div></div></div>
+        <div class="step"><span class="step-num">2</span><div><div class="step-t">Fulfill orders</div><div class="step-d">See committed weekly volume &amp; one consolidated prep list. Cook in batches, not chaos.</div></div></div>
+        <div class="step"><span class="step-num">3</span><div><div class="step-t">Get paid</div><div class="step-d">Automatic weekly payout (every Thursday) for every meal you confirmed &amp; cooked.</div></div></div>
+      </div>
+    </section>
+
     <div class="filters">
       ${kitchenSelect}
       <button class="btn ghost">📅 Date: Tuesday, Aug 18 ▼</button>

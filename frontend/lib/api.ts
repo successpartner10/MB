@@ -8,6 +8,12 @@ export interface Restaurant {
   neighborhood: string;
   postalPrefixes: string[];
   isActive: boolean;
+  hygieneRating?: number;
+  healthScore?: number;
+  verified?: boolean;
+  description?: string;
+  minWeeklyDishes?: number;
+  menuCount?: number;
 }
 
 export interface DashboardMeal {
@@ -40,7 +46,14 @@ export interface DashboardPayload {
     isPaused: boolean;
     perMeal: number;
     boxMode: string;
-    preferredRestaurant: { id: string; name: string; neighborhood: string } | null;
+    preferredRestaurant: {
+      id: string;
+      name: string;
+      neighborhood: string;
+      hygieneRating?: number;
+      healthScore?: number;
+      verified?: boolean;
+    } | null;
   } | null;
   address: {
     street: string;

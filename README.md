@@ -7,6 +7,30 @@ onboarding, 1-tap subscription controls, and kitchen batch aggregation.
 
 ---
 
+## 🧭 Design rationale (research-backed)
+
+Modelled on how HelloFresh, Factor, CookUnity, Uber Eats and DoorDash reduce
+friction for **both sides**:
+
+- **Eaters want 3 simple steps.** Research consistently shows users onboard fastest
+  when the flow is *profile → choose → pay/delivery*, broken into a few big, explicit
+  steps — not a long form. → We surface a giant **1️⃣ Register · 2️⃣ Choose · 3️⃣ Get
+  delivery** strip, keep signup to one Apple Pay / Google Pay tap, and show trust
+  signals (hygiene rating, DineSafe score) right where the user chooses.
+- **Restaurants want predictable volume + easy money.** Uber Eats / DoorDash onboarding
+  is *set up profile → upload menu → activate to take orders → set payout*. We mirror it
+  with **1️⃣ Set up · 2️⃣ Fulfill orders · 3️⃣ Get paid**, plus an automatic weekly
+  payout and a **commitment banner** (committed weekly customers & meals) so a kitchen
+  plans a full week, not a trickle of 1–2 meals.
+
+### Trust profile (why users trust a kitchen)
+Each partner kitchen exposes its **hygiene rating, Toronto DineSafe health score, and
+verified status** on the "Your Kitchen" card and in the choose-kitchen picker. A kitchen
+must also offer a **minimum of distinct weekly dishes** to be eligible for a box plan
+(else the app tells the user "we'll notify you when their menu grows").
+
+---
+
 ## 🔗 Live URLs
 
 | What | URL |

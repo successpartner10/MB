@@ -46,9 +46,9 @@ const ROUTES = [
 async function main() {
   // ---- restaurants ----
   const restaurants = [
-    { id: "rest_oak_ash", name: "Oak & Ash Kitchen", cuisine: "Grill & bowls", neighborhood: "Downtown / Bay", postalPrefixes: ["M5J", "M5K"] },
-    { id: "rest_sweet_basil", name: "Sweet Basil", cuisine: "Mediterranean & veg", neighborhood: "Harbourfront", postalPrefixes: ["M5V", "M5J"] },
-    { id: "rest_kobu", name: "Kobu Noodle & Rice", cuisine: "Asian bowls", neighborhood: "Financial District", postalPrefixes: ["M5K", "M5H"] },
+    { id: "rest_oak_ash", name: "Oak & Ash Kitchen", cuisine: "Grill & bowls", neighborhood: "Downtown / Bay", postalPrefixes: ["M5J", "M5K"], hygieneRating: 4.9, healthScore: 100, description: "Wood-fire grill and protein-forward bowls. Verified by Toronto DineSafe (100/100).", minWeeklyDishes: 3, verified: true },
+    { id: "rest_sweet_basil", name: "Sweet Basil", cuisine: "Mediterranean & veg", neighborhood: "Harbourfront", postalPrefixes: ["M5V", "M5J"], hygieneRating: 4.7, healthScore: 98, description: "Mediterranean and plant-forward plates. DineSafe pass (98).", minWeeklyDishes: 3, verified: true },
+    { id: "rest_kobu", name: "Kobu Noodle & Rice", cuisine: "Asian bowls", neighborhood: "Financial District", postalPrefixes: ["M5K", "M5H"], hygieneRating: 4.6, healthScore: 96, description: "Noodle and rice bowls with clean, balanced sauces. DineSafe pass (96).", minWeeklyDishes: 3, verified: true },
   ];
   for (const r of restaurants) {
     await prisma.restaurant.upsert({
@@ -68,6 +68,16 @@ async function main() {
     { id: "meal_padthai_6", restaurantId: "rest_kobu", title: "Shrimp Pad Thai", description: "Rice noodles, tiger shrimp, tamarind sauce, crushed peanuts.", calories: 590, proteinGrams: 33, carbsGrams: 72, fatGrams: 18, badges: ["GLUTEN_FREE"], imageUrl: "" },
     { id: "meal_caesar_7", restaurantId: "rest_sweet_basil", title: "Roasted Chicken Caesar Bowl", description: "Crispy chicken, romaine, parmesan, sourdough croutons.", calories: 540, proteinGrams: 44, carbsGrams: 38, fatGrams: 24, badges: ["BALANCED"], imageUrl: "" },
     { id: "meal_chili_8", restaurantId: "rest_oak_ash", title: "Turkey Chili & Brown Rice", description: "Slow-cooked turkey chili, cheddar, brown rice, pickled jalapeno.", calories: 470, proteinGrams: 36, carbsGrams: 48, fatGrams: 12, badges: ["HIGH_PROTEIN"], imageUrl: "" },
+    { id: "meal_brisket_9", restaurantId: "rest_oak_ash", title: "Smoked Brisket Mac Bowl", description: "Slow-smoked brisket, creamy mac, charred corn, BBQ glaze.", calories: 620, proteinGrams: 46, carbsGrams: 58, fatGrams: 22, badges: ["HIGH_PROTEIN"], imageUrl: "" },
+    { id: "meal_harissa_10", restaurantId: "rest_oak_ash", title: "Harissa Chicken & Quinoa", description: "Harissa-roasted chicken, fluffy quinoa, roasted carrots, tahini.", calories: 560, proteinGrams: 45, carbsGrams: 46, fatGrams: 18, badges: ["HIGH_PROTEIN", "GLUTEN_FREE"], imageUrl: "" },
+    { id: "meal_skewer_11", restaurantId: "rest_oak_ash", title: "Miso-Glazed Chicken Skewers", description: "Charred chicken skewers, miso glaze, sesame slaw, jasmine rice.", calories: 540, proteinGrams: 43, carbsGrams: 44, fatGrams: 16, badges: ["HIGH_PROTEIN"], imageUrl: "" },
+    { id: "meal_kofte_12", restaurantId: "rest_sweet_basil", title: "Turkish Kofte & Bulgur", description: "Herb-spiced kofte, cracked bulgur, yogurt-tahini, cucumber salad.", calories: 520, proteinGrams: 38, carbsGrams: 46, fatGrams: 20, badges: ["GLUTEN_FREE"], imageUrl: "" },
+    { id: "meal_halloumi_13", restaurantId: "rest_sweet_basil", title: "Grilled Halloumi & Greens", description: "Seared halloumi, roasted squash, farro, lemon-herb vinaigrette.", calories: 490, proteinGrams: 24, carbsGrams: 42, fatGrams: 24, badges: ["VEGETARIAN"], imageUrl: "" },
+    { id: "meal_zaatar_14", restaurantId: "rest_sweet_basil", title: "Za'atar Chicken & Couscous", description: "Za'atar-crusted chicken, pearl couscous, minted tomato salad.", calories: 550, proteinGrams: 41, carbsGrams: 50, fatGrams: 18, badges: ["BALANCED"], imageUrl: "" },
+    { id: "meal_tunapoke_15", restaurantId: "rest_kobu", title: "Spicy Tuna Poke Bowl", description: "Ahi tuna, spicy mayo, sushi rice, avocado, pickled ginger.", calories: 510, proteinGrams: 38, carbsGrams: 52, fatGrams: 16, badges: ["HIGH_PROTEIN"], imageUrl: "" },
+    { id: "meal_kungpao_16", restaurantId: "rest_kobu", title: "Kung Pao Chicken Bowl", description: "Wok-fried chicken, roasted peanuts, bell pepper, jasmine rice.", calories: 600, proteinGrams: 42, carbsGrams: 58, fatGrams: 20, badges: ["BALANCED"], imageUrl: "" },
+    { id: "meal_yakisoba_17", restaurantId: "rest_kobu", title: "Veggie Yakisoba", description: "Stir-fried noodles, cabbage, carrot, scallion, yakisoba sauce.", calories: 470, proteinGrams: 20, carbsGrams: 70, fatGrams: 14, badges: ["VEGETARIAN"], imageUrl: "" },
+    { id: "meal_teriyakitofu_18", restaurantId: "rest_kobu", title: "Teriyaki Tofu & Rice", description: "Crispy tofu, teriyaki glaze, steamed greens, brown rice.", calories: 450, proteinGrams: 26, carbsGrams: 54, fatGrams: 14, badges: ["VEGETARIAN", "GLUTEN_FREE"], imageUrl: "" },
   ];
 
   for (const m of meals) {

@@ -179,6 +179,23 @@ export default function DashboardPage() {
       )}
 
       <main className="space-y-4 px-5 pt-4">
+        {/* How it works — big numbered 3 steps */}
+        <section className="grid grid-cols-3 gap-2">
+          {[
+            { n: "1", t: "Register", d: "One-tap wallet. No forms." },
+            { n: "2", t: "Choose", d: "Your kitchen & meals." },
+            { n: "3", t: "Get delivery", d: "One weekly box, all-in." },
+          ].map((s) => (
+            <div key={s.n} className="card p-2.5 text-center">
+              <div className="mx-auto grid h-10 w-10 place-items-center rounded-xl bg-brand-600 text-xl font-black text-white shadow-md shadow-brand-600/30">
+                {s.n}
+              </div>
+              <div className="mt-1.5 text-xs font-bold">{s.t}</div>
+              <div className="text-[10px] leading-tight text-slate-500">{s.d}</div>
+            </div>
+          ))}
+        </section>
+
         {/* Next delivery */}
         <section className="card p-4">
           <div className="text-xs font-bold uppercase tracking-wide text-slate-400">Next Delivery</div>
@@ -212,7 +229,18 @@ export default function DashboardPage() {
                 </span>
                 <div>
                   <div className="font-bold">{subscription.preferredRestaurant.name}</div>
-                  <div className="text-xs text-slate-500">
+                  <div className="flex items-center gap-1.5 text-[11px] font-semibold text-slate-500">
+                    {subscription.preferredRestaurant.hygieneRating != null && (
+                      <span className="rounded-md bg-brand-600 px-1.5 py-0.5 text-[10px] font-bold text-white">
+                        {subscription.preferredRestaurant.hygieneRating}★
+                      </span>
+                    )}
+                    {subscription.preferredRestaurant.healthScore != null && (
+                      <span>DineSafe {subscription.preferredRestaurant.healthScore}/100</span>
+                    )}
+                    {subscription.preferredRestaurant.verified && <span>· verified</span>}
+                  </div>
+                  <div className="text-xs text-slate-400">
                     {subscription.preferredRestaurant.neighborhood} · full-week box committed
                   </div>
                 </div>
@@ -251,7 +279,15 @@ export default function DashboardPage() {
                       </span>
                       <div>
                         <div className="font-semibold">{r.name}</div>
-                        <div className="text-xs text-slate-500">{r.cuisine} · {r.neighborhood}</div>
+                        <div className="flex items-center gap-1.5 text-[11px] text-slate-500">
+                          {r.hygieneRating != null && (
+                            <span className="rounded-md bg-brand-600 px-1.5 py-0.5 text-[10px] font-bold text-white">
+                              {r.hygieneRating}★
+                            </span>
+                          )}
+                          {r.healthScore != null && <span>DineSafe {r.healthScore}/100</span>}
+                          <span>· {r.cuisine} · {r.neighborhood}</span>
+                        </div>
                       </div>
                     </button>
                   ))}

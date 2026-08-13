@@ -8,23 +8,29 @@
 // ============================================================================
 
 import { Router } from "express";
-import { db, findMeal, findRestaurant, restaurantForMeal } from "../db.js";
+import {
+  db,
+  findMeal,
+  findRestaurant,
+  restaurantForMeal,
+  restaurantTrustSummary,
+} from "../db.js";
 
 export const kitchenRouter = Router();
 
 const ELIGIBLE = ["SCHEDULED", "PREPARING", "PACKED", "OUT_FOR_DELIVERY"];
 
-/** GET /api/v1/restaurants — list partner kitchens for the portal selector. */
+/** GET /api/v1/restaurants — list partner kitchens (with trust summaries). */
 kitchenRouter.get("/api/v1/restaurants", (_req, res) => {
-  res.json({ restaurants: db.restaurants });
+  res.json({ restaurants: db.restaurants.map(restaurantTrustSummary) });
 });
 
-/** GET /api/v1/restaurants/:id — kitchen profile + its full menu. */
+/** GET /api/v1/restaurants/:id — kitchen profile (trust) + its full menu. */
 kitchenRouter.get("/api/v1/restaurants/:id", (req, res) => {
   const rest = findRestaurant(req.params.id);
   if (!rest) return res.status(404).json({ status: "ERROR", message: "Unknown restaurant" });
   res.json({
-    restaurant: rest,
+    restaurant: restaurantTrustSummary(rest),
     menu: db.meals.filter((m) => m.isActive && m.restaurantId === rest.id),
   });
 });

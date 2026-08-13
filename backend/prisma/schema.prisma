@@ -95,6 +95,12 @@ model Restaurant {
   neighborhood   String?
   postalPrefixes String[] // delivery zones this kitchen serves
   isActive       Boolean  @default(true)
+  // ---- trust profile ----
+  hygieneRating  Float    @default(4.5)
+  healthScore    Int      @default(95)
+  description    String?
+  minWeeklyDishes Int     @default(3) // distinct weekly dishes required for a box plan
+  verified       Boolean  @default(true)
   meals          Meal[]
 }
 
