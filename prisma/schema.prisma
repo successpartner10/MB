@@ -1,0 +1,117 @@
+// ============================================================================
+// MINIMAL BITES — Prisma Schema (Section 3 of the System Requirements)
+// PostgreSQL + Prisma ORM
+// ============================================================================
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum PlanTier {
+  MEALS_4
+  MEALS_6
+  MEALS_8
+}
+
+enum DeliveryDay {
+  SUNDAY_AM
+  SUNDAY_PM
+  TUESDAY_AM
+  TUESDAY_PM
+}
+
+enum DropoffPreference {
+  CONCIERGE
+  UNIT_DOOR
+  FRONT_PORCH
+}
+
+enum OrderStatus {
+  SCHEDULED
+  PREPARING
+  PACKED
+  OUT_FOR_DELIVERY
+  DELIVERED
+  SKIPPED
+}
+
+model User {
+  id                String            @id @default(uuid())
+  phone             String            @unique
+  email             String?           @unique
+  fullName          String
+  stripeCustomerId  String?           @unique
+  dietaryBadges     String[] // e.g. ["GLUTEN_FREE", "HIGH_PROTEIN"]
+  dropoffPreference DropoffPreference @default(CONCIERGE)
+  deliveryAddress   Address?
+  subscription      Subscription?
+  orders            Order[]
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+}
+
+model Address {
+  id           String   @id @default(uuid())
+  userId       String   @unique
+  user         User     @relation(fields: [userId], references: [id])
+  street       String
+  unit         String?
+  city         String   @default("Toronto")
+  province     String   @default("ON")
+  postalCode   String // e.g. M5J 2R8
+  buzzerCode   String?
+  instructions String?
+}
+
+model Subscription {
+  id                   String      @id @default(uuid())
+  userId               String      @unique
+  user                 User        @relation(fields: [userId], references: [id])
+  planTier             PlanTier    @default(MEALS_6)
+  deliveryDay          DeliveryDay @default(TUESDAY_PM)
+  isPaused             Boolean     @default(false)
+  stripeSubscriptionId String?     @unique
+  currentPeriodEnd     DateTime
+  createdAt            DateTime    @default(now())
+  updatedAt            DateTime    @updatedAt
+}
+
+model Meal {
+  id           String      @id @default(uuid())
+  title        String
+  description  String
+  calories     Int
+  proteinGrams Int
+  carbsGrams   Int
+  fatGrams     Int
+  imageUrl     String
+  badges       String[] // e.g. ["KETO", "GLUTEN_FREE"]
+  isActive     Boolean     @default(true)
+  orderItems   OrderItem[]
+}
+
+model Order {
+  id           String      @id @default(uuid())
+  userId       String
+  user         User        @relation(fields: [userId], references: [id])
+  deliveryDate DateTime
+  status       OrderStatus @default(SCHEDULED)
+  totalAmount  Decimal     @db.Decimal(10, 2)
+  items        OrderItem[]
+  cutoffAt     DateTime
+  createdAt    DateTime    @default(now())
+}
+
+model OrderItem {
+  id       String @id @default(uuid())
+  orderId  String
+  order    Order  @relation(fields: [orderId], references: [id])
+  mealId   String
+  meal     Meal   @relation(fields: [mealId], references: [id])
+  quantity Int    @default(1)
+}

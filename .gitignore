@@ -1,0 +1,23 @@
+# dependencies
+node_modules/
+
+# builds
+.next/
+out/
+dist/
+build/
+coverage/
+
+# env (use .env.example)
+.env
+.env.local
+backend/.env
+
+# logs & OS
+*.log
+.DS_Store
+npm-debug.log*
+
+# prisma studio/cache
+.prisma/
+*.db
