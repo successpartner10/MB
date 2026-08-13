@@ -1,4 +1,9 @@
-# Minimal Bites — Zero-Friction Meal Subscription Platform
+# Supper Club Direct — Curated Weekly Meals (GTA)
+
+**Rebranded from "Minimal Bites."** A curated, subscription-first meal delivery
+platform for the GTA. Zero-friction onboarding, 15 vetted partner restaurants,
+live DineSafe + Google-rating transparency, weekly/2-week/monthly cadence,
+pickup & delivery, and live multi-order tracking.
 
 **Target market:** Greater Toronto Area (GTA), Canada.
 Built from `system-requirements.txt`. A zero-friction, subscription-first meal
@@ -47,11 +52,24 @@ permanent `/vN/` path** so existing links keep working after you ship a new vers
 
 | Version | URL | Notes |
 |---------|-----|-------|
-| Latest | https://successpartner10.github.io/MB/v4/ | current release (v4) |
-| v4 | https://successpartner10.github.io/MB/v4/ | Ratings · repeat · schedule · map · add-ons · payouts |
+| Latest | https://successpartner10.github.io/MB/v5/ | current release — **Supper Club Direct** |
+| v5 | https://successpartner10.github.io/MB/v5/ | 15 restaurants · CN Tower tracking · fleet · cadence · live DineSafe · $200+10% · demo |
+| v4 | https://successpartner10.github.io/MB/v4/ | ratings · repeat · schedule · map · add-ons · payouts (as Minimal Bites) |
 | v3 | https://successpartner10.github.io/MB/v3/ | Build-Your-Box · 2-hr windows · live tracking (archived) |
 | v2 | https://successpartner10.github.io/MB/v2/ | Raleway redesign (archived) |
 | v1 | https://successpartner10.github.io/MB/v1/ | original release (archived) |
+
+## 🚀 v5 — Supper Club Direct (what's new)
+- **Rebrand** to **Supper Club Direct** across the whole PWA.
+- **15 restaurants**, varied cuisine across Toronto, **8–10 dishes each** (128 dishes total).
+- **24 sample users** with Toronto addresses & dietary badges.
+- **Indian Desire → CN Tower** live tracking map.
+- **Fleet board** — owner sees every order out at once (courier, ETA, status, progress).
+- **Order cadence** — weekly / every 2 weeks / monthly, pause up to 3 days before cutoff.
+- **Live DineSafe badges** — "Pass (unconditional)" vs "Conditional" + Google ratings (≥3.5, new-partner override).
+- **Pickup option** alongside delivery.
+- **Pricing** — $200/mo + 10% of app order value, first week free (research-backed hybrid; vs 25–30% commission).
+- **Animated demo** — self-running feature walkthrough for both subscribers & owners.
 
 ## 🧰 v4 — Uber-Eats / Instacart-style features (research-backed)
 Both sides, balanced. Inspired by Uber Eats, DoorDash, Instacart, HelloFresh & Factor.
