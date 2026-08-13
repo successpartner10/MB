@@ -48,6 +48,12 @@ export default function DashboardPage() {
   const [kitchenFilter, setKitchenFilter] = useState<string>("all");
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [chooseOpen, setChooseOpen] = useState(false);
+  const [window, setWindow] = useState("5-7");
+  const WINDOWS = [
+    { id: "5-7", slot: "5:00 PM - 7:00 PM", label: "5:00 – 7:00 PM" },
+    { id: "6-8", slot: "6:00 PM - 8:00 PM", label: "6:00 – 8:00 PM" },
+    { id: "7-9", slot: "7:00 PM - 9:00 PM", label: "7:00 – 9:00 PM" },
+  ];
 
   async function refresh() {
     const d = await getDashboard(USER_ID);
@@ -198,13 +204,32 @@ export default function DashboardPage() {
 
         {/* Next delivery */}
         <section className="card p-4">
-          <div className="text-xs font-bold uppercase tracking-wide text-slate-400">Next Delivery</div>
+          <div className="flex items-center justify-between">
+            <div className="text-xs font-bold uppercase tracking-wide text-slate-400">Next Delivery</div>
+            <Link href="/track" className="text-xs font-bold text-brand-600">🚚 Track</Link>
+          </div>
           <div className="mt-1 text-lg font-extrabold">
-            {fmtDate(order?.deliveryDate ?? "")} · {subscription?.window}
+            {fmtDate(order?.deliveryDate ?? "")} · {WINDOWS.find((w) => w.id === window)?.slot ?? subscription?.window}
           </div>
           <div className="mt-1 flex items-center gap-1.5 text-sm text-slate-600">
             📍 {address?.street}
             {address?.unit ? `, ${address.unit}` : ""} ({user.dropoffPreference.replace("_", " ")} drop-off)
+          </div>
+          <div className="mt-3">
+            <div className="text-[11px] font-bold uppercase tracking-wide text-slate-400">Choose your 2-hour window</div>
+            <div className="mt-1.5 flex flex-wrap gap-1.5">
+              {WINDOWS.map((w) => (
+                <button
+                  key={w.id}
+                  onClick={() => { setWindow(w.id); flash(`✓ Delivery window set to ${w.label}.`); }}
+                  className={`rounded-lg border px-2.5 py-1.5 text-xs font-semibold transition ${
+                    window === w.id ? "border-brand-600 bg-brand-50 text-brand-700" : "border-slate-200 text-slate-600"
+                  }`}
+                >
+                  {w.label}
+                </button>
+              ))}
+            </div>
           </div>
           <div className="mt-2 inline-flex items-center gap-1 rounded-full bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-700">
             ⏳ Edit cutoff: {cutoffLeft} left
@@ -416,7 +441,7 @@ export default function DashboardPage() {
       <nav className="fixed inset-x-0 bottom-0 border-t border-slate-200 bg-white">
         <div className="mx-auto grid max-w-md grid-cols-3 py-2 text-center text-xs font-medium text-slate-500">
           <Link href="/dashboard" className="py-1 text-brand-600">🍽️ This Week</Link>
-          <button className="py-1">📅 Schedule</button>
+          <Link href="/track" className="py-1">🚚 Track</Link>
           <button className="py-1">⚙️ Settings</button>
         </div>
       </nav>

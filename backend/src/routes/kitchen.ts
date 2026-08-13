@@ -15,10 +15,91 @@ import {
   restaurantForMeal,
   restaurantTrustSummary,
 } from "../db.js";
+import { mealPrice, VEG_MEALS, bestValueBox } from "../lib/pricing.js";
 
 export const kitchenRouter = Router();
 
 const ELIGIBLE = ["SCHEDULED", "PREPARING", "PACKED", "OUT_FOR_DELIVERY"];
+
+/**
+ * POST /api/v1/build/quote
+ * Build-Your-Box configurator.
+ *  - With `selection` (mealId -> qty): returns the all-inclusive total live.
+ *  - With `budget` + filters: returns the best-value box under that budget.
+ * Filters: restaurantId, area (nearby|further), cuisine, diet, cal, price.
+ */
+kitchenRouter.post("/api/v1/build/quote", (req, res) => {
+  const { selection, budget, filters } = req.body ?? {};
+  const f = filters ?? {};
+
+  // apply filters to the menu
+  const mealPool = db.meals.filter((m) => {
+    if (!m.isActive) return false;
+    const r = db.restaurants.find((x) => x.id === m.restaurantId);
+    if (f.restaurantId && m.restaurantId !== f.restaurantId) return false;
+    if (f.area === "nearby" && !["rest_oak_ash", "rest_sweet_basil"].includes(m.restaurantId)) return false;
+    if (f.area === "further" && m.restaurantId !== "rest_kobu") return false;
+    if (f.cuisine && !(r && r.cuisine === f.cuisine)) return false;
+    if (f.diet && !m.badges.includes(f.diet)) return false;
+    if (f.cal === "low" && m.calories >= 500) return false;
+    if (f.cal === "mid" && (m.calories < 500 || m.calories > 600)) return false;
+    if (f.cal === "high" && m.calories <= 600) return false;
+    if (f.price && mealPrice(m.id) !== Number(f.price)) return false;
+    return true;
+  });
+
+  // budget mode
+  if (budget) {
+    const picks = bestValueBox(
+      mealPool.map((m) => ({ id: m.id, price: mealPrice(m.id), proteinGrams: m.proteinGrams })),
+      Number(budget)
+    );
+    const items = picks.map((p) => {
+      const m = db.meals.find((x) => x.id === p.mealId);
+      const r = db.restaurants.find((x) => x.id === m?.restaurantId);
+      return {
+        mealId: p.mealId,
+        title: m?.title,
+        price: p.price,
+        restaurantId: m?.restaurantId,
+        restaurantName: r?.name,
+        proteinGrams: m?.proteinGrams,
+        calories: m?.calories,
+      };
+    });
+    const total = items.reduce((s, i) => s + i.price, 0);
+    return res.json({
+      mode: "budget",
+      budget: Number(budget),
+      totalCAD: Math.round(total * 100) / 100,
+      mealCount: items.length,
+      meals: items,
+    });
+  }
+
+  // selection mode: quote the running total
+  const items = Object.entries(selection ?? {}).flatMap(([mealId, rawQty]) => {
+    const qty = Number(rawQty);
+    const m = db.meals.find((x) => x.id === mealId && x.isActive);
+    if (!m || qty <= 0) return [];
+    const r = db.restaurants.find((x) => x.id === m.restaurantId);
+    return [{ mealId, qty, title: m.title, price: mealPrice(mealId), restaurantId: m.restaurantId, restaurantName: r?.name, calories: m.calories, proteinGrams: m.proteinGrams, type: VEG_MEALS.includes(mealId) ? "veg" : "nonveg" }];
+  });
+  const total = items.reduce((s, i) => s + i.price * i.qty, 0);
+  const count = items.reduce((s, i) => s + i.qty, 0);
+  const veg = items.filter((i) => i.type === "veg").reduce((s, i) => s + i.qty, 0);
+  const protein = items.reduce((s, i) => s + i.proteinGrams * i.qty, 0);
+  res.json({
+    mode: "selection",
+    totalCAD: Math.round(total * 100) / 100,
+    mealCount: count,
+    vegCount: veg,
+    nonVegCount: count - veg,
+    proteinGrams: protein,
+    allInclusive: true,
+    items,
+  });
+});
 
 /** GET /api/v1/restaurants — list partner kitchens (with trust summaries). */
 kitchenRouter.get("/api/v1/restaurants", (_req, res) => {

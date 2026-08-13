@@ -47,9 +47,22 @@ permanent `/vN/` path** so existing links keep working after you ship a new vers
 
 | Version | URL | Notes |
 |---------|-----|-------|
-| Latest | https://successpartner10.github.io/MB/ | current release (v2) |
-| v2 | https://successpartner10.github.io/MB/v2/ | frozen copy of current build |
-| v1 | https://successpartner10.github.io/MB/v1/ | earlier release (original design) |
+| Latest | https://successpartner10.github.io/MB/v3/ | current release (v3) |
+| v3 | https://successpartner10.github.io/MB/v3/ | Build-Your-Box · 2-hr windows · live tracking |
+| v2 | https://successpartner10.github.io/MB/v2/ | Raleway redesign (archived) |
+| v1 | https://successpartner10.github.io/MB/v1/ | original release (archived) |
+
+### 🍱 Build-Your-Box configurator (v3)
+Pick a mix (e.g. **2 non-veg + 3 veg**) and the all-inclusive total updates **instantly**.
+- Live per-meal pricing ($12 / $13 / $14, fees included).
+- Filters: **restaurant, area (nearby vs further), cuisine, diet, calories, price/meal**, sort by price/protein.
+- **Budget mode**: enter a weekly budget → the app picks the best-value box under it and shows the total.
+- Quick combos (2 non-veg + 3 veg, high-protein ×6, best-value ×6).
+- Backed by `POST /api/v1/build/quote` (selection or `budget` mode).
+
+### 🕐 2-hour delivery window + 🚚 live tracking (v3)
+- Choose a 2-hour delivery window (5–7, 6–8, or 7–9 PM) on the dashboard — one tap.
+- **Live tracking** (`#track` / `/track`): status timeline (Preparing → Packed → Out for delivery → Delivered), live ETA + progress bar, courier info, and a simulate-step control.
 
 To publish a new version: bump `VERSION` in `site/app.js`, copy the current build
 to a new `docs/vN/`, and update `/`. Old `/vN/` folders are left untouched.
