@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import PWARegister from "@/components/PWARegister";
 
@@ -7,13 +7,6 @@ export const metadata: Metadata = {
   description:
     "Curated chef-prepared meals delivered across the GTA. Flat all-inclusive pricing, 1-tap subscription controls, kitchen batch aggregation.",
   manifest: "/manifest.webmanifest",
-  themeColor: "#1faa62",
-  viewport: {
-    width: "device-width",
-    initialScale: 1,
-    maximumScale: 1,
-    viewportFit: "cover",
-  },
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
@@ -23,6 +16,14 @@ export const metadata: Metadata = {
     icon: "/icon-512.png",
     apple: "/apple-touch-icon.png",
   },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#1faa62",
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  viewportFit: "cover",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
