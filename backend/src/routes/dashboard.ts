@@ -28,10 +28,13 @@ dashboardRouter.get("/api/v1/dashboard/:userId", (req, res) => {
   const items = upcoming
     ? upcoming.items.map((it, idx) => {
         const meal = findMeal(it.mealId);
+        const rest = meal ? db.restaurants.find((r) => r.id === meal.restaurantId) : undefined;
         return {
           slot: idx + 1,
           mealId: meal?.id,
           title: meal?.title,
+          restaurantId: meal?.restaurantId,
+          restaurantName: rest?.name,
           calories: meal?.calories,
           proteinGrams: meal?.proteinGrams,
           carbsGrams: meal?.carbsGrams,

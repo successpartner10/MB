@@ -4,7 +4,15 @@
    site works fully offline and on GitHub Pages (no backend needed).
    ========================================================================== */
 
+const RESTAURANTS = [
+  { id: "rest_oak_ash", name: "Oak & Ash Kitchen", cuisine: "Grill & bowls", neighborhood: "Downtown / Bay", postalPrefixes: ["M5J", "M5K"] },
+  { id: "rest_sweet_basil", name: "Sweet Basil", cuisine: "Mediterranean & veg", neighborhood: "Harbourfront", postalPrefixes: ["M5V", "M5J"] },
+  { id: "rest_kobu", name: "Kobu Noodle & Rice", cuisine: "Asian bowls", neighborhood: "Financial District", postalPrefixes: ["M5K", "M5H"] },
+];
+const restName = (id) => (RESTAURANTS.find((r) => r.id === id) || {}).name || "Partner kitchen";
+
 const DATA = {
+  restaurants: RESTAURANTS,
   dashboard: {
     userId: "usr_99812",
     user: {
@@ -36,25 +44,25 @@ const DATA = {
       totalAmount: 78,
       cutoffAt: "2026-08-16T23:59:59.000Z",
       items: [
-        { slot: 1, mealId: "meal_shawarma_1", title: "Grilled Chicken Shawarma Bowl", calories: 580, proteinGrams: 48, badges: ["HIGH_PROTEIN"] },
-        { slot: 2, mealId: "meal_salmon_2", title: "Lemon Herb Atlantic Salmon", calories: 520, proteinGrams: 42, badges: ["GLUTEN_FREE"] },
-        { slot: 3, mealId: "meal_teriyaki_3", title: "Beef Teriyaki & Jasmine Rice", calories: 610, proteinGrams: 40, badges: ["BALANCED"] },
-        { slot: 4, mealId: "meal_falafel_4", title: "Mediterranean Falafel Plate", calories: 480, proteinGrams: 18, badges: ["VEGETARIAN"] },
-        { slot: 5, mealId: "meal_shawarma_1", title: "Grilled Chicken Shawarma Bowl", calories: 580, proteinGrams: 48, badges: ["HIGH_PROTEIN"] },
-        { slot: 6, mealId: "meal_steak_5", title: "Chili Lime Steak & Sweet Potato", calories: 640, proteinGrams: 52, badges: ["HIGH_PROTEIN"] },
+        { slot: 1, mealId: "meal_shawarma_1", restaurantId: "rest_oak_ash", title: "Grilled Chicken Shawarma Bowl", calories: 580, proteinGrams: 48, badges: ["HIGH_PROTEIN"] },
+        { slot: 2, mealId: "meal_salmon_2", restaurantId: "rest_sweet_basil", title: "Lemon Herb Atlantic Salmon", calories: 520, proteinGrams: 42, badges: ["GLUTEN_FREE"] },
+        { slot: 3, mealId: "meal_teriyaki_3", restaurantId: "rest_kobu", title: "Beef Teriyaki & Jasmine Rice", calories: 610, proteinGrams: 40, badges: ["BALANCED"] },
+        { slot: 4, mealId: "meal_falafel_4", restaurantId: "rest_sweet_basil", title: "Mediterranean Falafel Plate", calories: 480, proteinGrams: 18, badges: ["VEGETARIAN"] },
+        { slot: 5, mealId: "meal_shawarma_1", restaurantId: "rest_oak_ash", title: "Grilled Chicken Shawarma Bowl", calories: 580, proteinGrams: 48, badges: ["HIGH_PROTEIN"] },
+        { slot: 6, mealId: "meal_steak_5", restaurantId: "rest_oak_ash", title: "Chili Lime Steak & Sweet Potato", calories: 640, proteinGrams: 52, badges: ["HIGH_PROTEIN"] },
       ],
     },
   },
 
   meals: [
-    { id: "meal_shawarma_1", title: "Grilled Chicken Shawarma Bowl", calories: 580, proteinGrams: 48, badges: ["HIGH_PROTEIN"] },
-    { id: "meal_salmon_2", title: "Lemon Herb Atlantic Salmon", calories: 520, proteinGrams: 42, badges: ["GLUTEN_FREE"] },
-    { id: "meal_teriyaki_3", title: "Beef Teriyaki & Jasmine Rice", calories: 610, proteinGrams: 40, badges: ["BALANCED"] },
-    { id: "meal_falafel_4", title: "Mediterranean Falafel Plate", calories: 480, proteinGrams: 18, badges: ["VEGETARIAN"] },
-    { id: "meal_steak_5", title: "Chili Lime Steak & Sweet Potato", calories: 640, proteinGrams: 52, badges: ["HIGH_PROTEIN"] },
-    { id: "meal_padthai_6", title: "Shrimp Pad Thai", calories: 590, proteinGrams: 33, badges: ["GLUTEN_FREE"] },
-    { id: "meal_caesar_7", title: "Roasted Chicken Caesar Bowl", calories: 540, proteinGrams: 44, badges: ["BALANCED"] },
-    { id: "meal_chili_8", title: "Turkey Chili & Brown Rice", calories: 470, proteinGrams: 36, badges: ["HIGH_PROTEIN"] },
+    { id: "meal_shawarma_1", restaurantId: "rest_oak_ash", title: "Grilled Chicken Shawarma Bowl", calories: 580, proteinGrams: 48, badges: ["HIGH_PROTEIN"] },
+    { id: "meal_salmon_2", restaurantId: "rest_sweet_basil", title: "Lemon Herb Atlantic Salmon", calories: 520, proteinGrams: 42, badges: ["GLUTEN_FREE"] },
+    { id: "meal_teriyaki_3", restaurantId: "rest_kobu", title: "Beef Teriyaki & Jasmine Rice", calories: 610, proteinGrams: 40, badges: ["BALANCED"] },
+    { id: "meal_falafel_4", restaurantId: "rest_sweet_basil", title: "Mediterranean Falafel Plate", calories: 480, proteinGrams: 18, badges: ["VEGETARIAN"] },
+    { id: "meal_steak_5", restaurantId: "rest_oak_ash", title: "Chili Lime Steak & Sweet Potato", calories: 640, proteinGrams: 52, badges: ["HIGH_PROTEIN"] },
+    { id: "meal_padthai_6", restaurantId: "rest_kobu", title: "Shrimp Pad Thai", calories: 590, proteinGrams: 33, badges: ["GLUTEN_FREE"] },
+    { id: "meal_caesar_7", restaurantId: "rest_sweet_basil", title: "Roasted Chicken Caesar Bowl", calories: 540, proteinGrams: 44, badges: ["BALANCED"] },
+    { id: "meal_chili_8", restaurantId: "rest_oak_ash", title: "Turkey Chili & Brown Rice", calories: 470, proteinGrams: 36, badges: ["HIGH_PROTEIN"] },
   ],
 
   productionMatrix: {
@@ -63,11 +71,11 @@ const DATA = {
     totalMealsToCook: 266,
     totalPacked: 180,
     dishes: [
-      { mealId: "meal_shawarma_1", title: "Grilled Chicken Shawarma Bowl", calories: 580, badges: ["HIGH_PROTEIN"], totalQuantity: 140, packedQuantity: 80 },
-      { mealId: "meal_salmon_2", title: "Lemon Herb Atlantic Salmon", calories: 520, badges: ["GLUTEN_FREE"], totalQuantity: 85, packedQuantity: 85 },
-      { mealId: "meal_teriyaki_3", title: "Beef Teriyaki & Jasmine Rice", calories: 610, badges: ["BALANCED"], totalQuantity: 25, packedQuantity: 0 },
-      { mealId: "meal_falafel_4", title: "Mediterranean Falafel Plate", calories: 480, badges: ["VEGETARIAN"], totalQuantity: 15, packedQuantity: 15 },
-      { mealId: "meal_steak_5", title: "Chili Lime Steak & Sweet Potato", calories: 640, badges: ["HIGH_PROTEIN"], totalQuantity: 1, packedQuantity: 0 },
+      { mealId: "meal_shawarma_1", restaurantId: "rest_oak_ash", title: "Grilled Chicken Shawarma Bowl", calories: 580, badges: ["HIGH_PROTEIN"], totalQuantity: 140, packedQuantity: 80 },
+      { mealId: "meal_salmon_2", restaurantId: "rest_sweet_basil", title: "Lemon Herb Atlantic Salmon", calories: 520, badges: ["GLUTEN_FREE"], totalQuantity: 85, packedQuantity: 85 },
+      { mealId: "meal_teriyaki_3", restaurantId: "rest_kobu", title: "Beef Teriyaki & Jasmine Rice", calories: 610, badges: ["BALANCED"], totalQuantity: 25, packedQuantity: 0 },
+      { mealId: "meal_falafel_4", restaurantId: "rest_sweet_basil", title: "Mediterranean Falafel Plate", calories: 480, badges: ["VEGETARIAN"], totalQuantity: 15, packedQuantity: 15 },
+      { mealId: "meal_steak_5", restaurantId: "rest_oak_ash", title: "Chili Lime Steak & Sweet Potato", calories: 640, badges: ["HIGH_PROTEIN"], totalQuantity: 1, packedQuantity: 0 },
     ],
     routes: [
       { postalPrefix: "M5J", boxCount: 30 },
@@ -230,6 +238,7 @@ function simulateCheckout() {
 }
 
 /* ==================== DASHBOARD ==================== */
+let kitchenFilter = "all";
 function renderDashboard() {
   const d = DATA.dashboard;
   const { order, subscription, address, user } = d;
@@ -237,16 +246,35 @@ function renderDashboard() {
   const total = order.totalAmount;
   const planCount = { MEALS_4: "4 meals", MEALS_6: "6 meals", MEALS_8: "8 meals" }[subscription.planTier];
 
-  const items = order.items.map((it, i) => `
+  // unique kitchens across this week's meals
+  const kitchens = [];
+  const seen = {};
+  order.items.forEach((it) => {
+    if (it.restaurantId && !seen[it.restaurantId]) {
+      seen[it.restaurantId] = true;
+      kitchens.push({ id: it.restaurantId, name: restName(it.restaurantId) });
+    }
+  });
+  const visibleItems = kitchenFilter === "all" ? order.items : order.items.filter((it) => it.restaurantId === kitchenFilter);
+
+  const filterChips = kitchens.length > 1
+    ? `<div class="kitchen-filters">
+        <button class="chip ${kitchenFilter === "all" ? "on" : ""}" onclick="setKitchenFilter('all')">All kitchens</button>
+        ${kitchens.map((k) => `<button class="chip ${kitchenFilter === k.id ? "on" : ""}" onclick="setKitchenFilter('${k.id}')">${esc(k.name)}</button>`).join("")}
+      </div>`
+    : "";
+
+  const items = visibleItems.map((it, i) => `
     <div class="card meal">
       <div class="meal-top">
         <div>
           <div class="meal-title"><span class="slot">${i + 1}</span> ${esc(it.title)}</div>
+          ${it.restaurantId ? `<div class="meal-rest">prepared by ${esc(restName(it.restaurantId))}</div>` : ""}
           <div class="meal-meta">${it.badges.map(badgeHtml).join("")}<span class="chip bg-slate-100 text-slate-600">${it.calories} Cal / ${it.proteinGrams}g protein</span></div>
         </div>
-        <button class="btn ghost sm" onclick="renderSwap(${i})">🔄 Swap</button>
+        <button class="btn ghost sm" onclick="renderSwap(${it.slot})">🔄 Swap</button>
       </div>
-      <div id="swap-${i}"></div>
+      <div id="swap-${it.slot}"></div>
     </div>`).join("");
 
   return `
@@ -264,6 +292,7 @@ function renderDashboard() {
       </section>
 
       <div class="row-between"><div class="h3">Your ${planCount} this week</div><div class="accent bold">${money(total)} all-inclusive</div></div>
+      ${filterChips}
       <div class="meals">${items}</div>
 
       <div class="actions">
@@ -286,19 +315,25 @@ function renderDashboard() {
     </div>`;
 }
 
-function renderSwap(i) {
+function renderSwap(slot) {
   const d = DATA.dashboard;
-  const current = d.order.items[i].mealId;
+  const item = d.order.items.find((x) => x.slot === slot);
+  if (!item) return;
+  const current = item.mealId;
   const opts = DATA.meals
-    .map((m) => `<button class="swap-opt ${m.id === current ? "on" : ""}" onclick="doSwap(${i},'${m.id}')">${esc(m.title)}<span class="muted">${m.calories} Cal</span></button>`)
+    .map((m) => `<button class="swap-opt ${m.id === current ? "on" : ""}" onclick="doSwap(${slot},'${m.id}')">${esc(m.title)}<span class="muted">${m.calories} Cal · ${esc(restName(m.restaurantId))}</span></button>`)
     .join("");
-  document.getElementById("swap-" + i).innerHTML =
+  document.getElementById("swap-" + slot).innerHTML =
     `<div class="kicker" style="margin-top:10px">Choose a replacement:</div><div class="swap-grid">${opts}</div>`;
 }
-function doSwap(i, id) {
-  const item = DATA.dashboard.order.items[i];
-  item.mealId = id;
+function doSwap(slot, id) {
+  const d = DATA.dashboard;
+  const item = d.order.items.find((x) => x.slot === slot);
+  if (!item) return;
   const m = DATA.meals.find((x) => x.id === id);
+  if (!m) return;
+  item.mealId = id;
+  item.restaurantId = m.restaurantId;
   item.title = m.title;
   item.calories = m.calories;
   item.proteinGrams = m.proteinGrams;
@@ -307,14 +342,27 @@ function doSwap(i, id) {
   navigate();
 }
 
+function setKitchenFilter(id) {
+  kitchenFilter = id;
+  navigate();
+}
+
 /* ==================== KITCHEN ==================== */
+let kitchenSel = "all";
+function setKitchenSel(id) {
+  kitchenSel = id;
+  navigate();
+}
 function renderKitchen() {
   const pm = DATA.productionMatrix;
-  const totalPacked = pm.totalPacked;
-  const out = Object.values(pm.courier).reduce((s, n) => s + n, 0);
-  const cooking = pm.totalMealsToCook - totalPacked - out;
+  const filteredDishes = kitchenSel === "all" ? pm.dishes : pm.dishes.filter((d) => d.restaurantId === kitchenSel);
+  const kitchenName = kitchenSel === "all" ? "All partner kitchens" : restName(kitchenSel);
+  const totalForKitchen = filteredDishes.reduce((s, d) => s + d.totalQuantity, 0);
+  const packedForKitchen = filteredDishes.reduce((s, d) => s + d.packedQuantity, 0);
+  const outForKitchen = Object.values(pm.courier).reduce((s, n) => s + n, 0);
+  const cooking = totalForKitchen - packedForKitchen - outForKitchen;
 
-  const rows = pm.dishes.map((d) => {
+  const rows = filteredDishes.map((d) => {
     const pct = d.totalQuantity ? Math.round((d.packedQuantity / d.totalQuantity) * 100) : 0;
     const state = pct >= 100 ? "DONE" : pct > 0 ? "PACKED" : "READY";
     return `<tr>
@@ -331,35 +379,46 @@ function renderKitchen() {
     </tr>`;
   }).join("");
 
-  const cookingItems = pm.dishes.filter((d) => d.packedQuantity < d.totalQuantity)
+  const cookingItems = filteredDishes.filter((d) => d.packedQuantity < d.totalQuantity)
     .map((d) => `<li>${d.totalQuantity - d.packedQuantity}x ${short(d.title)}</li>`).join("") || `<li class="muted">Nothing cooking</li>`;
-  const packedItems = pm.dishes.filter((d) => d.packedQuantity > 0)
+  const packedItems = filteredDishes.filter((d) => d.packedQuantity > 0)
     .map((d) => `<li>${d.packedQuantity}x ${short(d.title)}</li>`).join("");
-  const routeItems = pm.routes.map((r) => {
+  // routes relevant to this kitchen (by its served postal prefixes)
+  const servedPrefixes = kitchenSel === "all" ? pm.routes.map((r) => r.postalPrefix) : (DATA.restaurants.find((r) => r.id === kitchenSel) || {}).postalPrefixes || [];
+  const routeItems = pm.routes.filter((r) => servedPrefixes.includes(r.postalPrefix)).map((r) => {
     const shipped = pm.courier[r.postalPrefix] || 0;
     return `<li>Route ${r.postalPrefix} — ${r.boxCount} boxes${shipped ? ` <span class="accent">(${shipped} shipped)</span>` : ""}</li>`;
   }).join("");
 
+  const kitchenSelect = `
+    <label class="btn ghost">🏠 Kitchen
+      <select onchange="setKitchenSel(this.value)">
+        <option value="all" ${kitchenSel === "all" ? "selected" : ""}>All partner kitchens</option>
+        ${DATA.restaurants.map((r) => `<option value="${r.id}" ${kitchenSel === r.id ? "selected" : ""}>${esc(r.name)} · ${esc(r.neighborhood)}</option>`).join("")}
+      </select>
+    </label>`;
+
   return `
     <header class="topbar">
-      <div class="brand"><span class="logo dark">MB</span><div><b>Minimal Bites</b><span class="sub">Kitchen Partner Portal · Node: Toronto Downtown / M5J</span></div></div>
+      <div class="brand"><span class="logo dark">MB</span><div><b>Minimal Bites</b><span class="sub">Kitchen Partner Portal · ${esc(kitchenName)}</span></div></div>
       <a href="#dashboard" class="navbtn ghost">Subscriber →</a>
     </header>
     <div class="filters">
+      ${kitchenSelect}
       <button class="btn ghost">📅 Date: Tuesday, Aug 18 ▼</button>
       <button class="btn ghost">🕐 Window: 5PM–7PM ▼</button>
       <button class="btn ghost">🧮 View: Aggregated Prep List ▼</button>
     </div>
 
     <section class="card table-card">
-      <div class="table-head"><span class="bold">🏭 Production Summary</span><span class="sum">${pm.totalMealsToCook} MEALS TOTAL</span></div>
+      <div class="table-head"><span class="bold">🏭 Production Summary · ${esc(kitchenName)}</span><span class="sum">${totalForKitchen} MEALS TOTAL</span></div>
       <table><thead><tr><th>Qty</th><th>Meal dish name</th><th>Dietary badges</th><th>Packing status</th></tr></thead><tbody>${rows}</tbody></table>
     </section>
 
     <div class="kanban">
       <div class="lane"><div class="lane-h"><span>🍳 In Cooking</span><span class="pill slate">${Math.max(0, cooking)}</span></div><ul>${cookingItems}</ul></div>
-      <div class="lane"><div class="lane-h"><span>📦 Packed &amp; Labeled</span><span class="pill brand">${totalPacked}</span></div><ul>${packedItems}</ul></div>
-      <div class="lane"><div class="lane-h"><span>🚚 Out With Courier</span><span class="pill sky">${out}</span></div><ul>${routeItems}</ul></div>
+      <div class="lane"><div class="lane-h"><span>📦 Packed &amp; Labeled</span><span class="pill brand">${packedForKitchen}</span></div><ul>${packedItems}</ul></div>
+      <div class="lane"><div class="lane-h"><span>🚚 Out With Courier</span><span class="pill sky">${outForKitchen}</span></div><ul>${routeItems}</ul></div>
     </div>
 
     <section class="card block">
@@ -396,6 +455,8 @@ window.selectTier = selectTier;
 window.simulateCheckout = simulateCheckout;
 window.renderSwap = renderSwap;
 window.doSwap = doSwap;
+window.setKitchenFilter = setKitchenFilter;
+window.setKitchenSel = setKitchenSel;
 window.flash = flash;
 window.exportMatrix = exportMatrix;
 

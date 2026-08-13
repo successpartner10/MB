@@ -44,16 +44,30 @@ const ROUTES = [
 ];
 
 async function main() {
-  // ---- meals ----
+  // ---- restaurants ----
+  const restaurants = [
+    { id: "rest_oak_ash", name: "Oak & Ash Kitchen", cuisine: "Grill & bowls", neighborhood: "Downtown / Bay", postalPrefixes: ["M5J", "M5K"] },
+    { id: "rest_sweet_basil", name: "Sweet Basil", cuisine: "Mediterranean & veg", neighborhood: "Harbourfront", postalPrefixes: ["M5V", "M5J"] },
+    { id: "rest_kobu", name: "Kobu Noodle & Rice", cuisine: "Asian bowls", neighborhood: "Financial District", postalPrefixes: ["M5K", "M5H"] },
+  ];
+  for (const r of restaurants) {
+    await prisma.restaurant.upsert({
+      where: { id: r.id },
+      update: r,
+      create: r,
+    });
+  }
+
+  // ---- meals (each prepared by a partner restaurant) ----
   const meals = [
-    { id: "meal_shawarma_1", title: "Grilled Chicken Shawarma Bowl", description: "Tandoor-grilled chicken, roasted veg, garlic tahini, basmati rice.", calories: 580, proteinGrams: 48, carbsGrams: 54, fatGrams: 16, badges: ["HIGH_PROTEIN"], imageUrl: "" },
-    { id: "meal_salmon_2", title: "Lemon Herb Atlantic Salmon", description: "BC-farmed salmon, lemon herb butter, charred greens, farro.", calories: 520, proteinGrams: 42, carbsGrams: 30, fatGrams: 24, badges: ["GLUTEN_FREE"], imageUrl: "" },
-    { id: "meal_teriyaki_3", title: "Beef Teriyaki & Jasmine Rice", description: "Glazed strip loin, tender broccoli, fragrant jasmine rice.", calories: 610, proteinGrams: 40, carbsGrams: 66, fatGrams: 18, badges: ["BALANCED"], imageUrl: "" },
-    { id: "meal_falafel_4", title: "Mediterranean Falafel Plate", description: "Crispy chickpea falafel, tzatziki, tabbouleh, warm pita.", calories: 480, proteinGrams: 18, carbsGrams: 52, fatGrams: 22, badges: ["VEGETARIAN"], imageUrl: "" },
-    { id: "meal_steak_5", title: "Chili Lime Steak & Sweet Potato", description: "Flank steak, chili-lime glaze, roasted sweet potato, slaw.", calories: 640, proteinGrams: 52, carbsGrams: 44, fatGrams: 26, badges: ["HIGH_PROTEIN"], imageUrl: "" },
-    { id: "meal_padthai_6", title: "Shrimp Pad Thai", description: "Rice noodles, tiger shrimp, tamarind sauce, crushed peanuts.", calories: 590, proteinGrams: 33, carbsGrams: 72, fatGrams: 18, badges: ["GLUTEN_FREE"], imageUrl: "" },
-    { id: "meal_caesar_7", title: "Roasted Chicken Caesar Bowl", description: "Crispy chicken, romaine, parmesan, sourdough croutons.", calories: 540, proteinGrams: 44, carbsGrams: 38, fatGrams: 24, badges: ["BALANCED"], imageUrl: "" },
-    { id: "meal_chili_8", title: "Turkey Chili & Brown Rice", description: "Slow-cooked turkey chili, cheddar, brown rice, pickled jalapeno.", calories: 470, proteinGrams: 36, carbsGrams: 48, fatGrams: 12, badges: ["HIGH_PROTEIN"], imageUrl: "" },
+    { id: "meal_shawarma_1", restaurantId: "rest_oak_ash", title: "Grilled Chicken Shawarma Bowl", description: "Tandoor-grilled chicken, roasted veg, garlic tahini, basmati rice.", calories: 580, proteinGrams: 48, carbsGrams: 54, fatGrams: 16, badges: ["HIGH_PROTEIN"], imageUrl: "" },
+    { id: "meal_salmon_2", restaurantId: "rest_sweet_basil", title: "Lemon Herb Atlantic Salmon", description: "BC-farmed salmon, lemon herb butter, charred greens, farro.", calories: 520, proteinGrams: 42, carbsGrams: 30, fatGrams: 24, badges: ["GLUTEN_FREE"], imageUrl: "" },
+    { id: "meal_teriyaki_3", restaurantId: "rest_kobu", title: "Beef Teriyaki & Jasmine Rice", description: "Glazed strip loin, tender broccoli, fragrant jasmine rice.", calories: 610, proteinGrams: 40, carbsGrams: 66, fatGrams: 18, badges: ["BALANCED"], imageUrl: "" },
+    { id: "meal_falafel_4", restaurantId: "rest_sweet_basil", title: "Mediterranean Falafel Plate", description: "Crispy chickpea falafel, tzatziki, tabbouleh, warm pita.", calories: 480, proteinGrams: 18, carbsGrams: 52, fatGrams: 22, badges: ["VEGETARIAN"], imageUrl: "" },
+    { id: "meal_steak_5", restaurantId: "rest_oak_ash", title: "Chili Lime Steak & Sweet Potato", description: "Flank steak, chili-lime glaze, roasted sweet potato, slaw.", calories: 640, proteinGrams: 52, carbsGrams: 44, fatGrams: 26, badges: ["HIGH_PROTEIN"], imageUrl: "" },
+    { id: "meal_padthai_6", restaurantId: "rest_kobu", title: "Shrimp Pad Thai", description: "Rice noodles, tiger shrimp, tamarind sauce, crushed peanuts.", calories: 590, proteinGrams: 33, carbsGrams: 72, fatGrams: 18, badges: ["GLUTEN_FREE"], imageUrl: "" },
+    { id: "meal_caesar_7", restaurantId: "rest_sweet_basil", title: "Roasted Chicken Caesar Bowl", description: "Crispy chicken, romaine, parmesan, sourdough croutons.", calories: 540, proteinGrams: 44, carbsGrams: 38, fatGrams: 24, badges: ["BALANCED"], imageUrl: "" },
+    { id: "meal_chili_8", restaurantId: "rest_oak_ash", title: "Turkey Chili & Brown Rice", description: "Slow-cooked turkey chili, cheddar, brown rice, pickled jalapeno.", calories: 470, proteinGrams: 36, carbsGrams: 48, fatGrams: 12, badges: ["HIGH_PROTEIN"], imageUrl: "" },
   ];
 
   for (const m of meals) {

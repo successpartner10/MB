@@ -27,9 +27,17 @@ app.use(authRouter);
 app.use(kitchenRouter);
 app.use(dashboardRouter);
 
-// convenience: list meals (used by swap + add-meal UIs)
+// convenience: list meals (used by swap + add-meal UIs), with restaurant info
 app.get("/api/v1/meals", (_req, res) => {
-  res.json({ meals: db.meals.filter((m) => m.isActive) });
+  res.json({
+    restaurants: db.restaurants,
+    meals: db.meals
+      .filter((m) => m.isActive)
+      .map((m) => {
+        const rest = db.restaurants.find((r) => r.id === m.restaurantId);
+        return { ...m, restaurantName: rest?.name };
+      }),
+  });
 });
 
 app.get("/api/health", (_req, res) => {

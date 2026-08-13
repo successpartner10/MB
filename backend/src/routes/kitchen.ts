@@ -1,49 +1,58 @@
 // ============================================================================
 // Kitchen batch aggregation — Section 4.2
 // Restaurants get CONSOLIDATED dish totals, not chaotic per-order tickets.
-// The demo backend runs on the in-memory store that mirrors the Prisma schema.
-// (Production: swap `db.ts` for the Prisma Client backed by PostgreSQL — the
-// schema + migration + seed live in backend/prisma and are verified in PG.)
+//
+// MULTI-RESTAURANT: pass ?restaurantId= to scope production to ONE partner
+// kitchen. Each kitchen sees ONLY the dishes it must cook and the routes that
+// include its meals. Omit restaurantId for the platform-wide view.
 // ============================================================================
 
 import { Router } from "express";
-import { db, findMeal } from "../db.js";
+import { db, findMeal, findRestaurant, restaurantForMeal } from "../db.js";
 
 export const kitchenRouter = Router();
 
-const PREFIX_MAP: Record<string, string> = {
-  usr_99812: "M5J",
-  usr_m5j: "M5J",
-  usr_m5v: "M5V",
-  usr_m5k: "M5K",
-  usr_m5h: "M5H",
-};
-
-function postalPrefixFor(userId: string): string {
-  for (const key of Object.keys(PREFIX_MAP)) {
-    if (userId === key || userId.startsWith(`${key}_`)) return PREFIX_MAP[key];
-  }
-  return "M5J";
-}
-
 const ELIGIBLE = ["SCHEDULED", "PREPARING", "PACKED", "OUT_FOR_DELIVERY"];
 
+/** GET /api/v1/restaurants — list partner kitchens for the portal selector. */
+kitchenRouter.get("/api/v1/restaurants", (_req, res) => {
+  res.json({ restaurants: db.restaurants });
+});
+
 /**
- * GET /api/v1/kitchen/production-matrix?date=2026-08-18
- * date defaults to the next Tuesday delivery window.
+ * GET /api/v1/kitchen/production-matrix?date=YYYY-MM-DD&restaurantId=...
+ * Aggregates all active orders (optionally scoped to one restaurant).
  */
 kitchenRouter.get("/api/v1/kitchen/production-matrix", (req, res) => {
-  const { date } = req.query;
+  const { date, restaurantId } = req.query as {
+    date?: string;
+    restaurantId?: string;
+  };
+  const restaurant = restaurantId ? findRestaurant(restaurantId) : undefined;
+  if (restaurantId && !restaurant) {
+    return res.status(404).json({ status: "ERROR", message: "Unknown restaurantId" });
+  }
+
   const orders = db.orders.filter((o) => {
     if (!ELIGIBLE.includes(o.status)) return false;
-    if (date) return o.deliveryDate.slice(0, 10) === String(date);
+    if (date && o.deliveryDate.slice(0, 10) !== String(date)) return false;
+    if (restaurant) {
+      // include order only if it contains at least one meal from this kitchen
+      const has = o.items.some(
+        (it) => findMeal(it.mealId)?.restaurantId === restaurant.id
+      );
+      if (!has) return false;
+    }
     return true;
   });
 
-  // ---- aggregate dish totals ----
+  // ---- aggregate dish totals (scoped to restaurant) ----
   const dishMap = new Map<string, { totalQuantity: number }>();
   for (const o of orders) {
     for (const it of o.items) {
+      const meal = findMeal(it.mealId);
+      if (!meal) continue;
+      if (restaurant && meal.restaurantId !== restaurant.id) continue;
       const cur = dishMap.get(it.mealId) ?? { totalQuantity: 0 };
       cur.totalQuantity += it.quantity;
       dishMap.set(it.mealId, cur);
@@ -53,9 +62,12 @@ kitchenRouter.get("/api/v1/kitchen/production-matrix", (req, res) => {
   const dishes = [...dishMap.entries()]
     .map(([mealId, { totalQuantity }]) => {
       const meal = findMeal(mealId);
+      const rest = restaurantForMeal(mealId);
       return {
         mealId,
         title: meal?.title ?? mealId,
+        restaurantId: meal?.restaurantId,
+        restaurantName: rest?.name,
         calories: meal?.calories,
         badges: meal?.badges ?? [],
         totalQuantity,
@@ -64,10 +76,11 @@ kitchenRouter.get("/api/v1/kitchen/production-matrix", (req, res) => {
     })
     .sort((a, b) => b.totalQuantity - a.totalQuantity);
 
-  // ---- route box counts ----
+  // ---- route box counts: distinct users per postal prefix among scoped orders ----
   const routeMap = new Map<string, Set<string>>();
   for (const o of orders) {
-    const prefix = postalPrefixFor(o.userId);
+    const pc = db.addresses.find((a) => a.userId === o.userId)?.postalCode;
+    const prefix = pc ? pc.replace(/\s/g, "").slice(0, 3).toUpperCase() : "M5J";
     if (!routeMap.has(prefix)) routeMap.set(prefix, new Set());
     routeMap.get(prefix)!.add(o.userId);
   }
@@ -81,6 +94,8 @@ kitchenRouter.get("/api/v1/kitchen/production-matrix", (req, res) => {
 
   res.json({
     deliveryDate: date ? String(date) : "upcoming",
+    restaurantId: restaurant?.id ?? null,
+    restaurantName: restaurant?.name ?? "All partner kitchens",
     totalMealsToCook,
     totalPacked,
     dishes,
@@ -89,7 +104,7 @@ kitchenRouter.get("/api/v1/kitchen/production-matrix", (req, res) => {
   });
 });
 
-/** POST /api/v1/kitchen/pack  { mealId, qty } — advance packing state. */
+// ---- transient Kanban state (in-memory overlay; Redis in production) ----
 kitchenRouter.post("/api/v1/kitchen/pack", (req, res) => {
   const { mealId, qty } = req.body ?? {};
   if (!mealId) return res.status(400).json({ status: "ERROR", message: "mealId required" });
@@ -98,7 +113,6 @@ kitchenRouter.post("/api/v1/kitchen/pack", (req, res) => {
   res.json({ status: "SUCCESS", mealId, packedQuantity: db.packing[mealId] });
 });
 
-/** POST /api/v1/kitchen/ship  { postalPrefix, boxCount } — move boxes to courier. */
 kitchenRouter.post("/api/v1/kitchen/ship", (req, res) => {
   const { postalPrefix, boxCount } = req.body ?? {};
   if (!postalPrefix)

@@ -1,10 +1,21 @@
 // Thin typed client for the Minimal Bites API. All requests hit relative
 // /api/* paths, which the Next dev server proxies to Express (port 4000).
 
+export interface Restaurant {
+  id: string;
+  name: string;
+  cuisine: string;
+  neighborhood: string;
+  postalPrefixes: string[];
+  isActive: boolean;
+}
+
 export interface DashboardMeal {
   slot: number;
   mealId?: string;
   title?: string;
+  restaurantId?: string;
+  restaurantName?: string;
   calories?: number;
   proteinGrams?: number;
   carbsGrams?: number;
@@ -50,6 +61,8 @@ export interface Meal {
   id: string;
   title: string;
   description: string;
+  restaurantId: string;
+  restaurantName?: string;
   calories: number;
   proteinGrams: number;
   carbsGrams: number;
@@ -61,6 +74,8 @@ export interface Meal {
 export interface KitchenDish {
   mealId: string;
   title: string;
+  restaurantId?: string;
+  restaurantName?: string;
   calories?: number;
   badges: string[];
   totalQuantity: number;
@@ -74,6 +89,8 @@ export interface KitchenRoute {
 
 export interface ProductionMatrix {
   deliveryDate: string;
+  restaurantId: string | null;
+  restaurantName: string;
   totalMealsToCook: number;
   totalPacked: number;
   dishes: KitchenDish[];
@@ -93,9 +110,21 @@ export async function getMeals(): Promise<Meal[]> {
   return j.meals;
 }
 
-export async function getProductionMatrix(date?: string): Promise<ProductionMatrix> {
-  const q = date ? `?date=${date}` : "";
-  const r = await fetch(`/api/v1/kitchen/production-matrix${q}`);
+export async function getRestaurants(): Promise<Restaurant[]> {
+  const r = await fetch(`/api/v1/restaurants`);
+  const j = await r.json();
+  return j.restaurants;
+}
+
+export async function getProductionMatrix(
+  date?: string,
+  restaurantId?: string
+): Promise<ProductionMatrix> {
+  const params = new URLSearchParams();
+  if (date) params.set("date", date);
+  if (restaurantId) params.set("restaurantId", restaurantId);
+  const qs = params.toString();
+  const r = await fetch(`/api/v1/kitchen/production-matrix${qs ? `?${qs}` : ""}`);
   if (!r.ok) throw new Error("Failed to load production matrix");
   return r.json();
 }

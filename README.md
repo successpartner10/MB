@@ -37,6 +37,36 @@ backend and no network** — open `docs/index.html` or the offline zip anywhere.
 
 ---
 
+## 🏪 Multi-restaurant model
+
+**One curated box for the subscriber; many partner kitchens behind it.**
+
+The subscriber still gets **one box, one order, one delivery, one bill** — they never
+pick a restaurant (that would be choice fatigue). But the meals inside their box are
+**prepared by different partner kitchens**. Each kitchen logs in and sees **only its
+own** consolidated production sheet.
+
+| Partner kitchen | Neighborhood | Signature dishes | Serves |
+|-----------------|--------------|------------------|--------|
+| **Oak & Ash Kitchen** | Downtown / Bay | Shawarma Bowl, Steak, Turkey Chili | M5J, M5K |
+| **Sweet Basil** | Harbourfront | Salmon, Falafel, Caesar Bowl | M5V, M5J |
+| **Kobu Noodle & Rice** | Financial District | Teriyaki, Pad Thai | M5K, M5H |
+
+**User-facing:** each meal card shows *"prepared by {kitchen}"* + a **"by kitchen"
+filter** chip row — but billing/delivery stay fully unified.
+
+**Kitchen-facing:** the portal has a **kitchen selector** (`?restaurantId=`). Each
+partner sees only its dishes and its routes. E.g. **Oak & Ash** sees 141 meals
+(140× Shawarma + 1× Steak); **Sweet Basil** sees 100 (85× Salmon + 15× Falafel);
+**Kobu** sees 25× Teriyaki. The `production-matrix` API supports
+`?restaurantId=rest_oak_ash`.
+
+**Data model:** a `Restaurant` table (name, cuisine, neighborhood, served postal
+prefixes); `Meal.restaurantId` → `Restaurant`. Mirrored in Prisma schema, in-memory
+store, the API, both UIs, and PostgreSQL (migration `add_restaurants` applied).
+
+---
+
 ## 🧭 What's inside
 
 ```

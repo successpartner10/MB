@@ -8,6 +8,7 @@
 import {
   db,
   seedMeals,
+  seedRestaurants,
   type Order,
   type User,
   type Address,
@@ -162,6 +163,17 @@ function buildExtraOrders(): Order[] {
         createdAt: nowIso,
       });
     }
+    if (!db.addresses.find((a) => a.userId === virtualUserId)) {
+      db.addresses.push({
+        id: `addr_v_${i}`,
+        userId: virtualUserId,
+        street: "100 King St W",
+        unit: `Unit ${100 + i}`,
+        city: "Toronto",
+        province: "ON",
+        postalCode: `${route.prefix} 1A1`,
+      });
+    }
     orders.push({
       id: `ord_v_${i}`,
       userId: virtualUserId,
@@ -180,6 +192,7 @@ export function seedAll() {
   db.users = [aria];
   db.addresses = [ariaAddress];
   db.subscriptions = [ariaSubscription];
+  db.restaurants = seedRestaurants;
   db.meals = seedMeals;
   db.orders = [ariaOrder];
   db.packing = { meal_shawarma_1: 80, meal_salmon_2: 85, meal_teriyaki_3: 0, meal_falafel_4: 15 };
@@ -198,10 +211,13 @@ export function seedAll() {
   console.log("=== MINIMAL BITES SEED COMPLETE ===");
   console.log(`Primary user: ${aria.id} (${aria.fullName})`);
   console.log(`Orders seeded: ${db.orders.length}`);
+  console.log(`Partner restaurants: ${db.restaurants.map((r) => r.name).join(" · ")}`);
   const total = Object.values(matrixCounts).reduce((s, n) => s + n, 0);
   console.log(`Production matrix total: ${total} meals`);
   for (const [k, v] of Object.entries(matrixCounts)) {
-    console.log(`  ${k}: ${v}`);
+    const meal = db.meals.find((m) => m.id === k);
+    const rest = meal ? db.restaurants.find((r) => r.id === meal.restaurantId) : null;
+    console.log(`  ${v}x  ${meal?.title}  [${rest?.name}]`);
   }
 }
 

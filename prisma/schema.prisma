@@ -81,10 +81,22 @@ model Subscription {
   updatedAt            DateTime    @updatedAt
 }
 
+model Restaurant {
+  id             String   @id @default(uuid())
+  name           String
+  cuisine        String?
+  neighborhood   String?
+  postalPrefixes String[] // delivery zones this kitchen serves
+  isActive       Boolean  @default(true)
+  meals          Meal[]
+}
+
 model Meal {
   id           String      @id @default(uuid())
   title        String
   description  String
+  restaurantId String
+  restaurant   Restaurant  @relation(fields: [restaurantId], references: [id])
   calories     Int
   proteinGrams Int
   carbsGrams   Int

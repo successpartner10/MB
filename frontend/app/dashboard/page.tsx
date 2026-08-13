@@ -35,6 +35,7 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [toast, setToast] = useState("");
   const [swapOpen, setSwapOpen] = useState<number | null>(null);
+  const [kitchenFilter, setKitchenFilter] = useState<string>("all");
 
   async function refresh() {
     const d = await getDashboard(USER_ID);
@@ -118,6 +119,19 @@ export default function DashboardPage() {
   const perMeal = subscription?.perMeal ?? 13;
   const total = order?.totalAmount ?? 0;
 
+  // unique kitchens across this week's meals (for the "prepared by" filter)
+  const kitchens = useMemo(() => {
+    const set = new Map<string, string>();
+    (order?.items ?? []).forEach((it) => {
+      if (it.restaurantId && it.restaurantName) set.set(it.restaurantId, it.restaurantName);
+    });
+    return [...set.entries()].map(([id, name]) => ({ id, name }));
+  }, [order]);
+
+  const visibleItems = kitchenFilter === "all"
+    ? order?.items ?? []
+    : (order?.items ?? []).filter((it) => it.restaurantId === kitchenFilter);
+
   return (
     <div className="mx-auto flex min-h-screen max-w-md flex-col pb-24">
       {/* Header */}
@@ -160,8 +174,30 @@ export default function DashboardPage() {
             <h2 className="font-bold text-slate-700">Your {planCount} this week</h2>
             <span className="text-sm font-extrabold text-brand-600">${total.toFixed(2)} all-inclusive</span>
           </div>
+
+          {/* "Prepared by" kitchen filter — still one box & one bill */}
+          {kitchens.length > 1 && (
+            <div className="mt-2 flex flex-wrap gap-1.5 px-1">
+              <button
+                onClick={() => setKitchenFilter("all")}
+                className={`chip ${kitchenFilter === "all" ? "bg-brand-600 text-white" : "bg-slate-100 text-slate-600"}`}
+              >
+                All kitchens
+              </button>
+              {kitchens.map((k) => (
+                <button
+                  key={k.id}
+                  onClick={() => setKitchenFilter(k.id)}
+                  className={`chip ${kitchenFilter === k.id ? "bg-brand-600 text-white" : "bg-slate-100 text-slate-600"}`}
+                >
+                  {k.name}
+                </button>
+              ))}
+            </div>
+          )}
+
           <div className="mt-2 space-y-2">
-            {order?.items.map((item, idx) => (
+            {visibleItems.map((item, idx) => (
               <div key={idx} className="card p-3">
                 <div className="flex items-start justify-between gap-2">
                   <div>
@@ -171,6 +207,11 @@ export default function DashboardPage() {
                       </span>
                       <span className="font-semibold">{item.title}</span>
                     </div>
+                    {item.restaurantName && (
+                      <div className="mt-0.5 pl-7 text-[11px] font-medium text-slate-400">
+                        prepared by {item.restaurantName}
+                      </div>
+                    )}
                     <div className="mt-1.5 flex flex-wrap gap-1.5 pl-7">
                       {item.badges.map((b) => <Badge key={b} label={b} />)}
                       <span className="chip bg-slate-100 text-slate-600">
@@ -179,13 +220,13 @@ export default function DashboardPage() {
                     </div>
                   </div>
                   <button
-                    onClick={() => setSwapOpen(swapOpen === idx ? null : idx)}
+                    onClick={() => setSwapOpen(swapOpen === item.slot ? null : item.slot)}
                     className="btn btn-ghost !px-2.5 !py-1 text-xs"
                   >
                     🔄 Swap
                   </button>
                 </div>
-                {swapOpen === idx && (
+                {swapOpen === item.slot && (
                   <div className="mt-3 border-t border-slate-100 pt-2">
                     <div className="mb-1.5 text-xs font-semibold text-slate-400">Choose a replacement:</div>
                     <div className="grid grid-cols-2 gap-1.5">
@@ -193,11 +234,13 @@ export default function DashboardPage() {
                         <button
                           key={m.id}
                           disabled={m.id === item.mealId}
-                          onClick={() => doSwap(idx, m.id)}
+                          onClick={() => doSwap(item.slot - 1, m.id)}
                           className="rounded-lg border border-slate-200 px-2 py-1.5 text-left text-xs font-medium text-slate-700 hover:border-brand-500 disabled:opacity-40"
                         >
                           {m.title}
-                          <span className="block text-[10px] text-slate-400">{m.calories} Cal</span>
+                          {m.restaurantName && (
+                            <span className="block text-[10px] text-slate-400">by {m.restaurantName}</span>
+                          )}
                         </button>
                       ))}
                     </div>

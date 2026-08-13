@@ -3,23 +3,42 @@
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import Badge from "@/components/Badge";
-import { getProductionMatrix, post, type ProductionMatrix } from "@/lib/api";
+import {
+  getProductionMatrix,
+  getRestaurants,
+  post,
+  type ProductionMatrix,
+  type Restaurant,
+} from "@/lib/api";
 
 type DragKind = "dish" | "route";
 
 export default function KitchenPage() {
   const [matrix, setMatrix] = useState<ProductionMatrix | null>(null);
+  const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
+  const [restaurantId, setRestaurantId] = useState<string>("");
   const [loading, setLoading] = useState(true);
   const [drag, setDrag] = useState<{ kind: DragKind; id: string } | null>(null);
 
   const load = useCallback(async () => {
-    const m = await getProductionMatrix();
+    const m = await getProductionMatrix(undefined, restaurantId || undefined);
     setMatrix(m);
     return m;
+  }, [restaurantId]);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const rest = await getRestaurants();
+        setRestaurants(rest.filter((r) => r.isActive));
+      } finally {
+        setLoading(false);
+      }
+    })();
   }, []);
 
   useEffect(() => {
-    load().finally(() => setLoading(false));
+    load().catch(() => {});
   }, [load]);
 
   // ---- Kanban drag & drop actions (all hit the real API) ----
@@ -99,18 +118,40 @@ export default function KitchenPage() {
           <span className="grid h-9 w-9 place-items-center rounded-xl bg-slate-900 text-white font-black">MB</span>
           <div>
             <div className="font-extrabold tracking-tight">Minimal Bites — Kitchen Partner Portal</div>
-            <div className="text-xs text-slate-500">Node: Toronto Downtown / M5J</div>
+            <div className="text-xs text-slate-500">
+              {matrix?.restaurantName ?? "Select a kitchen"} · {matrix?.restaurantId ? "kitchen view" : "all partner kitchens"}
+            </div>
           </div>
         </div>
         <Link href="/" className="btn btn-ghost text-sm">← Back</Link>
       </header>
 
-      {/* Filters */}
-      <div className="mt-4 flex flex-wrap gap-2">
-        {["📅 Date: Tuesday, Aug 18 ▼", "🕐 Window: 5PM–7PM ▼", "🧮 View: Aggregated Prep List ▼"].map((f) => (
-          <button key={f} className="btn btn-ghost text-sm">{f}</button>
-        ))}
+      {/* Kitchen selector + filters */}
+      <div className="mt-4 flex flex-wrap items-center gap-2">
+        <label className="btn btn-ghost text-sm !px-2">
+          🏠 Kitchen
+          <select
+            value={restaurantId}
+            onChange={(e) => setRestaurantId(e.target.value)}
+            className="ml-1 rounded-lg border border-slate-200 bg-white px-2 py-1 text-sm font-semibold text-slate-800"
+          >
+            <option value="">All partner kitchens</option>
+            {restaurants.map((r) => (
+              <option key={r.id} value={r.id}>
+                {r.name} · {r.neighborhood}
+              </option>
+            ))}
+          </select>
+        </label>
+        <button className="btn btn-ghost text-sm">📅 Date: Tuesday, Aug 18 ▼</button>
+        <button className="btn btn-ghost text-sm">🕐 Window: 5PM–7PM ▼</button>
+        <button className="btn btn-ghost text-sm">🧮 View: Aggregated Prep List ▼</button>
       </div>
+      {matrix?.restaurantId && (
+        <p className="mt-2 text-xs text-slate-500">
+          Showing production for <b>{matrix.restaurantName}</b> only — other partner kitchens' orders are hidden here.
+        </p>
+      )}
 
       {/* Production summary table */}
       <section className="mt-4 card overflow-hidden">
