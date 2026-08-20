@@ -874,10 +874,12 @@ function clearOrder(rid) { ORDERS[rid] = { selected: {}, tier: 100 }; navigate()
    CHECKOUT — review weekly box + delivery, then confirm
    ========================================================================== */
 function renderCheckout() {
-  const active = myOrders(); // restaurantIds with items
-  const empty = !active.length;
+  const active = myOrders(); // restaurantIds with items (drafts)
+  const confirmed = allRestaurantOrders(); // placed orders
+  const placed = windowConfirmed && confirmed.length > 0;
+  const empty = !active.length && confirmed.length === 0;
   let grandTotal = 0;
-  const orderBlocks = active.map((rid) => {
+  const draftBlocks = active.map((rid) => {
     const o = ORDERS[rid];
     const r = RESTAURANTS.find((x) => x.id === rid) || {};
     const tot = orderTotals(rid);
@@ -895,27 +897,75 @@ function renderCheckout() {
         <div class="billrow muted sm"><span>Delivery (single kitchen → you)</span><span class="accent bold">INCLUDED</span></div>
       </section>`;
   }).join("");
+  // Confirmed (placed) order blocks — shown after placing, or if customer returns
+  const confirmedBlocks = confirmed.map((o) => {
+    grandTotal += o.total;
+    return `
+      <section class="order-card">
+        <div class="oc-head"><div class="oc-brand">${esc(o.rest)} <span class="oc-tag">confirmed</span></div>
+          <span class="oc-plan">$${o.tier}<span class="tier-sub">/week plan</span></span></div>
+        ${o.items.map((it) => `<div class="billrow"><span>${it.qty}× ${esc(it.title)}</span><span class="bold">${money(it.qty * it.price)}</span></div>`).join("")}
+        <div class="billrow total"><span>${esc(o.rest)} subtotal</span><span class="tb-amt">${money(o.total)}</span></div>
+        <div class="billrow muted sm"><span>Delivery (single kitchen → you)</span><span class="accent bold">INCLUDED</span></div>
+      </section>`;
+  }).join("");
+  const orderBlocks = draftBlocks + confirmedBlocks;
+  const d = fmtDate(nextDeliveryDate());
+  const winBlock = `
+    <section class="card block" style="max-width:720px;margin:0 auto 16px">
+      <div class="kicker">${ico("truck")} Delivery</div>
+      <div class="h2">${d}</div>
+      <div class="muted">${ico("pin")} 120 Bay St, Unit 1402 · Concierge</div>
+      <div class="window-pick" style="margin-top:10px"><span class="wp-label">${ico("clock")} 2-hour window</span><div class="wp-opts">
+        ${DELIVERY_WINDOWS.map((w) => `<button class="wp-opt ${chosenWindow === w.id ? "on" : ""}" onclick="setDeliveryWindow('${w.id}')">${w.label}</button>`).join("")}</div></div>
+      ${windowConfirmed ? `<div class="confirm-banner">${ico("check")} Window confirmed — ${deliveryWindowSlot()} on ${d}. <button class="btn ghost sm" onclick="changeWindow()">Change</button></div>` : ""}
+    </section>`;
+  const confirmBlock = placed ? `
+    <section class="card block confirm-card" style="max-width:720px;margin:0 auto 16px">
+      <div class="kicker">${ico("check")} Order confirmed</div>
+      <div class="billrow"><span>Total (${allRestaurantOrders().reduce((a, o) => a + o.items.reduce((x, it) => x + it.qty, 0), 0)} meals)</span><span class="bold">$${allRestaurantOrders().reduce((a, o) => a + o.total, 0).toFixed(2)}</span></div>
+      <div class="billrow"><span>Delivery date</span><span class="bold">${d}</span></div>
+      <div class="billrow"><span>Delivery window</span><span class="bold">${deliveryWindowSlot()}</span></div>
+      <div class="billrow"><span>Delivery</span><span class="accent bold">INCLUDED</span></div>
+      <div class="share-actions">
+        <span class="share-label">${ico("tap")} Send to your calendar:</span>
+        <div class="share-btns">
+          <a class="btn ghost sm" href="${emailLink()}">${ico("printer")} Email</a>
+          <a class="btn ghost sm" href="${smsLink()}">${ico("tap")} Text</a>
+          <a class="btn ghost sm" href="${calendarLink()}" target="_blank">${ico("calendar")} Calendar</a>
+          <a class="btn ghost sm" href="${icsLink()}" download="supper-club-delivery.ics">${ico("download")} .ics</a>
+        </div>
+        <p class="muted sm">Add the date &amp; window to your calendar so you know when to expect it.</p>
+      </div>
+    </section>` : "";
   return `
     <div class="consumer-shell">
       <header class="topbar"><a href="#restaurants" class="brand">${ico("arrowLeft")}<div><b>${esc(BRAND)}</b></div></a>
         <a href="#restaurants" class="navbtn ghost sm">${ico("store")} Add another kitchen</a></header>
       <section class="build-hero">
-        <div class="eyebrow">Checkout · your weekly orders</div><h1>Your week, one order per kitchen.</h1>
-        <p>Each order is delivered separately, directly from its kitchen — live-tracked, delivery included.</p></section>
+        <div class="eyebrow">Checkout · your weekly orders</div><h1>Review, choose a window, confirm.</h1>
+        <p>Each order is delivered separately from its kitchen. Pick your delivery window and confirm below.</p></section>
       <section class="checkout-orders" style="max-width:720px;margin:0 auto 16px">
         ${empty ? `<p class="muted">No weekly orders yet. <a href="#restaurants">Pick a kitchen</a> and build your first order.</p>` : orderBlocks}
       </section>
       ${empty ? `<div style="text-align:center;padding:20px"><a href="#restaurants" class="btn primary">${ico("store")} Choose a kitchen</a></div>` : `
+      ${winBlock}
       <section class="card block" style="max-width:720px;margin:0 auto 16px">
         <div class="billrow total"><span>All-inclusive weekly total</span><span class="tb-amt">${money(grandTotal)}</span></div>
         <p class="muted sm">Delivery included on every order. Split across ${active.length} ${active.length === 1 ? "kitchen" : "kitchens"} — each delivered separately.</p>
       </section>
+      ${confirmBlock}
+      ${placed ? `<div style="max-width:720px;margin:0 auto;text-align:center"><a href="#dashboard" class="btn ghost" style="width:100%">${ico("arrow")} Go to your week</a></div>` : `
       <div style="max-width:720px;margin:0 auto;text-align:center">
-        <button class="btn primary" style="width:100%" onclick="placeOrders()">${ico("check")} Confirm & place all weekly orders — ${money(grandTotal)}</button>
-        <p class="muted sm" style="margin-top:8px">Each restaurant is notified by email &amp; text with the full order. Delivered on your chosen day.</p>
-      </div>`}
+        <button class="btn primary" style="width:100%" onclick="confirmAndPlace()">${ico("check")} Confirm window & place all orders — ${money(grandTotal)}</button>
+        <p class="muted sm" style="margin-top:8px">Each restaurant is notified by email &amp; text. You'll see a confirmation with your delivery date, time, and price.</p>
+      </div>`}`}
       <footer class="foot">${versionBadge()}</footer>
     </div>`;
+}
+function confirmAndPlace() {
+  if (!windowConfirmed) { flash("Choose your 2-hour delivery window first."); return; }
+  placeOrders();
 }
 
 /* ============================================================================
@@ -1082,6 +1132,7 @@ function placeOrders() {
   ids.forEach((rid) => { ORDERS[rid] = { selected: {}, tier: 100 }; });
   windowConfirmed = true;
   flash("✓ Orders placed — restaurants notified.");
+  location.hash = "#checkout";
   navigate();
 }
 function restaurantOrders(rid) { return (CONFIRMED_ORDERS[rid] || []).slice().sort((a, b) => new Date(a.deliveryDate) - new Date(b.deliveryDate)); }
@@ -1271,7 +1322,7 @@ function orderSummary() {
   });
   return { ids, lines, total, count, confirmed: confirmed.length > 0 };
 }
-function setDeliveryWindow(id) { chosenWindow = id; windowConfirmed = false; navigate(); }
+function setDeliveryWindow(id) { chosenWindow = id; windowConfirmed = true; navigate(); }
 function confirmDelivery() { windowConfirmed = true; flash("✓ Delivery confirmed — window saved."); navigate(); }
 function changeWindow() { windowConfirmed = false; navigate(); }
 function orderSummaryText() {
@@ -1690,7 +1741,7 @@ window.moduleOn = moduleOn;
 window.setQty = setQty; window.setBuildFilter = setBuildFilter; window.quickCombo = quickCombo; window.applyBudget = applyBudget; window.buildState = buildState;
 window.boxTotal = boxTotal; window.selectedItems = selectedItems; window.clearBox = clearBox;
 window.orderAdd = orderAdd; window.setTier = setTier; window.clearOrder = clearOrder; window.ORDERS = ORDERS;
-window.placeOrders = placeOrders; window.CONFIRMED_ORDERS = CONFIRMED_ORDERS; window.confirmDelivery = confirmDelivery; window.changeWindow = changeWindow;
+window.placeOrders = placeOrders; window.CONFIRMED_ORDERS = CONFIRMED_ORDERS; window.confirmDelivery = confirmDelivery; window.changeWindow = changeWindow; window.confirmAndPlace = confirmAndPlace;
 window.setDeliveryWindow = setDeliveryWindow; window.setCadence = setCadence; window.toggleWeek = toggleWeek; window.advanceTrack = advanceTrack; window.TRACK = TRACK;
 window.setRestFilter = setRestFilter; window.demoNext = demoNext; window.demoPrev = demoPrev;
 window.meals = meals; window.RESTAURANTS = RESTAURANTS;
