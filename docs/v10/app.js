@@ -518,7 +518,7 @@ function renderHome() {
       <header class="topbar">
         <a href="#" class="brand">${ico("sparkle")}<div><b>${esc(BRAND)}</b><span class="sub">Curated weekly meals · GTA</span></div></a>
         <nav class="consumer-nav">
-          <a href="#build" class="navbtn primary cta-big">${ico("plus")}<span class="cta-bold">My Week. Fully Catered.</span></a>
+          <a href="#build" class="navbtn primary cta-big">${ico("plus")}<span class="cta-stack"><span class="cta-bold">My Week. Fully Catered.</span><span class="cta-sub">(Build your meals)</span></span></a>
           <a href="#restaurants" class="navbtn ghost">${ico("store")}<span>Restaurants</span></a>
           <a href="#gives" class="navbtn link">${ico("heart")}<span>Gives</span></a>
           <a href="#delivery" class="navbtn link">${ico("truck")}<span>Delivery</span></a>

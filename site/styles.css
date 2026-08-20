@@ -734,3 +734,7 @@ button,.btn,.btn.sm,.navbtn,.p-navbtn,.stp-btn,.wp-opt,.addon-opt,.swap-opt,.kit
 .consumer-nav { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; flex: 1 1 100%; justify-content: flex-end; }
 @media (max-width: 760px){ .consumer-nav { justify-content: flex-start; } }
 .navbtn.cta-big { flex-basis: 100%; order: -1; }
+
+/* 10) v10 — CTA stacked: main line + "(Build your meals)" sub-line */
+.navbtn.cta-big .cta-stack { display: flex; flex-direction: column; align-items: center; line-height: 1.2; }
+.navbtn.cta-big .cta-sub { font-size: 0.72em; font-weight: 600; opacity: .85; letter-spacing: .01em; margin-top: 2px; }
