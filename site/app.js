@@ -518,7 +518,7 @@ function renderHome() {
       <header class="topbar">
         <a href="#" class="brand">${ico("sparkle")}<div><b>${esc(BRAND)}</b><span class="sub">Curated weekly meals · GTA</span></div></a>
         <nav class="consumer-nav">
-          <a href="#build" class="navbtn primary">${ico("plus")}<span class="cta-bold">Plan the Week, Prepped</span></a>
+          <a href="#build" class="navbtn primary">${ico("plus")}<span class="cta-bold">Myweek. Fully catered.</span></a>
           <a href="#restaurants" class="navbtn ghost">${ico("store")}<span>Restaurants</span></a>
           <a href="#gives" class="navbtn link">${ico("heart")}<span>Gives</span></a>
           <a href="#delivery" class="navbtn link">${ico("truck")}<span>Delivery</span></a>
@@ -1049,7 +1049,7 @@ function renderBuild() {
       <header class="topbar"><a href="#" class="brand">${ico("sparkle")}<div><b>${esc(BRAND)}</b></div></a>
         <a href="#partners" class="navbtn link sm">${ico("store")}<span>Restaurant owners</span></a></header>
       <section class="build-hero">
-        <div class="eyebrow">Plan the week, prepped</div><h1>Build your weekly box. See your total <span class="accent">instantly.</span></h1>
+        <div class="eyebrow">Myweek. Fully catered.</div><h1>Build your weekly box. See your total <span class="accent">instantly.</span></h1>
         <p>This is a recurring weekly order — mix veg &amp; non-veg, filter by restaurant/cuisine/diet, or set a weekly budget. We'll warn you when you hit it.</p></section>
       <div class="combo-strip">
         <div class="combo-title">Quick combos</div>
