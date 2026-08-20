@@ -819,3 +819,19 @@ button,.btn,.btn.sm,.navbtn,.p-navbtn,.stp-btn,.wp-opt,.addon-opt,.swap-opt,.kit
   background: #0d9488 !important; color: #fff !important; border-color: #0f766e !important;
   box-shadow: 0 4px 12px rgba(13,148,136,.25);
 }
+
+/* 15) v11 — "My Week. Fully Catered." must read as a real CTA button, not a tagline */
+.navbtn.cta-big {
+  background: linear-gradient(135deg,#14b8a6,#0d9488) !important;
+  color: #fff !important;
+  border-radius: 18px !important;
+  box-shadow: 0 8px 24px rgba(13,148,136,.35), inset 0 1px 0 rgba(255,255,255,.2);
+  border: none;
+  min-height: 64px;
+  width: 100% !important;
+  margin: 12px auto 0;
+}
+.navbtn.cta-big:hover { transform: translateY(-2px); box-shadow: 0 14px 34px rgba(13,148,136,.4); }
+.navbtn.cta-big .ic { width: 26px; height: 26px; }
+.navbtn.cta-big .cta-bold { color: #fff; }
+.navbtn.cta-big .cta-sub { color: #eafff8 !important; opacity: .95; }
