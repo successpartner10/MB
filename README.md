@@ -52,24 +52,30 @@ permanent `/vN/` path** so existing links keep working after you ship a new vers
 
 | Version | URL | Notes |
 |---------|-----|-------|
-| Latest | https://successpartner10.github.io/MB/v5/ | current release — **Supper Club Direct** |
-| v5 | https://successpartner10.github.io/MB/v5/ | 15 restaurants · CN Tower tracking · fleet · cadence · live DineSafe · $200+10% · demo |
+| Latest | https://successpartner10.github.io/MB/v6/ | current release — **Supper Club Direct** |
+| v6 | https://successpartner10.github.io/MB/v6/ | Content sections · Gives ledger · daily auctions · flat $500 · search-first |
+| v5 | https://successpartner10.github.io/MB/v5/ | 15 restaurants · CN Tower tracking · fleet · cadence · live DineSafe |
 | v4 | https://successpartner10.github.io/MB/v4/ | ratings · repeat · schedule · map · add-ons · payouts (as Minimal Bites) |
 | v3 | https://successpartner10.github.io/MB/v3/ | Build-Your-Box · 2-hr windows · live tracking (archived) |
 | v2 | https://successpartner10.github.io/MB/v2/ | Raleway redesign (archived) |
 | v1 | https://successpartner10.github.io/MB/v1/ | original release (archived) |
 
-## 🚀 v5 — Supper Club Direct (what's new)
+## 🚀 v6 — Supper Club Direct (what's new)
 - **Rebrand** to **Supper Club Direct** across the whole PWA.
 - **15 restaurants**, varied cuisine across Toronto, **8–10 dishes each** (128 dishes total).
-- **24 sample users** with Toronto addresses & dietary badges.
-- **Indian Desire → CN Tower** live tracking map.
-- **Fleet board** — owner sees every order out at once (courier, ETA, status, progress).
-- **Order cadence** — weekly / every 2 weeks / monthly, pause up to 3 days before cutoff.
-- **Live DineSafe badges** — "Pass (unconditional)" vs "Conditional" + Google ratings (≥3.5, new-partner override).
-- **Pickup option** alongside delivery.
-- **Pricing** — $200/mo + 10% of app order value, first week free (research-backed hybrid; vs 25–30% commission).
-- **Animated demo** — self-running feature walkthrough for both subscribers & owners.
+- **Search-first homepage** — always-visible search bar + filter chips + content sections.
+- **Content sections (auto-generated / auctioned):**
+  - **Featured Restaurant** hero (daily auction winner).
+  - **Dish of the Day with recipe** (daily auction winner).
+  - **Chef Story of the Day** (daily auction winner).
+  - **"What Toronto Ate"** — auto-generated top-dishes list from order data.
+- **Daily content auctions** — $50 start, Mon–Wed bidding, one slot per restaurant per week (fairness cap), transparent bids, winner supplies next-day material. Empty slots fall back to auto data-picks / giving sponsor.
+- **Supper Club Gives** — a separate, searchable **public giving ledger** (date + sponsor + restaurant + app + amounts + shelter). Equal three-way $500/wk split.
+- **Flat $500/month membership** — first month free, no commission, no bypass incentive.
+- **24 sample users**, live DineSafe flags (Pass/Conditional), pickup, order cadence (weekly/2-wk/monthly), fleet board, Indian Desire → CN Tower tracking.
+- **Animated demo** for both subscribers & owners.
+
+See `supper-club-business-spec.md` (in the repo / workspace) for the full finalized business model, auction rules, giving program, and accounting/CRA plan.
 
 ## 🧰 v4 — Uber-Eats / Instacart-style features (research-backed)
 Both sides, balanced. Inspired by Uber Eats, DoorDash, Instacart, HelloFresh & Factor.
