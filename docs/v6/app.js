@@ -319,13 +319,46 @@ const routes = {
   "": renderHome, restaurants: renderRestaurants, build: renderBuild, dashboard: renderDashboard,
   schedule: renderSchedule, track: renderTrack, demo: renderDemo, gives: renderGives,
   partners: renderPartners, kitchen: renderKitchen, fleet: renderFleet, payouts: renderPayouts, auction: renderAuction,
+  admin: renderAdmin,
 };
-const PARTNER_ROUTES = ["partners", "kitchen", "fleet", "payouts", "auction"];
+const PARTNER_ROUTES = ["partners", "kitchen", "fleet", "payouts", "auction", "admin"];
 function currentRoute() { const h = location.hash.replace(/^#\/?/, "").split("?")[0]; return routes[h] ? h : ""; }
 
 /* ---- owner auth gate (demo: password stored in localStorage; real auth in production) ---- */
 const OWNER_PASS = "supperclub"; // demo credential — replace with a vetted auth provider in prod
 function isOwnerAuthed() { try { return localStorage.getItem("scd_owner") === "1"; } catch { return false; } }
+
+/* ---- ADMIN module toggles (default ON; admin can switch any off) ----
+   These control which homepage sections / features are enabled. Stored in
+   localStorage so toggles persist; admin panel edits them. */
+const MODULE_DEFAULTS = {
+  search: true,
+  featured: true,        // Featured Restaurant hero
+  dishOfDay: true,       // Dish of the Day (with recipe)
+  chefStory: true,       // Chef Story of the Day
+  whatAte: true,         // What Toronto Ate (auto-generated)
+  gives: true,           // Supper Club Gives strip + ledger
+  gallery: true,         // Fresh from the kitchens gallery
+  auction: true,         // daily content auctions (owner tool)
+  fleet: true,           // fleet board (owner tool)
+  payouts: true,         // payouts (owner tool)
+  kitchens: true,        // restaurant list
+};
+function getModules() {
+  const m = { ...MODULE_DEFAULTS };
+  try {
+    const raw = localStorage.getItem("scd_modules");
+    if (raw) { Object.assign(m, JSON.parse(raw)); }
+  } catch {}
+  return m;
+}
+function moduleOn(key) { return getModules()[key] !== false; }
+function setModule(key, on) {
+  const m = getModules();
+  m[key] = !!on;
+  try { localStorage.setItem("scd_modules", JSON.stringify(m)); } catch {}
+  navigate();
+}
 function renderLogin() {
   return `
     <div class="partner-shell">
@@ -427,7 +460,8 @@ function renderHome() {
         </nav>
       </header>
 
-      <!-- search bar (always visible) -->
+      ${moduleOn("search") ? `
+      <!-- search bar -->
       <section class="search-bar">
         <input type="search" placeholder="Search food, restaurant, or cuisine…" oninput="homeSearch(this.value)" />
         <div class="search-filters">
@@ -437,7 +471,7 @@ function renderHome() {
           <button class="chip">Nearby</button>
           <button class="chip">Under $13</button>
         </div>
-      </section>
+      </section>` : ""}
 
       <section class="hero">
         <div class="hero-title">
@@ -449,6 +483,7 @@ function renderHome() {
         <div class="steps hero-steps">${steps}</div>
       </section>
 
+      ${moduleOn("featured") ? `
       <!-- FEATURED RESTAURANT (hero) — daily auction winner -->
       <section class="featured-hero">
         <div class="fh-photo"><img src="img/dish-indian-2.jpg" alt="${esc(featured.name)}" /></div>
@@ -458,8 +493,9 @@ function renderHome() {
           <div class="fh-meta">${esc(featured.cuisine)} · ${esc(featured.neighborhood)} ${googleHtml(featured)}</div>
           <a href="#restaurants" class="btn primary sm" style="margin-top:12px">Order from ${esc(featured.name)} ${ico("arrow")}</a>
         </div>
-      </section>
+      </section>` : ""}
 
+      ${moduleOn("dishOfDay") ? `
       <!-- DISH OF THE DAY (with recipe) — daily auction winner -->
       <section class="content-sec">
         <div class="kicker">Dish of the day · by ${esc(dish.rest)}</div>
@@ -470,8 +506,9 @@ function renderHome() {
             <div class="dish-recipe">${esc(dish.recipe)}</div>
           </div>
         </div>
-      </section>
+      </section>` : ""}
 
+      ${moduleOn("chefStory") ? `
       <!-- CHEF STORY OF THE DAY — daily auction winner -->
       <section class="content-sec">
         <div class="kicker">Chef story · ${esc(chefStory.rest)}</div>
@@ -479,16 +516,18 @@ function renderHome() {
           <div class="chef-avatar"><img src="img/chef.jpg" alt="${esc(chefStory.chef)}" /></div>
           <div><div class="chef-name">${esc(chefStory.chef)}</div><div class="chef-line">${esc(chefStory.line)}</div></div>
         </div>
-      </section>
+      </section>` : ""}
 
+      ${moduleOn("whatAte") ? `
       <!-- WHAT TORONTO ATE (auto-generated from data) -->
       <section class="content-sec">
         <div class="kicker">${ico("chart")} What Toronto ate this week · <em>auto-generated</em></div>
         <div class="top-dishes">
           ${whatAte.map((w, i) => `<div class="top-dish"><span class="td-rank">${i + 1}</span><span class="td-name">${esc(w.dish)}</span><span class="td-rest">${esc(w.rest)}</span><span class="td-orders">${w.orders} orders</span></div>`).join("")}
         </div>
-      </section>
+      </section>` : ""}
 
+      ${moduleOn("gives") ? `
       <!-- SUPPER CLUB GIVES strip → links to ledger -->
       <section class="gives-strip">
         <div class="gs-icon">${ico("heart")}</div>
@@ -497,8 +536,9 @@ function renderHome() {
           <div class="gs-sub">Supper Club Direct + a restaurant + a sponsor each give $500 this week to feed a local shelter.</div>
         </div>
         <a href="#gives" class="btn dark sm">See the ledger ${ico("arrow")}</a>
-      </section>
+      </section>` : ""}
 
+      ${moduleOn("gallery") ? `
       <!-- REAL DISH PHOTOS from partner kitchens (GTA cuisines) -->
       <section class="content-sec">
         <div class="kicker">${ico("chef")} Fresh from the kitchens · this week's specials</div>
@@ -509,13 +549,14 @@ function renderHome() {
           <div class="dg-item"><img src="img/chef-2.jpg" alt="Sweet Basil" /><span class="dg-label">Sweet Basil</span></div>
           <div class="dg-item"><img src="img/chef-3.jpg" alt="Seoul Food Co." /><span class="dg-label">Seoul Food Co.</span></div>
         </div>
-      </section>
+      </section>` : ""}
 
+      ${moduleOn("kitchens") ? `
       <section class="top-rest">
         <div class="kicker" style="margin:0 0 12px">${ico("store")} Partner kitchens</div>
         <div class="top-grid">${top}</div>
         <a href="#restaurants" class="btn ghost sm" style="margin-top:14px">View all ${RESTAURANTS.length} restaurants ${ico("arrow")}</a>
-      </section>
+      </section>` : ""}
 
       <section class="for-partners">
         <div class="fp-icon">${ico("store")}</div>
@@ -984,7 +1025,8 @@ function renderPartners() {
           <a href="#fleet" class="p-navbtn" data-nav="fleet">${ico("truck")} Fleet</a>
           <a href="#kitchen" class="p-navbtn" data-nav="kitchen">${ico("pot")} Kitchen</a>
           <a href="#payouts" class="p-navbtn" data-nav="payouts">${ico("wallet")} Payouts</a>
-          <a href="#auction" class="p-navbtn" data-nav="auction">${ico("gavel")} Auctions</a></nav>
+          <a href="#auction" class="p-navbtn" data-nav="auction">${ico("gavel")} Auctions</a>
+          <a href="#admin" class="p-navbtn" data-nav="admin">${ico("gear")} Admin</a></nav>
         <a href="#" class="btn p-outline sm" onclick="ownerLogout()">${ico("arrowLeft")} Sign out</a></header>
       <section class="p-hero"><div class="eyebrow dark">Get on the GTA's zero-friction meal box</div>
         <h1>Run your kitchen on ${esc(BRAND)}</h1>
@@ -1026,7 +1068,8 @@ function renderFleet() {
           <a href="#fleet" class="p-navbtn active" data-nav="fleet">${ico("truck")} Fleet</a>
           <a href="#kitchen" class="p-navbtn" data-nav="kitchen">${ico("pot")} Kitchen</a>
           <a href="#payouts" class="p-navbtn" data-nav="payouts">${ico("wallet")} Payouts</a>
-          <a href="#auction" class="p-navbtn" data-nav="auction">${ico("gavel")} Auctions</a></nav>
+          <a href="#auction" class="p-navbtn" data-nav="auction">${ico("gavel")} Auctions</a>
+          <a href="#admin" class="p-navbtn" data-nav="admin">${ico("gear")} Admin</a></nav>
         <a href="#" class="btn p-outline sm">${ico("arrowLeft")} Back to eaters</a></header>
       <section class="p-filters">
         <button class="btn p-outline sm">${ico("calendar")} Today ▼</button>
@@ -1055,7 +1098,8 @@ function renderKitchen() {
           <a href="#fleet" class="p-navbtn" data-nav="fleet">${ico("truck")} Fleet</a>
           <a href="#kitchen" class="p-navbtn active" data-nav="kitchen">${ico("pot")} Kitchen</a>
           <a href="#payouts" class="p-navbtn" data-nav="payouts">${ico("wallet")} Payouts</a>
-          <a href="#auction" class="p-navbtn" data-nav="auction">${ico("gavel")} Auctions</a></nav>
+          <a href="#auction" class="p-navbtn" data-nav="auction">${ico("gavel")} Auctions</a>
+          <a href="#admin" class="p-navbtn" data-nav="admin">${ico("gear")} Admin</a></nav>
         <a href="#" class="btn p-outline sm">${ico("arrowLeft")} Back to eaters</a></header>
       <section class="p-table-card">
         <div class="p-table-head"><span class="bold">${ico("pot")} Production Summary</span><span class="p-sum">325 MEALS</span></div>
@@ -1077,7 +1121,8 @@ function renderPayouts() {
           <a href="#fleet" class="p-navbtn" data-nav="fleet">${ico("truck")} Fleet</a>
           <a href="#kitchen" class="p-navbtn" data-nav="kitchen">${ico("pot")} Kitchen</a>
           <a href="#payouts" class="p-navbtn active" data-nav="payouts">${ico("wallet")} Payouts</a>
-          <a href="#auction" class="p-navbtn" data-nav="auction">${ico("gavel")} Auctions</a></nav>
+          <a href="#auction" class="p-navbtn" data-nav="auction">${ico("gavel")} Auctions</a>
+          <a href="#admin" class="p-navbtn" data-nav="admin">${ico("gear")} Admin</a></nav>
         <a href="#" class="btn p-outline sm">${ico("arrowLeft")} Back to eaters</a></header>
       <section class="pay-hero"><div class="pay-hero-label">Your membership fee</div><div class="pay-hero-amt">$500</div>
         <div class="pay-hero-sub">Flat $500/month · first month free · no commission, ever · deposited Thu, Aug 20</div></section>
@@ -1086,9 +1131,59 @@ function renderPayouts() {
     </div>`;
 }
 
+/* ============================================================================
+   ADMIN — module control panel (enable/disable features)
+   ========================================================================== */
+const MODULE_META = [
+  { key: "search", label: "Search bar", desc: "Search box + filter chips on the homepage" },
+  { key: "featured", label: "Featured Restaurant hero", desc: "Hero banner on the homepage" },
+  { key: "dishOfDay", label: "Dish of the Day", desc: "Daily featured dish with recipe" },
+  { key: "chefStory", label: "Chef Story of the Day", desc: "Daily chef profile" },
+  { key: "whatAte", label: "What Toronto Ate", desc: "Auto-generated top-dishes list" },
+  { key: "gives", label: "Supper Club Gives", desc: "Community giving strip + ledger" },
+  { key: "gallery", label: "Fresh from the kitchens", desc: "Real dish-photo gallery" },
+  { key: "auction", label: "Content Auctions", desc: "Daily featured/dish/chef bidding (owner tool)" },
+  { key: "fleet", label: "Fleet Board", desc: "Owner live-order tracking" },
+  { key: "payouts", label: "Payouts", desc: "Owner payout dashboard" },
+  { key: "kitchens", label: "Partner Kitchens", desc: "Restaurant list on the homepage" },
+];
+function renderAdmin() {
+  const m = getModules();
+  const rows = MODULE_META.map((mod) => {
+    const on = m[mod.key] !== false;
+    return `<div class="admin-row">
+      <div class="admin-info"><div class="admin-label">${esc(mod.label)}</div><div class="muted sm">${esc(mod.desc)}</div></div>
+      <label class="switch">
+        <input type="checkbox" ${on ? "checked" : ""} onchange="setModule('${mod.key}', this.checked)" />
+        <span class="slider"></span>
+      </label>
+    </div>`;
+  }).join("");
+  return `
+    <div class="partner-shell">
+      <header class="p-topbar"><div class="p-brand">${ico("gear")}<div><b>${esc(BRAND)}</b><span>admin control panel</span></div></div>
+        <nav class="p-nav"><a href="#admin" class="p-navbtn active" data-nav="admin">${ico("gear")} Modules</a>
+          <a href="#partners" class="p-navbtn" data-nav="partners">${ico("home")} Overview</a>
+          <a href="#auction" class="p-navbtn" data-nav="auction">${ico("gavel")} Auctions</a>
+          <a href="#admin" class="p-navbtn" data-nav="admin">${ico("gear")} Admin</a></nav>
+        <a href="#" class="btn p-outline sm" onclick="ownerLogout()">${ico("arrowLeft")} Sign out</a></header>
+      <section class="p-hero"><div class="eyebrow dark">Module control</div>
+        <h1>Enable or disable features</h1>
+        <p>Every module is ON by default. Toggle any off to hide it from the app. Changes save instantly and persist.</p></section>
+      <section class="admin-board">
+        <div class="admin-head">Module</div>
+        ${rows}
+      </section>
+      <footer class="p-foot">Admin panel — control which features are live. Default: all ON.</footer>
+    </div>`;
+}
+
 /* ---------- boot ---------- */
 window.addEventListener("hashchange", navigate);
 window.navigate = navigate;
+window.getModules = getModules;
+window.setModule = setModule;
+window.moduleOn = moduleOn;
 window.setQty = setQty; window.setBuildFilter = setBuildFilter; window.quickCombo = quickCombo; window.applyBudget = applyBudget; window.buildState = buildState;
 window.setDeliveryWindow = setDeliveryWindow; window.setCadence = setCadence; window.toggleWeek = toggleWeek; window.advanceTrack = advanceTrack; window.TRACK = TRACK;
 window.setRestFilter = setRestFilter; window.demoNext = demoNext; window.demoPrev = demoPrev;
