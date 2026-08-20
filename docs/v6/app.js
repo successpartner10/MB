@@ -499,6 +499,18 @@ function renderHome() {
         <a href="#gives" class="btn dark sm">See the ledger ${ico("arrow")}</a>
       </section>
 
+      <!-- REAL DISH PHOTOS from partner kitchens (GTA cuisines) -->
+      <section class="content-sec">
+        <div class="kicker">${ico("chef")} Fresh from the kitchens · this week's specials</div>
+        <div class="dish-gallery">
+          <div class="dg-item"><img src="img/dish-butter-chicken.jpg" alt="Indian Desire" /><span class="dg-label">Indian Desire</span></div>
+          <div class="dg-item"><img src="img/dish-poke.jpg" alt="Kobu Noodle & Rice" /><span class="dg-label">Kobu</span></div>
+          <div class="dg-item"><img src="img/dish-veggie-bowl.jpg" alt="Green Table" /><span class="dg-label">Green Table</span></div>
+          <div class="dg-item"><img src="img/chef-2.jpg" alt="Sweet Basil" /><span class="dg-label">Sweet Basil</span></div>
+          <div class="dg-item"><img src="img/chef-3.jpg" alt="Seoul Food Co." /><span class="dg-label">Seoul Food Co.</span></div>
+        </div>
+      </section>
+
       <section class="top-rest">
         <div class="kicker" style="margin:0 0 12px">${ico("store")} Partner kitchens</div>
         <div class="top-grid">${top}</div>

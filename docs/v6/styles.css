@@ -555,3 +555,36 @@ h1, h2, h3, .h2, .h3 { letter-spacing: -.02em; }
 /* 6) Homepage hero section separation */
 .hero { padding-bottom: 40px; }
 .steps.hero-steps { margin-top: 32px; }
+
+/* ============================================================================
+   FINAL DESIGN OVERRIDE — force 2px rectangle corners everywhere interactive
+   (placed last so it always wins over any earlier border-radius)
+   ========================================================================== */
+
+/* all buttons, chips, tabs, inputs, selects -> 2px rectangles */
+button, .btn, .btn.sm, .btn.big, .btn.col, .btn.primary, .btn.ghost, .btn.link, .btn.dark,
+.btn.p-outline, .btn.p-primary, .navbtn, .p-navbtn,
+.stp-btn, .wp-opt, .addon-opt, .swap-opt, .kitchen-opt, .tier, .tier-opt,
+.chip, .search-filters .chip, .frow .chip, .kitchen-filters .chip, .filters .chip,
+input, select, textarea, .login-input, .budget-input input, .gives-search input, .search-bar input,
+.login-card code, .trust-badge, .status-pill, .pill, .cutoff, .ver-badge, .k-avatar, .c-avatar {
+  border-radius: 2px !important;
+}
+
+/* key content surfaces -> 2px too (cards, panels, strips, images) */
+.card, .step, .feature, .rest-card, .rest-full, .dish-card, .chef-card, .top-dishes,
+.gives-strip, .gl-ledger, .auction-note, .auction-board, .bid-feed, .fleet-board,
+.p-table-card, .pricing-band, .pstep, .p-cta, .pay-hero, .commit-banner, .lane,
+.filters-panel, .build-grid, .meal-pick, .window-pick, .track-steps, .demo-stage,
+.login-card, .mini-map, .dropoff-photo,
+.fh-photo, .dish-img, .chef-avatar, .rest-avatar, .dish-chip, .slot, .td-rank,
+.featured-hero, .for-partners, .hero-steps, .bar, .progress, .photo-svg {
+  border-radius: 2px !important;
+}
+
+/* dish gallery — real photos, grid */
+.dish-gallery { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-top: 14px; }
+@media (max-width: 760px){ .dish-gallery{ grid-template-columns: repeat(2, 1fr); } }
+.dg-item { border-radius: 2px; overflow: hidden; background: #fff; border: 1px solid var(--line); }
+.dg-item img { width: 100%; height: 140px; object-fit: cover; display: block; }
+.dg-label { display: block; padding: 8px 10px; font-size: 12.5px; font-weight: 700; color: var(--ink); }
