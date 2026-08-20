@@ -498,3 +498,58 @@ button { font: inherit; cursor: pointer; }
 .login-card p { color: #94a3b8; }
 .login-input { width: 100%; padding: 12px 14px; border: 1px solid #334155; border-radius: 10px; background: #0b1020; color: #fff; font-size: 15px; margin: 16px 0 12px; }
 .login-card code { background: #1e293b; padding: 2px 6px; border-radius: 5px; }
+
+/* ============================================================================
+   DESIGN OVERRIDE — rect buttons (4px corners) + cleaner homepage sections
+   ========================================================================== */
+
+/* 1) ALL buttons -> rectangles with 4px corners */
+.btn, .btn.sm, .btn.big, .btn.col, .btn.primary, .btn.ghost, .btn.link, .btn.dark,
+.navbtn, .p-navbtn, .btn.p-outline, .btn.p-primary,
+.stp-btn, .wp-opt, .addon-opt, .swap-opt, .kitchen-opt, .tier,
+.chip, .search-filters .chip, .frow .chip, .kitchen-filters .chip,
+.p-filters select, .budget-input input, .login-input {
+  border-radius: 4px !important;
+}
+
+/* 2) Homepage — clearer section division, breathing room */
+.hero, .top-rest, .content-sec, .for-partners, .gives-strip,
+.search-bar, .featured-hero, .features {
+  max-width: 1080px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 28px;
+  padding-right: 28px;
+}
+.featured-hero { margin-top: 24px; }
+.content-sec { margin-top: 34px; }
+.content-sec + .content-sec { border-top: 2px solid var(--line); padding-top: 28px; }
+.top-rest { margin-top: 40px; border-top: 2px solid var(--line); padding-top: 30px; }
+.for-partners { margin-top: 40px; }
+
+/* 3) Better fonts & typography */
+body { font-weight: 400; letter-spacing: 0; }
+.hero-title h1 { font-size: clamp(36px, 5.2vw, 58px); font-weight: 900; letter-spacing: -.03em; }
+.hero-title p { font-size: 18px; line-height: 1.7; color: #475569; }
+.kicker { font-size: 12px; letter-spacing: .14em; font-weight: 800; color: #0d9488; }
+.fh-name, .dish-title, .chef-name, .rest-name, .gives-strip .gs-title, .step-t, .pstep-t { font-weight: 900; }
+h1, h2, h3, .h2, .h3 { letter-spacing: -.02em; }
+
+/* 4) More contrast */
+:root { --ink: #0b1220; --muted: #475569; --line: #cbd5e1; }
+.muted, .hero-title p, .dish-recipe, .chef-line, .step-d, .feat-d, .rest-meta,
+.fp-d, .gs-sub, .meal-rest, .tb-note, .tier-desc { color: #475569; }
+.card, .step, .feature, .rest-card, .rest-full, .dish-card, .chef-card {
+  box-shadow: 0 2px 8px rgba(15,23,42,.06);
+  border-color: #cbd5e1;
+}
+
+/* 5) Section cards get a clear, distinct look */
+.top-grid { gap: 16px; }
+.feature { border-left: 4px solid var(--brand); }
+.step { border-left: 4px solid var(--brand); }
+.dish-card, .chef-card { border-left: 4px solid var(--brand); }
+
+/* 6) Homepage hero section separation */
+.hero { padding-bottom: 40px; }
+.steps.hero-steps { margin-top: 32px; }
