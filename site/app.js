@@ -911,8 +911,8 @@ function renderCheckout() {
         <p class="muted sm">Delivery included on every order. Split across ${active.length} ${active.length === 1 ? "kitchen" : "kitchens"} — each delivered separately.</p>
       </section>
       <div style="max-width:720px;margin:0 auto;text-align:center">
-        <a href="#dashboard" class="btn primary" style="width:100%">${ico("check")} Confirm all weekly orders — ${money(grandTotal)}</a>
-        <button class="btn ghost sm" style="margin-top:10px" onclick="flash('Scheduled for your delivery day. Manage anytime.')">${ico("calendar")} Choose delivery day</button>
+        <button class="btn primary" style="width:100%" onclick="placeOrders()">${ico("check")} Confirm & place all weekly orders — ${money(grandTotal)}</button>
+        <p class="muted sm" style="margin-top:8px">Each restaurant is notified by email &amp; text with the full order. Delivered on your chosen day.</p>
       </div>`}
       <footer class="foot">${versionBadge()}</footer>
     </div>`;
@@ -1051,6 +1051,51 @@ function askOrderCheckoutOrChange(rid) {
 }
 function myOrders() { return Object.keys(ORDERS).filter((rid) => orderTotals(rid).count > 0); }
 function orderLine(rid, mid) { const o = ORDERS[rid]; const m = meals.find((x) => x.id === mid); if (!o || !m) return ""; return `<div class="billrow"><span>${o.selected[mid]}× ${esc(m.title)}</span><span class="bold">${money(o.selected[mid] * m.price)}</span></div>`; }
+
+/* ---- CONFIRMED ORDERS (sent to restaurants) ----
+   When a customer confirms checkout, each restaurant's order is snapshotted
+   into CONFIRMED_ORDERS[restaurantId] = [order, ...], newest appended.
+   The restaurant-side Kitchen page lists them, earliest delivery date on top. */
+const CONFIRMED_ORDERS = {};
+let orderSeq = 1000;
+function placeOrders() {
+  const ids = myOrders();
+  if (!ids.length) { flash("No orders to place."); return; }
+  const d = fmtDate(nextDeliveryDate());
+  const slot = deliveryWindowSlot();
+  const customer = { name: "Aria Chen", addr: "120 Bay St, Unit 1402", postal: "M5J 2R8" };
+  ids.forEach((rid) => {
+    const o = ORDERS[rid];
+    const r = RESTAURANTS.find((x) => x.id === rid) || { name: "Kitchen" };
+    const items = meals.filter((m) => o.selected[m.id] > 0).map((m) => ({ title: m.title, qty: o.selected[m.id], price: m.price }));
+    const total = items.reduce((a, it) => a + it.qty * it.price, 0);
+    const order = {
+      id: "ORD-" + (++orderSeq),
+      rid, rest: r.name, tier: o.tier || 100, total,
+      items, customer, deliveryDate: d, window: slot, status: "received",
+      placedAt: new Date().toLocaleString("en-CA"),
+    };
+    if (!CONFIRMED_ORDERS[rid]) CONFIRMED_ORDERS[rid] = [];
+    CONFIRMED_ORDERS[rid].push(order);
+  });
+  // clear drafts once placed
+  ids.forEach((rid) => { ORDERS[rid] = { selected: {}, tier: 100 }; });
+  windowConfirmed = true;
+  flash("✓ Orders placed — restaurants notified.");
+  navigate();
+}
+function restaurantOrders(rid) { return (CONFIRMED_ORDERS[rid] || []).slice().sort((a, b) => new Date(a.deliveryDate) - new Date(b.deliveryDate)); }
+function allRestaurantOrders() {
+  const out = [];
+  Object.keys(CONFIRMED_ORDERS).forEach((rid) => out.push(...CONFIRMED_ORDERS[rid]));
+  return out.sort((a, b) => new Date(a.deliveryDate) - new Date(b.deliveryDate));
+}
+function notifyRestaurant(order, mode) {
+  // Real build: POST to a webhook/email/SMS provider. Here we build the message + links.
+  const body = `New order received at ${order.rest}:\n\nOrder #${order.id}\nCustomer: ${order.customer.name} · ${order.customer.addr} ${order.customer.postal}\nDelivery: ${order.deliveryDate}, ${order.window}\n\n${order.items.map((it) => `${it.qty}× ${it.title} — $${(it.qty * it.price).toFixed(2)}`).join("\n")}\n\nTotal: $${order.total.toFixed(2)}\nPlan: $${order.tier}/week`;
+  if (mode === "email") return "mailto:kitchen@" + order.rid + ".com?subject=" + encodeURIComponent("New order " + order.id + " — " + order.rest) + "&body=" + encodeURIComponent(body);
+  return "sms:?body=" + encodeURIComponent(body);
+}
 const budgetState = { continue: false }; // after "yes, keep adding" we stop nagging
 function budgetValue() { const v = parseFloat(buildState.budget); return (v && v > 0) ? v : 80; }
 function doAdd(id, delta) {
@@ -1202,47 +1247,132 @@ function renderBuild() {
    ========================================================================== */
 let chosenWindow = "5-7";
 let cadence = "weekly";
+let windowConfirmed = false;
 function deliveryWindowSlot() { return (DELIVERY_WINDOWS.find((w) => w.id === chosenWindow) || DELIVERY_WINDOWS[0]).slot; }
-function setDeliveryWindow(id) { chosenWindow = id; flash(`✓ Delivery window set.`); navigate(); }
+function orderSummary() {
+  const ids = myOrders();
+  const lines = [];
+  let total = 0, count = 0;
+  // Include confirmed (placed) orders in the customer's view
+  const confirmed = allRestaurantOrders().slice();
+  ids.forEach((rid) => {
+    const o = ORDERS[rid];
+    const r = RESTAURANTS.find((x) => x.id === rid) || { name: "Kitchen" };
+    const items = meals.filter((m) => o.selected[m.id] > 0);
+    let sub = 0;
+    items.forEach((m) => { const q = o.selected[m.id]; sub += q * m.price; count += q; });
+    total += sub;
+    lines.push({ rest: r.name, tier: o.tier, sub, items, status: "draft" });
+  });
+  confirmed.forEach((o) => {
+    const items = o.items.map((it) => { const m = meals.find((x) => x.title === it.title); return { id: m ? m.id : "x", title: it.title, price: it.price, restaurantId: o.rid, qty: it.qty }; });
+    total += o.total; count += o.items.reduce((a, it) => a + it.qty, 0);
+    lines.push({ rest: o.rest, tier: o.tier, sub: o.total, items, status: "confirmed", oid: o.id });
+  });
+  return { ids, lines, total, count, confirmed: confirmed.length > 0 };
+}
+function setDeliveryWindow(id) { chosenWindow = id; windowConfirmed = false; navigate(); }
+function confirmDelivery() { windowConfirmed = true; flash("✓ Delivery confirmed — window saved."); navigate(); }
+function changeWindow() { windowConfirmed = false; navigate(); }
+function orderSummaryText() {
+  const s = orderSummary();
+  const parts = s.lines.map((l) => `${l.rest} — $${l.sub.toFixed(2)}`).join(", ");
+  return `My Week. Fully Catered.\n\n${s.lines.map((l) => `• ${l.rest}: ${l.items.map((m) => `${s.lines.find(x=>x.rest===l.rest).items}`).length}`).join("\n")}\n\nTotal: $${s.total.toFixed(2)}\nDelivery: ${fmtDate(nextDeliveryDate())}, ${deliveryWindowSlot()}`;
+}
+function nextDeliveryDate() { const d = new Date(); d.setDate(d.getDate() + 4); return d; }
+function calendarLink() {
+  const start = nextDeliveryDate(); const s = new Date(start); s.setHours(17,0,0);
+  const e = new Date(start); e.setHours(19,0,0);
+  const fmt = (x) => x.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
+  const text = encodeURIComponent("My Week. Fully Catered. delivery — $" + orderSummary().total.toFixed(2));
+  const det = encodeURIComponent("Delivery window " + deliveryWindowSlot() + " · " + orderSummary().lines.map((l) => l.rest).join(", "));
+  return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${text}&dates=${fmt(s)}/${fmt(e)}&details=${det}`;
+}
+function emailLink() {
+  const s = orderSummary();
+  const body = encodeURIComponent(`My Week. Fully Catered.\n\n${s.lines.map((l) => `• ${l.rest}: $${l.sub.toFixed(2)} ($${l.tier}/week plan)`).join("\n")}\n\nTotal: $${s.total.toFixed(2)}\nDelivery: ${fmtDate(nextDeliveryDate())}, ${deliveryWindowSlot()}\nAddress: 120 Bay St, Unit 1402, Toronto`);
+  return `mailto:?subject=${encodeURIComponent("My Week. Fully Catered. delivery — " + fmtDate(nextDeliveryDate()))}&body=${body}`;
+}
+function smsLink() {
+  const s = orderSummary();
+  const body = encodeURIComponent(`My Week delivery ${fmtDate(nextDeliveryDate())} ${deliveryWindowSlot()}. $${s.total.toFixed(2)}. ${s.lines.map((l) => l.rest).join(", ")}`);
+  return `sms:?body=${body}`;
+}
+function icsLink() {
+  const start = nextDeliveryDate(); const s = new Date(start); s.setHours(17,0,0);
+  const e = new Date(start); e.setHours(19,0,0);
+  const f = (x) => x.getFullYear() + ("0"+(x.getMonth()+1)).slice(-2) + ("0"+x.getDate()).slice(-2) + "T" + ("0"+x.getHours()).slice(-2) + ("0"+x.getMinutes()).slice(-2) + "00";
+  const desc = `My Week. Fully Catered. delivery ${deliveryWindowSlot()} - ${orderSummary().lines.map((l) => l.rest).join(", ")}.`;
+  const ics = `BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//SupperClub//EN\nBEGIN:VEVENT\nDTSTART:${f(s)}\nDTEND:${f(e)}\nSUMMARY:${desc}\nEND:VEVENT\nEND:VCALENDAR`;
+  return "data:text/calendar;charset=utf-8," + encodeURIComponent(ics);
+}
 function setCadence(c) { cadence = c; flash(`✓ Plan set to ${c === "weekly" ? "weekly" : c === "biweekly" ? "every 2 weeks" : "monthly"}.`); navigate(); }
 function renderDashboard() {
-  const order = { items: 6, total: 78 };
-  const items = [1, 2, 3, 4, 5, 6].map((n) => {
-    const m = meals[(n * 3) % meals.length];
-    const r = mealRestaurant(m);
-    return `<div class="card meal"><div class="meal-top"><div>
-      <div class="meal-title"><span class="slot">${n}</span> ${esc(m.title)}</div>
-      <div class="meal-rest">${ico("chef")} prepared by ${esc(restName(m.restaurantId))}</div>
-      <div class="meal-meta">${m.badges.map(badgeHtml).join("")}<span class="chip bg-slate-100 text-slate-600">${m.calories} Cal · ${m.proteinGrams}g</span></div></div>
-      <button class="btn ghost sm" onclick="flash('Swap coming in full build')">${ico("swap")} Swap</button></div></div>`;
-  }).join("");
+  const s = orderSummary();
+  const items = s.lines.map((l) => `
+    <section class="card meal">
+      <div class="meal-top"><div><div class="meal-title"><span class="slot">${ico("store")}</span> ${esc(l.rest)}</div>
+        <div class="meal-rest">${ico("calendar")} $${l.tier}/week plan</div></div>
+        <span class="acc-amt">$${l.sub.toFixed(2)}</span></div>
+      <div class="yb-list">${l.items.map((m) => {
+        const q = (m.qty != null) ? m.qty : (ORDERS[s.ids[s.lines.indexOf(l)]] || {}).selected?.[m.id] || 0;
+        return `<div class="yb-row"><span class="yb-qty">${q}×</span><span class="yb-name">${esc(m.title)}</span><span class="yb-price">${money(q * m.price)}</span></div>`;
+      }).join("")}</div>
+    </section>`).join("");
+  const empty = s.count === 0;
+  const d = fmtDate(nextDeliveryDate());
 
   return `
     <div class="mobile">
       <header class="topbar"><a href="#" class="brand">${ico("sparkle")}<div><b>${esc(BRAND)}</b></div></a>
         <a href="#partners" class="navbtn link sm">${ico("store")}<span>Restaurant owners</span></a></header>
+
       <section class="card block">
         <div class="kicker">${ico("truck")} Next delivery</div>
-        <div class="h2">${fmtDate(new Date())} · ${deliveryWindowSlot()}</div>
+        <div class="h2">${d}</div>
         <div class="muted">${ico("pin")} 120 Bay St, Unit 1402 · Concierge</div>
         <div class="window-pick"><span class="wp-label">${ico("clock")} 2-hour window</span><div class="wp-opts">
           ${DELIVERY_WINDOWS.map((w) => `<button class="wp-opt ${chosenWindow === w.id ? "on" : ""}" onclick="setDeliveryWindow('${w.id}')">${w.label}</button>`).join("")}</div></div>
+        ${windowConfirmed ? `
+          <div class="confirm-banner">${ico("check")} Window confirmed — ${deliveryWindowSlot()} on ${d}. <button class="btn ghost sm" onclick="changeWindow()">Change</button></div>
+        ` : `
+          <button class="btn primary sm" style="width:100%;margin-top:12px" onclick="confirmDelivery()">${ico("check")} Confirm delivery window</button>
+        `}
         <div class="cadence-row"><span class="wp-label">${ico("calendar")} Plan frequency</span><div class="wp-opts">
           <button class="wp-opt ${cadence === "weekly" ? "on" : ""}" onclick="setCadence('weekly')">Weekly</button>
           <button class="wp-opt ${cadence === "biweekly" ? "on" : ""}" onclick="setCadence('biweekly')">Every 2 wks</button>
           <button class="wp-opt ${cadence === "monthly" ? "on" : ""}" onclick="setCadence('monthly')">Monthly</button></div></div>
         <div class="cutoff">${ico("clock")} Pause up to 3 days before · <a href="#track" class="track-link">${ico("truck")} Track</a></div>
       </section>
-      <div class="row-between"><div class="h3">Your 6 meals this week</div><div class="accent bold">$78 all-in</div></div>
-      <div class="meals">${items}</div>
+
+      ${empty ? `<section class="card block"><p class="muted">You have no weekly orders yet. <a href="#restaurants">Pick a kitchen</a> to get started.</p></section>` : `
+      <div class="row-between"><div class="h3">Your week</div><div class="accent bold">$${s.total.toFixed(2)} all-in</div></div>
+      <div class="meals">${items}</div>`}
+
+      ${windowConfirmed && !empty ? `
+      <section class="card block confirm-card">
+        <div class="kicker">${ico("check")} Order confirmed</div>
+        <div class="billrow"><span>Total (${s.count} meals)</span><span class="bold">$${s.total.toFixed(2)}</span></div>
+        <div class="billrow"><span>Delivery date</span><span class="bold">${d}</span></div>
+        <div class="billrow"><span>Delivery window</span><span class="bold">${deliveryWindowSlot()}</span></div>
+        <div class="billrow"><span>Delivery</span><span class="accent bold">INCLUDED</span></div>
+        <div class="share-actions">
+          <span class="share-label">${ico("tap")} Send to your calendar:</span>
+          <div class="share-btns">
+            <a class="btn ghost sm" href="${emailLink()}">${ico("printer")} Email</a>
+            <a class="btn ghost sm" href="${smsLink()}">${ico("tap")} Text</a>
+            <a class="btn ghost sm" href="${calendarLink()}" target="_blank">${ico("calendar")} Calendar</a>
+            <a class="btn ghost sm" href="${icsLink()}" download="supper-club-delivery.ics">${ico("download")} .ics</a>
+          </div>
+          <p class="muted sm">Add the date &amp; window to your calendar so you know when to expect it.</p>
+        </div>
+      </section>` : ""}
+
       <div class="actions">
         <button class="btn ghost col" onclick="flash('✓ Week paused — no charge.')">${ico("pause")}<span>Pause</span></button>
         <button class="btn ghost col" onclick="flash('✓ Switched to pickup.')">${ico("bag")}<span>Pickup</span></button>
         <button class="btn ghost col" onclick="flash('✓ Delivery mode.')">${ico("truck")}<span>Deliver</span></button>
       </div>
-      <section class="card block"><div class="kicker">${ico("wallet")} Billing</div>
-        <div class="billrow"><span>6 meals × $13/ea</span><span class="bold">$78.00</span></div>
-        <div class="billrow"><span>Delivery, fees &amp; taxes</span><span class="accent bold">INCLUDED</span></div></section>
     </div>
     <div class="mobnav">
       <a data-nav="dashboard" href="#dashboard" class="active">${ico("home")}<span>This Week</span></a>
@@ -1433,11 +1563,23 @@ function renderFleet() {
 
 /* KITCHEN — production matrix */
 function renderKitchen() {
-  const dishRows = [
-    { n: 140, title: "Chicken Tikka Masala", rest: "Indian Desire" }, { n: 85, title: "Bulgogi Beef Bowl", rest: "Seoul Food Co." },
-    { n: 60, title: "Lemon Herb Salmon", rest: "Sweet Basil" }, { n: 40, title: "Carne Asada Bowl", rest: "Taco Toro" },
-  ].map((d) => `<tr><td class="qty">${d.n}x</td><td class="name">${esc(d.title)}</td><td class="p-muted">${esc(d.rest)}</td>
-    <td><div class="pack"><div class="bar"><div class="fill" style="width:70%"></div></div><span>${Math.round(d.n * 0.7)}/${d.n} PACKED</span></div></td></tr>`).join("");
+  const orders = allRestaurantOrders();
+  const empty = !orders.length;
+  const cards = orders.map((o) => `
+    <section class="k-order">
+      <div class="ko-head">
+        <span class="ko-id">${esc(o.id)}</span>
+        <span class="ko-status received">${ico("check")} Received</span>
+        <span class="ko-date">${ico("calendar")} ${esc(o.deliveryDate)} · ${esc(o.window)}</span>
+      </div>
+      <div class="ko-cust">${ico("pin")} <b>${esc(o.customer.name)}</b> — ${esc(o.customer.addr)} ${esc(o.customer.postal)}</div>
+      <div class="ko-items">${o.items.map((it) => `<div class="billrow"><span>${it.qty}× ${esc(it.title)}</span><span class="bold">${money(it.qty * it.price)}</span></div>`).join("")}</div>
+      <div class="ko-total"><span>Total (${o.items.reduce((a, i) => a + i.qty, 0)} items · $${o.tier}/wk plan)</span><span class="tb-amt">${money(o.total)}</span></div>
+      <div class="ko-notify">
+        <a class="btn ghost sm" href="${notifyRestaurant(o, "email")}">${ico("printer")} Email owner</a>
+        <a class="btn ghost sm" href="${notifyRestaurant(o, "sms")}">${ico("tap")} Text owner</a>
+      </div>
+    </section>`).join("");
   return `
     <div class="partner-shell">
       <header class="p-topbar"><div class="p-brand">${ico("store")}<div><b>${esc(BRAND)}</b><span>kitchen portal</span></div></div>
@@ -1447,11 +1589,13 @@ function renderKitchen() {
           <a href="#payouts" class="p-navbtn" data-nav="payouts">${ico("wallet")} Payouts</a>
           <a href="#auction" class="p-navbtn" data-nav="auction">${ico("gavel")} Auctions</a>
         <a href="#" class="btn p-outline sm">${ico("arrowLeft")} Back to eaters</a></header>
-      <section class="p-table-card">
-        <div class="p-table-head"><span class="bold">${ico("pot")} Production Summary</span><span class="p-sum">325 MEALS</span></div>
-        <table><thead><tr><th>Qty</th><th>Dish</th><th>Kitchen</th><th>Packing</th></tr></thead><tbody>${dishRows}</tbody></table>
+      <section class="p-hero"><div class="eyebrow dark">Incoming orders</div>
+        <h1>Confirmed orders</h1>
+        <p>${orders.length ? `${orders.length} order${orders.length === 1 ? "" : "s"} received, earliest delivery first.` : "No orders yet — they'll appear here the moment a customer confirms."}</p></section>
+      <section class="k-list">
+        ${empty ? `<div class="p-table-card"><div class="muted" style="padding:24px">No orders received yet.</div></div>` : cards}
       </section>
-      <footer class="p-foot">Kitchen portal — aggregate batch totals, not chaotic order tickets.</footer>
+      <footer class="p-foot">Kitchen portal — every confirmed order, with customer, dishes, price, and delivery details.</footer>
     </div>`;
 }
 
@@ -1546,6 +1690,7 @@ window.moduleOn = moduleOn;
 window.setQty = setQty; window.setBuildFilter = setBuildFilter; window.quickCombo = quickCombo; window.applyBudget = applyBudget; window.buildState = buildState;
 window.boxTotal = boxTotal; window.selectedItems = selectedItems; window.clearBox = clearBox;
 window.orderAdd = orderAdd; window.setTier = setTier; window.clearOrder = clearOrder; window.ORDERS = ORDERS;
+window.placeOrders = placeOrders; window.CONFIRMED_ORDERS = CONFIRMED_ORDERS; window.confirmDelivery = confirmDelivery; window.changeWindow = changeWindow;
 window.setDeliveryWindow = setDeliveryWindow; window.setCadence = setCadence; window.toggleWeek = toggleWeek; window.advanceTrack = advanceTrack; window.TRACK = TRACK;
 window.setRestFilter = setRestFilter; window.demoNext = demoNext; window.demoPrev = demoPrev;
 window.meals = meals; window.RESTAURANTS = RESTAURANTS;

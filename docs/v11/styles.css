@@ -607,9 +607,8 @@ input, select, textarea, .login-input, .budget-input input, .gives-search input,
    Frosted glass · soft layered shadows · smooth motion · SF-style type
    ========================================================================== */
 
-/* 1) Typography — SF-like, clean, larger */
-:root { --sf: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
-body { font-family: var(--sf); font-weight: 400; letter-spacing: -0.01em; -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
+/* 1) Typography — Raleway brand font, clean & larger (kept across the whole app) */
+body { font-family: "Raleway", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-weight: 400; letter-spacing: -0.01em; -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
 h1,h2,h3,.h2,.h3,.fh-name,.dish-title,.chef-name,.rest-name,.gs-title,.step-t,.pstep-t { letter-spacing: -0.025em; font-weight: 700; }
 body { background: #f5f5f7; } /* Apple grey */
 
@@ -836,3 +835,56 @@ button,.btn,.btn.sm,.navbtn,.p-navbtn,.stp-btn,.wp-opt,.addon-opt,.swap-opt,.kit
 .navbtn.cta-big .ic { width: 26px; height: 26px; }
 .navbtn.cta-big .cta-bold { color: #fff; }
 .navbtn.cta-big .cta-sub { color: #eafff8 !important; opacity: .95; }
+
+/* 16) v11 — restaurant-side confirmed order list + confirm/share on customer side */
+.k-list { max-width: 1080px; margin: 0 auto; padding: 0 24px; display: flex; flex-direction: column; gap: 14px; }
+.k-order { background: #0f1730; border: 1px solid #1e293b; border-radius: 16px !important; padding: 18px; }
+.ko-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 8px; }
+.ko-id { font-weight: 900; color: #fff; font-size: 16px; }
+.ko-status { font-size: 12px; font-weight: 800; color: #6ee7b7; }
+.ko-status.received { background: #064e3b; padding: 4px 10px; border-radius: 999px; }
+.ko-date { color: #94a3b8; font-size: 13px; font-weight: 700; }
+.ko-cust { color: #cbd5e1; font-size: 14px; margin-bottom: 10px; }
+.ko-items { border-top: 1px solid #1e293b; padding-top: 8px; }
+.ko-items .billrow { color: #cbd5e1; }
+.ko-total { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 10px; color: #e2e8f0; font-weight: 800; }
+.ko-notify { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+.confirm-banner { background: #f0fdfa; border: 1px solid #99f6e4; color: #0f766e; border-radius: 12px; padding: 10px 12px; font-weight: 700; display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 10px; }
+.confirm-card { margin-top: 14px; }
+.share-actions { border-top: 1px solid var(--line); margin-top: 12px; padding-top: 12px; }
+.share-label { font-weight: 800; font-size: 14px; display: flex; align-items: center; gap: 6px; color: #0b1220; margin-bottom: 8px; }
+.share-btns { display: flex; gap: 8px; flex-wrap: wrap; }
+.acc-amt { font-weight: 900; color: #0d9488; }
+
+/* 17) v11 — BIGGER, MORE OBVIOUS TYPE (Raleway) */
+body { font-size: 16px; }
+h1, .h1 { font-size: clamp(34px, 5.5vw, 54px) !important; font-weight: 900; }
+h2, .h2 { font-size: 26px !important; font-weight: 900; }
+h3, .h3 { font-size: 21px !important; font-weight: 800; }
+.eyebrow, .kicker { font-size: 14px !important; font-weight: 800; }
+.hero-title p, .build-hero p, .p-hero p { font-size: 19px !important; line-height: 1.65; }
+.muted, .hero-title p, .dish-recipe, .chef-line, .step-d, .feat-d, .rest-meta,
+.fp-d, .gs-sub, .meal-rest, .tb-note, .tier-desc { font-size: 15px !important; }
+.card, .step, .feature, .rest-card, .rest-full, .dish-card, .chef-card, .meal-pick, .filters-panel { font-size: 16px; }
+.rest-name { font-size: 19px !important; font-weight: 800; }
+.rest-name.lg { font-size: 22px !important; }
+.rest-meta, .mp-meta, .meal-meta { font-size: 14px !important; }
+.meal-title, .mp-title, .dish-title { font-size: 17px !important; font-weight: 800; }
+.dish-title { font-size: 20px !important; }
+.fh-name { font-size: 32px !important; }
+.fh-meta { font-size: 16px !important; }
+.btn, .navbtn, .p-navbtn, .wp-opt, .tier-chip, button { font-size: 16px !important; }
+.btn.sm { font-size: 14px !important; }
+.chip { font-size: 13px !important; font-weight: 800; }
+.bold-chips .chip, .filters .chip, .frow .chip { font-size: 15px !important; }
+.p-brand b { font-size: 20px !important; }
+.p-brand span { font-size: 13px !important; }
+.p-cta-t { font-size: 26px !important; }
+.p-cta-d, .p-foot { font-size: 15px !important; }
+.p-label { font-size: 14px !important; }
+.mp-price { font-size: 17px !important; }
+.ko-id { font-size: 19px !important; }
+.ko-date, .ko-cust { font-size: 15px !important; }
+.oc-brand { font-size: 21px !important; }
+.billrow, .yb-name, .yb-price { font-size: 15px !important; }
+.yb-title { font-size: 20px !important; }
