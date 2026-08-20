@@ -71,9 +71,9 @@ export const FLEET = [
 ];
 
 // ---------- pricing ----------
-export const PRICING = { base: 200, orderFeePct: 0.10, firstWeekFree: true };
-export function partnerMonthlyFee(monthlyOrderValue: number): number {
-  return PRICING.base + Math.round(monthlyOrderValue * PRICING.orderFeePct * 100) / 100;
+export const PRICING = { base: 500, orderFeePct: 0, firstMonthFree: true };
+export function partnerMonthlyFee(): number {
+  return PRICING.base;
 }
 
 // ---------- seed function ----------

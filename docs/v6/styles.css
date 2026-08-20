@@ -482,12 +482,14 @@ button { font: inherit; cursor: pointer; }
 .bid-feed-item:last-child { border-bottom: none; }
 .bf-slot { color: #6ee7b7; font-weight: 700; min-width: 140px; }
 
-/* photo placeholders */
-.fh-photo { width: 180px; height: 120px; border-radius: 16px; display: grid; place-items: center; color: #fff; font-size: 64px; font-weight: 900; position: relative; flex: none; }
-.ph-label { position: absolute; bottom: 8px; left: 0; right: 0; text-align: center; font-size: 10px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; opacity: .9; background: rgba(0,0,0,.25); padding: 2px 0; }
-.dish-img { position: relative; }
-.chef-avatar { position: relative; overflow: hidden; }
-@media (max-width:560px){ .fh-photo{ width: 100%; height: 90px; font-size: 44px; } }
+/* photo placeholders / real images — less tall, wider (16:10 ratio) */
+.fh-photo { width: 220px; border-radius: 4px; overflow: hidden; flex: none; aspect-ratio: 16/10; background: #0f172a; }
+.fh-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.dish-img { width: 220px; border-radius: 4px; overflow: hidden; flex: none; aspect-ratio: 16/10; background: #e2e8f0; }
+.dish-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.chef-avatar { width: 220px; height: 138px; border-radius: 4px; overflow: hidden; flex: none; }
+.chef-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
+@media (max-width:560px){ .fh-photo, .dish-img, .chef-avatar { width: 100%; } }
 
 /* owner login */
 .login-wrap { max-width: 420px; margin: 60px auto; padding: 0 20px; }

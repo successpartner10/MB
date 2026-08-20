@@ -4,7 +4,7 @@
    Two products: Subscriber app (light/green) + Partner portal (dark/amber).
    Features: 15 restaurants · build-your-box · 2-hr windows · live tracking
    to CN Tower · fleet board · order cadence (weekly/2-wk/monthly) · live
-   DineSafe badges · $200 + 10% pricing · pickup option · animated demo.
+   DineSafe badges · flat $500/mo pricing · pickup option · animated demo.
    ========================================================================== */
 
 /* ---------- versioning ---------- */
@@ -278,15 +278,15 @@ const FLEET = [
 ];
 
 /* ============================================================================
-   PRICING — $200/month flat + 10% of app order value; first week free
+   PRICING — flat $500/month, first month free (no commission)
    ========================================================================== */
 const PRICING = {
-  base: 200,
-  orderFeePct: 0.10,
-  firstWeekFree: true,
+  base: 500,
+  orderFeePct: 0,
+  firstMonthFree: true,
 };
-function partnerMonthlyFee(monthlyOrderValue) {
-  return PRICING.base + Math.round(monthlyOrderValue * PRICING.orderFeePct * 100) / 100;
+function partnerMonthlyFee() {
+  return PRICING.base;
 }
 
 /* ---------- helpers ---------- */
@@ -451,7 +451,7 @@ function renderHome() {
 
       <!-- FEATURED RESTAURANT (hero) — daily auction winner -->
       <section class="featured-hero">
-        <div class="fh-photo" style="background:linear-gradient(135deg,#7c3aed,#0d9488)">${esc(featured.name[0])}<span class="ph-label">Richmond Station · photo</span></div>
+        <div class="fh-photo"><img src="img/dish-indian-2.jpg" alt="${esc(featured.name)}" /></div>
         <div class="fh-body">
           <div class="fh-tag">Featured restaurant</div>
           <div class="fh-name">${esc(featured.name)}</div>
@@ -464,7 +464,7 @@ function renderHome() {
       <section class="content-sec">
         <div class="kicker">Dish of the day · by ${esc(dish.rest)}</div>
         <div class="dish-card">
-          <div class="dish-img" style="background:linear-gradient(135deg,#0d9488,#f59e0b)">${ico("chef")}<span class="ph-label">Dish photo</span></div>
+          <div class="dish-img"><img src="img/dish-butter-chicken.jpg" alt="${esc(dish.title)}" /></div>
           <div class="dish-body">
             <div class="dish-title">${esc(dish.title)}</div>
             <div class="dish-recipe">${esc(dish.recipe)}</div>
@@ -476,7 +476,7 @@ function renderHome() {
       <section class="content-sec">
         <div class="kicker">Chef story · ${esc(chefStory.rest)}</div>
         <div class="chef-card">
-          <div class="chef-avatar" style="background:linear-gradient(135deg,#7c3aed,#0d9488)">${esc(chefStory.chef[0])}<span class="ph-label">Chef photo</span></div>
+          <div class="chef-avatar"><img src="img/chef.jpg" alt="${esc(chefStory.chef)}" /></div>
           <div><div class="chef-name">${esc(chefStory.chef)}</div><div class="chef-line">${esc(chefStory.line)}</div></div>
         </div>
       </section>
@@ -701,7 +701,7 @@ const DEMO_SCRIPT = [
   { side: "sub", icon: "truck", title: "4 · Live delivery", text: "Track your courier live — e.g. Indian Desire on Bloor St all the way to the CN Tower." },
   { side: "owner", icon: "factory", title: "A · Owner: batch orders", text: "One consolidated prep list per kitchen. No chaotic per-order tickets." },
   { side: "owner", icon: "truck", title: "B · Owner: fleet board", text: "See every order out at once — courier, live map, ETA, status." },
-  { side: "owner", icon: "wallet", title: "C · Owner: get paid", text: "$200/mo + 10% of the orders we bring. First week free. Predictable, no 25% commission." },
+  { side: "owner", icon: "wallet", title: "C · Owner: get paid", text: "Flat $500/month. First month free. No commissions. Predictable." },
 ];
 let demoIdx = 0;
 function renderDemo() {
@@ -963,7 +963,7 @@ function renderPartners() {
   const steps = [
     ["1", "Set up", "Profile, menu & zones. Automated DineSafe + rating vetting.", "store"],
     ["2", "Fulfill orders", "Committed weekly volume + one consolidated prep list.", "pot"],
-    ["3", "Get paid", "$200/mo + 10% of orders we bring. First week free.", "wallet"],
+    ["3", "Get paid", "Flat $500/month. First month free.", "wallet"],
   ].map(([n, t, d, ic]) => `<div class="pstep"><span class="pstep-num">${n}</span><div class="pstep-body"><div class="pstep-t">${ico(ic)} ${t}</div><div class="pstep-d">${d}</div></div></div>`).join("");
   return `
     <div class="partner-shell">
@@ -979,11 +979,9 @@ function renderPartners() {
         <p>Committed weekly customers, consolidated batch orders, automated vetting, and automatic payouts. You just cook.</p></section>
       <section class="p-steps"><div class="p-label">It's 3 steps to your first payout</div>${steps}</section>
       <section class="pricing-band">
-        <div class="pb-item"><span class="pb-num">$200</span><span class="pb-l">/ month</span></div>
-        <div class="pb-plus">+</div>
-        <div class="pb-item"><span class="pb-num">10%</span><span class="pb-l">of app orders</span></div>
+        <div class="pb-item"><span class="pb-num">$500</span><span class="pb-l">/ month</span></div>
         <div class="pb-plus">=</div>
-        <div class="pb-item accent"><span class="pb-num">First week</span><span class="pb-l">free</span></div>
+        <div class="pb-item accent"><span class="pb-num">First month</span><span class="pb-l">free</span></div>
       </section>
       <section class="p-cta"><div class="p-cta-left"><div class="p-label">Automated vetting — no manual checks</div>
         <div class="p-cta-t">DineSafe &amp; Google rating, verified nightly</div>
@@ -1058,7 +1056,7 @@ function renderKitchen() {
 /* PAYOUTS */
 function renderPayouts() {
   const rows = [
-    ["Flat membership", "$200", "fixed"], ["10% of app orders", "$325", "10% of $3,250"], ["Total this month", "$525", "total"],
+    ["Flat membership", "$500", "fixed"], ["Total this month", "$500", "total"],
   ].map(([l, v, c]) => `<div class="pay-row"><span>${l}</span><span class="pay-val">${v} ${c === "total" ? `<span class="pay-dir up">▲</span>` : ""}</span></div>`).join("");
   return `
     <div class="partner-shell">
@@ -1069,10 +1067,10 @@ function renderPayouts() {
           <a href="#payouts" class="p-navbtn active" data-nav="payouts">${ico("wallet")} Payouts</a>
           <a href="#auction" class="p-navbtn" data-nav="auction">${ico("gavel")} Auctions</a></nav>
         <a href="#" class="btn p-outline sm">${ico("arrowLeft")} Back to eaters</a></header>
-      <section class="pay-hero"><div class="pay-hero-label">Your fee this month</div><div class="pay-hero-amt">$525</div>
-        <div class="pay-hero-sub">$200 base + 10% of $3,250 in app orders · deposited Thu, Aug 20</div></section>
+      <section class="pay-hero"><div class="pay-hero-label">Your membership fee</div><div class="pay-hero-amt">$500</div>
+        <div class="pay-hero-sub">Flat $500/month · first month free · no commission, ever · deposited Thu, Aug 20</div></section>
       <section class="p-table-card"><div class="p-table-head"><span class="bold">${ico("chart")} Fee breakdown</span></div>${rows}</section>
-      <footer class="p-foot">Predictable: flat $200 + 10% of the orders we bring. First week free.</footer>
+      <footer class="p-foot">Predictable: flat $500/month, first month free. No commission.</footer>
     </div>`;
 }
 

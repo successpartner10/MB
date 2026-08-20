@@ -320,16 +320,14 @@ kitchenRouter.get("/api/v1/fleet", (_req, res) => {
   });
 });
 
-/** GET /api/v1/partner/pricing — the $200 + 10% membership model. */
+/** GET /api/v1/partner/pricing — flat $500/month membership (first month free). */
 kitchenRouter.get("/api/v1/partner/pricing", (_req, res) => {
   res.json({
     base: PRICING.base,
     orderFeePct: PRICING.orderFeePct,
-    firstWeekFree: PRICING.firstWeekFree,
-    example: {
-      at2000: partnerMonthlyFee(2000),
-      at3250: partnerMonthlyFee(3250),
-    },
+    firstMonthFree: PRICING.firstMonthFree,
+    monthlyFee: partnerMonthlyFee(),
+    note: "Flat $500/month, first month free, no commission.",
   });
 });
 
