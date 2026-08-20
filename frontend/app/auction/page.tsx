@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { getAuctions, placeBid } from "@/lib/api";
+import OwnerGate from "@/components/OwnerGate";
 
 export default function AuctionPage() {
   const [data, setData] = useState<any>(null);
@@ -20,6 +21,7 @@ export default function AuctionPage() {
   }
 
   return (
+    <OwnerGate>
     <div className="mx-auto max-w-5xl px-5 py-6">
       <header className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 pb-4">
         <div className="font-extrabold tracking-tight">Supper Club Direct — Content Auctions</div>
@@ -61,5 +63,6 @@ export default function AuctionPage() {
       ))}
       <p className="mt-4 text-xs text-slate-400">Bids close weekly (Mon–Wed). Winner supplies the hero image / dish+recipe / chef story for the next day. Transparent — all bids visible.</p>
     </div>
+    </OwnerGate>
   );
 }

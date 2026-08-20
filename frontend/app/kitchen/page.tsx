@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import Badge from "@/components/Badge";
+import OwnerGate from "@/components/OwnerGate";
 import {
   getProductionMatrix,
   getRestaurants,
@@ -123,6 +124,7 @@ export default function KitchenPage() {
   const readyRoutes = matrix.routes.filter((r) => (matrix.courier[r.postalPrefix] ?? 0) === 0);
 
   return (
+    <OwnerGate>
     <div className="mx-auto max-w-6xl px-5 py-6">
       {/* Header */}
       <header className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 pb-4">
@@ -353,6 +355,7 @@ export default function KitchenPage() {
         </p>
       </section>
     </div>
+    </OwnerGate>
   );
 }
 

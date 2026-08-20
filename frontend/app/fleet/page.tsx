@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import OwnerGate from "@/components/OwnerGate";
 
 const FLEET = [
   { id: "ord-1001", customer: "Aria Chen", addr: "120 Bay St, #1402", rest: "Indian Desire", status: "out", courier: "Marcus", eta: "12 min", progress: 74 },
@@ -20,6 +21,7 @@ const STATUS: Record<string, { label: string; cls: string }> = {
 export default function FleetPage() {
   const outCount = FLEET.filter((f) => f.status === "out").length;
   return (
+    <OwnerGate>
     <div className="mx-auto max-w-5xl px-5 py-6">
       <header className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 pb-4">
         <div className="font-extrabold tracking-tight">Supper Club Direct — Fleet Board</div>
@@ -52,5 +54,6 @@ export default function FleetPage() {
 
       <p className="mt-4 text-xs text-slate-400">Fleet board — track every order out at once.</p>
     </div>
+    </OwnerGate>
   );
 }

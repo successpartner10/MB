@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import OwnerGate from "@/components/OwnerGate";
 
 const BARS = [62, 78, 45, 90, 70, 100, 82];
 
@@ -16,6 +17,7 @@ export default function PayoutsPage() {
   const fee = 200 + Math.round(data.orders * 0.1);
 
   return (
+    <OwnerGate>
     <div className="mx-auto max-w-4xl px-5 py-6">
       <header className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 pb-4">
         <div className="font-extrabold tracking-tight">Supper Club Direct — Partner Payouts</div>
@@ -66,5 +68,6 @@ export default function PayoutsPage() {
 
       <p className="mt-4 text-xs text-slate-400">Predictable: flat $200 + 10% of the orders we bring. No 25% commission. Never.</p>
     </div>
+    </OwnerGate>
   );
 }

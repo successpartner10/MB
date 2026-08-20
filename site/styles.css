@@ -488,3 +488,13 @@ button { font: inherit; cursor: pointer; }
 .dish-img { position: relative; }
 .chef-avatar { position: relative; overflow: hidden; }
 @media (max-width:560px){ .fh-photo{ width: 100%; height: 90px; font-size: 44px; } }
+
+/* owner login */
+.login-wrap { max-width: 420px; margin: 60px auto; padding: 0 20px; }
+.login-card { background: #111a33; border: 1px solid #1e293b; border-radius: 20px; padding: 32px; text-align: center; }
+.login-ico { width: 60px; height: 60px; border-radius: 16px; background: #f59e0b; color: #0b1020; display: grid; place-items: center; margin: 0 auto 16px; }
+.login-ico .ic { width: 28px; height: 28px; }
+.login-card h2 { color: #fff; font-size: 22px; font-weight: 900; }
+.login-card p { color: #94a3b8; }
+.login-input { width: 100%; padding: 12px 14px; border: 1px solid #334155; border-radius: 10px; background: #0b1020; color: #fff; font-size: 15px; margin: 16px 0 12px; }
+.login-card code { background: #1e293b; padding: 2px 6px; border-radius: 5px; }

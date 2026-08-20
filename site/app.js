@@ -320,12 +320,57 @@ const routes = {
   schedule: renderSchedule, track: renderTrack, demo: renderDemo, gives: renderGives,
   partners: renderPartners, kitchen: renderKitchen, fleet: renderFleet, payouts: renderPayouts, auction: renderAuction,
 };
+const PARTNER_ROUTES = ["partners", "kitchen", "fleet", "payouts", "auction"];
 function currentRoute() { const h = location.hash.replace(/^#\/?/, "").split("?")[0]; return routes[h] ? h : ""; }
+
+/* ---- owner auth gate (demo: password stored in localStorage; real auth in production) ---- */
+const OWNER_PASS = "supperclub"; // demo credential — replace with a vetted auth provider in prod
+function isOwnerAuthed() { try { return localStorage.getItem("scd_owner") === "1"; } catch { return false; } }
+function renderLogin() {
+  return `
+    <div class="partner-shell">
+      <header class="p-topbar"><div class="p-brand">${ico("store")}<div><b>${esc(BRAND)}</b><span>restaurant owner sign-in</span></div></div></header>
+      <section class="login-wrap">
+        <div class="login-card">
+          <div class="login-ico">${ico("shield")}</div>
+          <h2>Restaurant Owner Sign-in</h2>
+          <p class="muted sm">The auction, fleet, kitchen, and payout tools are for restaurant owners only. Sign in to continue.</p>
+          <input type="password" id="owner-pass" placeholder="Enter owner password" class="login-input" onkeydown="if(event.key==='Enter')ownerLogin()" />
+          <button class="btn p-primary" style="width:100%" onclick="ownerLogin()">${ico("arrow")} Sign in</button>
+          <p class="muted sm" style="margin-top:12px">Demo password: <code>supperclub</code></p>
+          <a href="#" class="btn p-outline sm" style="margin-top:8px">${ico("arrowLeft")} Back to eaters</a>
+        </div>
+      </section>
+    </div>`;
+}
+function ownerLogin() {
+  const inp = document.getElementById("owner-pass");
+  const val = inp ? inp.value : "";
+  if (val === OWNER_PASS) {
+    try { localStorage.setItem("scd_owner", "1"); } catch {}
+    flash("✓ Signed in as restaurant owner.");
+    navigate();
+  } else {
+    flash("Incorrect password.");
+  }
+}
+function ownerLogout() {
+  try { localStorage.removeItem("scd_owner"); } catch {}
+  flash("Signed out.");
+  navigate();
+}
 function navigate() {
   const r = currentRoute();
-  document.querySelectorAll("[data-nav]").forEach((a) => a.classList.toggle("active", a.dataset.nav === r));
   const app = document.getElementById("app");
-  app.className = (r === "partners" || r === "kitchen" || r === "fleet" || r === "payouts" || r === "auction") ? "partner" : "consumer";
+  // Partner routes require owner sign-in
+  if (PARTNER_ROUTES.includes(r) && !isOwnerAuthed()) {
+    app.className = "partner";
+    app.innerHTML = renderLogin();
+    window.scrollTo(0, 0);
+    return;
+  }
+  document.querySelectorAll("[data-nav]").forEach((a) => a.classList.toggle("active", a.dataset.nav === r));
+  app.className = PARTNER_ROUTES.includes(r) ? "partner" : "consumer";
   app.innerHTML = routes[r]();
   window.scrollTo(0, 0);
 }
@@ -349,18 +394,26 @@ function renderHome() {
       </div>
     </div>`).join("");
 
-  /* ---- auto-generated content sections (data-driven placeholders) ----
-     Using top Toronto/GTA restaurants for the demo look & feel. */
-  const featured = RESTAURANTS.find((r) => r.id === "rest_indian") || RESTAURANTS[0];
-  const dish = { title: "Butter Chicken & Basmati", rest: "Indian Desire", img: "BC", recipe: "Tandoor-grilled chicken, tomato-makhani sauce, basmati. Serves 2. Pair with naan & a squeeze of lime.", photo: "Butter Chicken" };
-  const chefStory = { rest: "Richmond Station", chef: "Carl Heinrich", line: "Top Chef Canada winner, cooks contemporary Canadian with a farm-first ethos at Richmond Station." };
-  const topPhotos = ["Richmond Station", "Pai Northern Thai", "Aloette", "Indian Desire"];
-  const whatAte = [
-    { dish: "Bulgogi Beef Bowl", rest: "Seoul Food Co.", orders: 214 },
-    { dish: "Chicken Tikka Masala", rest: "Indian Desire", orders: 198 },
-    { dish: "Lemon Herb Salmon", rest: "Sweet Basil", orders: 176 },
-    { dish: "Carne Asada Bowl", rest: "Taco Toro", orders: 149 },
-  ];
+  /* ---- auto-generated content sections ----
+     Uses LIVE_CONTENT from the API when available, else embedded demo data. */
+  const live = LIVE_CONTENT || {};
+  const featured = live.featured
+    ? { name: live.featured.name, cuisine: live.featured.cuisine, neighborhood: live.featured.neighborhood, google: live.featured.google, dineSafe: live.featured.dineSafe }
+    : (RESTAURANTS.find((r) => r.id === "rest_indian") || RESTAURANTS[0]);
+  const dish = live.dishOfTheDay
+    ? { title: live.dishOfTheDay.title, rest: live.dishOfTheDay.restaurant, recipe: live.dishOfTheDay.recipe }
+    : { title: "Butter Chicken & Basmati", rest: "Indian Desire", recipe: "Tandoor-grilled chicken, tomato-makhani sauce, basmati. Serves 2. Pair with naan & a squeeze of lime." };
+  const chefStory = live.chefStory
+    ? { rest: live.chefStory.restaurant, chef: live.chefStory.chef, line: live.chefStory.line }
+    : { rest: "Richmond Station", chef: "Carl Heinrich", line: "Top Chef Canada winner, cooks contemporary Canadian with a farm-first ethos at Richmond Station." };
+  const whatAte = (live.whatTorontoAte && live.whatTorontoAte.length)
+    ? live.whatTorontoAte.map((w) => ({ dish: w.dish, rest: w.restaurant, orders: w.orders }))
+    : [
+        { dish: "Bulgogi Beef Bowl", rest: "Seoul Food Co.", orders: 214 },
+        { dish: "Chicken Tikka Masala", rest: "Indian Desire", orders: 198 },
+        { dish: "Lemon Herb Salmon", rest: "Sweet Basil", orders: 176 },
+        { dish: "Carne Asada Bowl", rest: "Taco Toro", orders: 149 },
+      ];
 
   return `
     <div class="consumer-shell">
@@ -470,6 +523,27 @@ function homeSearch(q) {
   // placeholder: in the real build this filters restaurants/dishes by query
   flash(q ? `Searching "${q}"…` : "");
 }
+
+/* ---- optional live-content fetch: tries the API, falls back to embedded data ----
+   On GitHub Pages (no backend) it silently uses embedded data. In a local/demo build
+   with a public API reachable, it uses live content. Set API_BASE to a public URL. */
+const API_BASE = ""; // e.g. "https://your-api.example.com" when hosted; "" = embedded fallback
+let LIVE_CONTENT = null;
+let LIVE_LOADED = false;
+async function loadLiveContent() {
+  if (LIVE_LOADED) return;
+  LIVE_LOADED = true;
+  if (!API_BASE) return; // no API configured -> keep embedded
+  try {
+    const res = await fetch(`${API_BASE}/api/v1/content`);
+    if (res.ok) { LIVE_CONTENT = await res.json(); }
+  } catch { /* offline / no API -> keep embedded */ }
+}
+function liveOr(field, fallback) {
+  return LIVE_CONTENT && LIVE_CONTENT[field] != null ? LIVE_CONTENT[field] : fallback;
+}
+// kick off content load once at boot
+if (typeof window !== "undefined") { loadLiveContent(); }
 
 /* ============================================================================
    SUPPER CLUB GIVES — public transparent ledger
@@ -899,7 +973,7 @@ function renderPartners() {
           <a href="#kitchen" class="p-navbtn" data-nav="kitchen">${ico("pot")} Kitchen</a>
           <a href="#payouts" class="p-navbtn" data-nav="payouts">${ico("wallet")} Payouts</a>
           <a href="#auction" class="p-navbtn" data-nav="auction">${ico("gavel")} Auctions</a></nav>
-        <a href="#" class="btn p-outline sm">${ico("arrowLeft")} Back to eaters</a></header>
+        <a href="#" class="btn p-outline sm" onclick="ownerLogout()">${ico("arrowLeft")} Sign out</a></header>
       <section class="p-hero"><div class="eyebrow dark">Get on the GTA's zero-friction meal box</div>
         <h1>Run your kitchen on ${esc(BRAND)}</h1>
         <p>Committed weekly customers, consolidated batch orders, automated vetting, and automatic payouts. You just cook.</p></section>
@@ -1009,6 +1083,8 @@ window.setQty = setQty; window.setBuildFilter = setBuildFilter; window.quickComb
 window.setDeliveryWindow = setDeliveryWindow; window.setCadence = setCadence; window.toggleWeek = toggleWeek; window.advanceTrack = advanceTrack; window.TRACK = TRACK;
 window.setRestFilter = setRestFilter; window.demoNext = demoNext; window.demoPrev = demoPrev;
 window.homeSearch = homeSearch;
+window.ownerLogin = ownerLogin;
+window.ownerLogout = ownerLogout;
 window.flash = flash;
 if (navigator && navigator.serviceWorker && typeof navigator.serviceWorker.register === "function") { navigator.serviceWorker.register("sw.js").catch(() => {}); }
 navigate();
