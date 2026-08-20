@@ -1008,12 +1008,46 @@ function openRest(rid) { activeRest = rid; if (!ORDERS[rid]) ORDERS[rid] = { sel
 function getOrder(rid) { openRest(rid); return ORDERS[rid]; }
 function orderTotals(rid) { const o = ORDERS[rid]; if (!o) return { total: 0, count: 0 }; let t = 0, c = 0; meals.forEach((m) => { const q = o.selected[m.id] || 0; if (q > 0) { t += q * m.price; c += q; } }); return { total: t, count: c }; }
 function orderTotal(rid) { return orderTotals(rid).total; }
-function setTier(rid, tier) { getOrder(rid).tier = tier; flash(`✓ Weekly order set to $${tier}/week from ${esc(restName(rid))}.`); navigate(); }
+function setTier(rid, tier) { const o = getOrder(rid); o.tier = tier; o.continue = false; flash(`✓ Weekly order set to $${tier}/week from ${esc(restName(rid))}.`); navigate(); }
 function orderAdd(rid, mid, delta) {
+  const o = getOrder(rid);
+  const q = (o.selected[mid] || 0) + delta;
+  if (delta > 0) {
+    const m = meals.find((x) => x.id === mid);
+    const tier = o.tier || WEEKLY_TIERS[0];
+    const tot = orderTotals(rid);
+    const addPrice = m ? m.price : 0;
+    if (tier && (tot.total + addPrice) > tier && !o.continue) {
+      showModal({
+        ico: "calendar",
+        title: `Weekly order reached — $${tier}`,
+        message: `Your order from ${esc(restName(rid))} is at $${tot.total.toFixed(2)}. Adding “${m ? esc(m.title) : "this item"}” brings it to $${(tot.total + addPrice).toFixed(2)}, past your $${tier}/week plan. Do you want to continue or reconsider?`,
+        buttons: [
+          { label: "Yes, continue", primary: true, action: () => { o.continue = true; doOrderAdd(rid, mid, delta); } },
+          { label: "Reconsider items", action: () => askOrderCheckoutOrChange(rid) },
+        ],
+      });
+      return;
+    }
+  }
+  doOrderAdd(rid, mid, delta);
+}
+function doOrderAdd(rid, mid, delta) {
   const o = getOrder(rid);
   const q = (o.selected[mid] || 0) + delta;
   if (q <= 0) delete o.selected[mid]; else o.selected[mid] = q;
   navigate();
+}
+function askOrderCheckoutOrChange(rid) {
+  showModal({
+    ico: "box",
+    title: "What would you like to do?",
+    message: `Check out this order from ${esc(restName(rid))}, or remove some items to fit your weekly plan?`,
+    buttons: [
+      { label: "Check out this order", primary: true, action: () => { getOrder(rid).continue = false; location.hash = "#checkout"; navigate(); } },
+      { label: "Reconsider items", action: () => { getOrder(rid).continue = false; } },
+    ],
+  });
 }
 function myOrders() { return Object.keys(ORDERS).filter((rid) => orderTotals(rid).count > 0); }
 function orderLine(rid, mid) { const o = ORDERS[rid]; const m = meals.find((x) => x.id === mid); if (!o || !m) return ""; return `<div class="billrow"><span>${o.selected[mid]}× ${esc(m.title)}</span><span class="bold">${money(o.selected[mid] * m.price)}</span></div>`; }
