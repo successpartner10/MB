@@ -527,7 +527,7 @@ function homeSearch(q) {
 /* ---- optional live-content fetch: tries the API, falls back to embedded data ----
    On GitHub Pages (no backend) it silently uses embedded data. In a local/demo build
    with a public API reachable, it uses live content. Set API_BASE to a public URL. */
-const API_BASE = ""; // e.g. "https://your-api.example.com" when hosted; "" = embedded fallback
+const API_BASE = ""; // 🔌 SET THIS: e.g. "https://supperclub-api.onrender.com" when you host the backend publicly. "" = embedded fallback (works offline / GitHub Pages).
 let LIVE_CONTENT = null;
 let LIVE_LOADED = false;
 async function loadLiveContent() {
