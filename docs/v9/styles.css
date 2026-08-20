@@ -679,3 +679,47 @@ button,.btn,.btn.sm,.navbtn,.p-navbtn,.stp-btn,.wp-opt,.addon-opt,.swap-opt,.kit
   .dish-gallery { grid-template-columns: repeat(2, 1fr); }
   .dg-item img { height: 130px; width: 100%; object-fit: cover; }
 }
+
+/* 8) v9.1 — modal dialogs, bold filters, bold CTA, delivery page, owner mini-link */
+.cta-bold { font-weight: 900; letter-spacing: -.01em; }
+
+/* bold homepage filter chips */
+.bold-chips { gap: 10px; }
+.bold-chips .chip { font-size: 15px; font-weight: 800; padding: 10px 16px; border-radius: 999px !important; border: 2px solid transparent; }
+.bold-chips .chip.on { background: #0d9488 !important; color: #fff !important; border-color: #0f766e; box-shadow: 0 4px 12px rgba(13,148,136,.25); }
+
+/* small owner link under homepage footer */
+.owner-mini { text-align: center; padding: 4px 20px 22px; font-size: 13px; }
+.owner-mini a { color: #64748b; text-decoration: none; font-weight: 600; }
+.owner-mini a:hover { color: #0d9488; }
+
+/* restaurant link cards */
+.rest-full.link-card { display: block; text-decoration: none; color: inherit; position: relative; transition: transform .15s ease, box-shadow .15s ease; }
+.rest-full.link-card:hover { transform: translateY(-2px); box-shadow: 0 2px 4px rgba(0,0,0,.05), 0 14px 32px rgba(0,0,0,.10) !important; }
+.rest-order-btn { margin-top: 12px; display: inline-flex; align-items: center; gap: 6px; color: #0d9488; font-weight: 800; font-size: 14px; }
+
+/* budget indicator in total bar / menu */
+.budget-ind { padding: 4px 10px; border-radius: 999px; font-size: 13px; font-weight: 800; }
+.budget-ind.ok { background: #f0fdfa; color: #0f766e; }
+.budget-ind.over { background: #fff1f2; color: #e11d48; }
+
+/* modal dialog */
+#modal { position: fixed; inset: 0; z-index: 999; display: none; }
+.modal-overlay { position: fixed; inset: 0; background: rgba(11,18,32,.55); backdrop-filter: blur(4px); display: grid; place-items: center; padding: 20px; }
+.modal-card { background: #fff; border-radius: 20px !important; max-width: 460px; width: 100%; padding: 28px; box-shadow: 0 24px 60px rgba(0,0,0,.25); text-align: left; }
+.modal-ico { width: 52px; height: 52px; border-radius: 16px; background: #f0fdfa; color: #0d9488; display: grid; place-items: center; margin-bottom: 14px; }
+.modal-ico .ic { width: 26px; height: 26px; }
+.modal-title { font-size: 20px; font-weight: 900; color: #0b1220; letter-spacing: -.02em; margin-bottom: 8px; }
+.modal-msg { color: #475569; font-size: 15px; line-height: 1.55; margin-bottom: 20px; }
+.modal-btns { display: flex; flex-direction: column; gap: 10px; }
+.modal-btns .btn { width: 100%; padding: 13px; font-size: 15px; font-weight: 800; }
+
+/* delivery page */
+.dlv-board { display: flex; flex-direction: column; gap: 12px; margin-top: 12px; }
+.dlv-row { background: #fff; border: 1px solid var(--line); border-radius: 14px !important; padding: 16px 18px; box-shadow: 0 1px 2px rgba(0,0,0,.04), 0 8px 24px rgba(0,0,0,.06); }
+.dlv-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 6px; }
+.dlv-name { font-weight: 900; color: #0b1220; display: inline-flex; align-items: center; gap: 8px; }
+.dlv-name .ic { color: #0d9488; }
+.dlv-rec { background: #0d9488; color: #fff; font-size: 11px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; padding: 4px 10px; border-radius: 999px; }
+.dlv-how { color: #334155; font-size: 14px; line-height: 1.5; }
+.dlv-why { color: #64748b; font-size: 13px; margin-top: 6px; }

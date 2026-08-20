@@ -314,15 +314,41 @@ function flash(msg) {
 function courierMapX(p) { return 20 + (265 * (p / 100)); }
 function courierMapY(p) { return 130 - (105 * (p / 100)); }
 
+/* ---------- modal dialog (budget prompts, confirmations) ---------- */
+function showModal(o) {
+  let el = document.getElementById("modal");
+  if (!el) { el = document.createElement("div"); el.id = "modal"; document.body.appendChild(el); }
+  el.innerHTML = `
+    <div class="modal-overlay" onclick="if(event.target===this)closeModal()">
+      <div class="modal-card">
+        ${o.ico ? `<div class="modal-ico">${ico(o.ico)}</div>` : ""}
+        <div class="modal-title">${o.title}</div>
+        ${o.message ? `<div class="modal-msg">${o.message}</div>` : ""}
+        <div class="modal-btns">
+          ${o.buttons.map((b, i) => `<button class="btn ${b.primary ? "primary" : "ghost"} ${b.danger ? "danger" : ""}" onclick="modalAction(${i})">${b.label}</button>`).join("")}
+        </div>
+      </div>
+    </div>`;
+  el.style.display = "block";
+  window._modal = o.buttons;
+}
+function closeModal() { const el = document.getElementById("modal"); if (el) el.style.display = "none"; }
+function modalAction(i) {
+  const o = window._modal;
+  if (o && o[i]) { const act = o[i].action; closeModal(); if (act) act(); }
+}
+
 /* ---------- router ---------- */
 const routes = {
   "": renderHome, restaurants: renderRestaurants, build: renderBuild, dashboard: renderDashboard,
   schedule: renderSchedule, track: renderTrack, demo: renderDemo, gives: renderGives,
+  "restaurant-menu": renderRestaurantMenu, checkout: renderCheckout, delivery: renderDelivery,
   partners: renderPartners, kitchen: renderKitchen, fleet: renderFleet, payouts: renderPayouts, auction: renderAuction,
   admin: renderAdmin,
 };
 const PARTNER_ROUTES = ["partners", "kitchen", "fleet", "payouts", "auction"];
 function currentRoute() { const h = location.hash.replace(/^#\/?/, "").split("?")[0]; return routes[h] ? h : ""; }
+function routeParams() { const qs = location.hash.split("?")[1] || ""; const p = {}; qs.split("&").forEach((kv) => { const [k, v] = kv.split("="); if (k) p[k] = decodeURIComponent(v || ""); }); return p; }
 
 /* ---- owner auth gate (demo: password stored in localStorage; real auth in production) ---- */
 const OWNER_PASS = "supperclub"; // restaurant-owner credential — replace with a vetted auth provider in prod
@@ -449,7 +475,15 @@ function renderHome() {
     ["3", "Get delivery", "One box, one bill, weekly or monthly. All-inclusive.", "truck"],
   ].map(([n, t, d, ic]) => `<div class="step"><div class="step-num">${n}</div><div class="step-body"><div class="step-head">${ico(ic)}<span>${t}</span></div><div class="step-d">${d}</div></div></div>`).join("");
 
-  const top = RESTAURANTS.slice(0, 6).map((r) => `
+  const homeRestaurants = RESTAURANTS.filter((r) => {
+    if (homeFilter.q && !(r.name.toLowerCase().includes(homeFilter.q) || r.cuisine.toLowerCase().includes(homeFilter.q))) return false;
+    if (homeFilter.type === "high-protein") { const hp = meals.filter((m) => m.restaurantId === r.id && m.badges.includes("HIGH_PROTEIN")).length; if (!hp) return false; }
+    if (homeFilter.type === "vegetarian") { const vg = meals.filter((m) => m.restaurantId === r.id && m.type === "veg").length; if (!vg) return false; }
+    if (homeFilter.type === "nearby" && r.radius < 7) return false;
+    if (homeFilter.type === "under-13") { const cheap = meals.some((m) => m.restaurantId === r.id && m.price <= 12); if (!cheap) return false; }
+    return true;
+  }).slice(0, 6);
+  const top = (homeRestaurants.length ? homeRestaurants : RESTAURANTS.slice(0, 6)).map((r) => `
     <div class="rest-card ${r.dineSafe !== "unconditional" ? "warn" : ""}">
       <div class="rest-avatar">${esc(r.name[0])}</div>
       <div class="rest-info"><div class="rest-name">${esc(r.name)}</div>
@@ -484,23 +518,23 @@ function renderHome() {
       <header class="topbar">
         <a href="#" class="brand">${ico("sparkle")}<div><b>${esc(BRAND)}</b><span class="sub">Curated weekly meals · GTA</span></div></a>
         <nav class="consumer-nav">
-          <a href="#build" class="navbtn primary">${ico("plus")}<span>Build your box</span></a>
+          <a href="#build" class="navbtn primary">${ico("plus")}<span class="cta-bold">Plan the Week, Prepped</span></a>
           <a href="#restaurants" class="navbtn ghost">${ico("store")}<span>Restaurants</span></a>
           <a href="#gives" class="navbtn link">${ico("heart")}<span>Gives</span></a>
-          <a href="#partners" class="navbtn link">${ico("store")}<span>Restaurant owners</span></a>
+          <a href="#delivery" class="navbtn link">${ico("truck")}<span>Delivery</span></a>
         </nav>
       </header>
 
       ${moduleOn("search") ? `
       <!-- search bar -->
       <section class="search-bar">
-        <input type="search" placeholder="Search food, restaurant, or cuisine…" oninput="homeSearch(this.value)" />
-        <div class="search-filters">
-          <button class="chip on">All</button>
-          <button class="chip">High-protein</button>
-          <button class="chip">Vegetarian</button>
-          <button class="chip">Nearby</button>
-          <button class="chip">Under $13</button>
+        <input type="search" placeholder="Search food, restaurant, or cuisine…" oninput="homeSearch(this.value)" value="${esc(homeFilter.q)}" />
+        <div class="search-filters bold-chips">
+          <button class="chip ${homeFilter.type === "all" ? "on" : ""}" onclick="homeFilterType('all')">All</button>
+          <button class="chip ${homeFilter.type === "high-protein" ? "on" : ""}" onclick="homeFilterType('high-protein')">💪 High-protein</button>
+          <button class="chip ${homeFilter.type === "vegetarian" ? "on" : ""}" onclick="homeFilterType('vegetarian')">🥦 Vegetarian</button>
+          <button class="chip ${homeFilter.type === "nearby" ? "on" : ""}" onclick="homeFilterType('nearby')">📍 Nearby</button>
+          <button class="chip ${homeFilter.type === "under-13" ? "on" : ""}" onclick="homeFilterType('under-13')">💵 Under $13</button>
         </div>
       </section>` : ""}
 
@@ -589,23 +623,20 @@ function renderHome() {
         <a href="#restaurants" class="btn ghost sm" style="margin-top:14px">View all ${RESTAURANTS.length} restaurants ${ico("arrow")}</a>
       </section>` : ""}
 
-      <section class="for-partners">
-        <div class="fp-icon">${ico("store")}</div>
-        <div>
-          <div class="kicker">Own a kitchen?</div>
-          <div class="fp-t">Run your restaurant on ${esc(BRAND)}</div>
-          <div class="fp-d">Flat $500/month. First month free. Bid for daily featured slots from $50. No commissions. Ever.</div>
-        </div>
-        <a href="#partners" class="btn dark">${ico("arrow")}<span>Restaurant owners →</span></a>
-      </section>
-
-      <footer class="foot">${versionBadge()}<span class="admin-foot">· <a href="#admin" style="opacity:.6">Platform admin</a></span></footer>
+      <footer class="foot">${versionBadge()}
+        <span class="admin-foot">· <a href="#admin" style="opacity:.6">Platform admin</a></span></footer>
+      <div class="owner-mini"><a href="#partners">${ico("store")} Restaurant owners — deliver & run your kitchen on ${esc(BRAND)}</a></div>
     </div>`;
 }
 
 function homeSearch(q) {
-  // placeholder: in the real build this filters restaurants/dishes by query
-  flash(q ? `Searching "${q}"…` : "");
+  homeFilter.q = (q || "").toLowerCase().trim();
+  navigate();
+}
+function homeFilterType(type) {
+  homeFilter.type = type;
+  flash(type === "all" ? "Showing all kitchens" : `Filtering by ${type.replace("-", " ")}…`);
+  navigate();
 }
 
 /* ---- optional live-content fetch: tries the API, falls back to embedded data ----
@@ -729,6 +760,7 @@ function renderAuction() {
    RESTAURANTS (browse 15)
    ========================================================================== */
 let restFilter = { cuisine: "all", area: "all", diet: "all" };
+let homeFilter = { type: "all", q: "" }; // homepage search + bold chips
 function renderRestaurants() {
   const cuisines = [...new Set(RESTAURANTS.map((r) => r.cuisine))];
   const list = RESTAURANTS.filter((r) => {
@@ -739,7 +771,7 @@ function renderRestaurants() {
   });
   const cards = list.map((r) => {
     const menu = meals.filter((m) => m.restaurantId === r.id);
-    return `<div class="rest-full ${r.dineSafe !== "unconditional" ? "warn" : ""}">
+    return `<a href="#restaurant-menu?rest=${r.id}" class="rest-full link-card ${r.dineSafe !== "unconditional" ? "warn" : ""}">
       <div class="rest-full-head">
         <div class="rest-avatar big">${esc(r.name[0])}</div>
         <div>
@@ -751,7 +783,8 @@ function renderRestaurants() {
       <div class="rest-dishes"><div class="kicker" style="margin-bottom:8px">Menu · ${menu.length} dishes</div>
         <div class="dish-chips">${menu.slice(0, 8).map((m) => `<span class="dish-chip">${esc(m.title)} · $${m.price}</span>`).join("")}</div>
       </div>
-    </div>`;
+      <div class="rest-order-btn">${ico("arrow")} Add to weekly box</div>
+    </a>`;
   }).join("");
 
   return `
@@ -774,6 +807,110 @@ function renderRestaurants() {
     </div>`;
 }
 function setRestFilter(field, val) { restFilter[field] = val; navigate(); }
+
+/* ============================================================================
+   RESTAURANT MENU — pick a restaurant, then add its dishes to your weekly box
+   ========================================================================== */
+function renderRestaurantMenu() {
+  const p = routeParams();
+  const rid = p.rest || RESTAURANTS[0].id;
+  const r = RESTAURANTS.find((x) => x.id === rid) || RESTAURANTS[0];
+  const menu = meals.filter((m) => m.restaurantId === r.id);
+  const totals = buildTotals();
+  const budget = budgetValue();
+  const rows = menu.map((m) => {
+    const q = buildState.selected[m.id] || 0;
+    return `<div class="meal-pick ${q ? "on" : ""}">
+      <div class="mp-info"><div class="mp-title">${esc(m.title)}</div>
+        <div class="mp-meta">${m.badges.map(badgeHtml).join("")}<span class="chip bg-slate-100 text-slate-600">${m.calories} Cal · ${m.proteinGrams}g</span><span class="mp-price">$${m.price}</span></div></div>
+      <div class="stepper"><button class="stp-btn" onclick="setQty('${m.id}',-1)">−</button><span class="stp-val">${q}</span><button class="stp-btn" onclick="setQty('${m.id}',1)">+</button></div>
+    </div>`;
+  }).join("");
+  return `
+    <div class="consumer-shell">
+      <header class="topbar"><a href="#restaurants" class="brand">${ico("arrowLeft")}<div><b>${esc(BRAND)}</b></div></a>
+        <a href="#restaurants" class="navbtn ghost sm">${ico("store")} All restaurants</a></header>
+      <section class="build-hero">
+        <div class="eyebrow">${esc(r.cuisine)} · ${esc(r.neighborhood)}</div>
+        <h1>${esc(r.name)}</h1>
+        <p>${googleHtml(r)} ${dineSafeHtml(r)} — add dishes to your <b>weekly box</b>. Budget: <b>$${budget}</b> · box so far: <b>$${totals.total.toFixed(2)}</b>.</p></section>
+      <div class="build-grid">
+        <div class="meals-panel"><div class="meals-count">${menu.length} dishes · ${esc(r.name)}</div><div class="meal-picks">${rows}</div></div>
+      </div>
+      <div class="total-bar">
+        <div class="tb-stats"><span><b>${totals.count}</b> meals in box</span><span class="budget-ind ${totals.total > budget ? "over" : "ok"}">$${totals.total.toFixed(2)} / $${budget} budget</span></div>
+        <a href="#checkout" class="btn primary">${ico("box")} Check out ${ico("arrow")}</a>
+      </div>
+    </div>`;
+}
+
+/* ============================================================================
+   CHECKOUT — review weekly box + delivery, then confirm
+   ========================================================================== */
+function renderCheckout() {
+  const totals = buildTotals();
+  const budget = budgetValue();
+  const items = meals.filter((m) => buildState.selected[m.id] > 0);
+  const itemRows = items.map((m) => `<div class="billrow"><span>${buildState.selected[m.id]}× ${esc(m.title)} <span class="muted">· ${esc(restName(m.restaurantId))}</span></span><span class="bold">${money(buildState.selected[m.id] * m.price)}</span></div>`).join("");
+  const empty = !items.length;
+  return `
+    <div class="consumer-shell">
+      <header class="topbar"><a href="#build" class="brand">${ico("arrowLeft")}<div><b>${esc(BRAND)}</b></div></a>
+        <a href="#build" class="navbtn ghost sm">${ico("plus")} Keep editing</a></header>
+      <section class="build-hero">
+        <div class="eyebrow">Checkout · weekly box</div><h1>Your week, all in one box.</h1>
+        <p>${totals.count} meals · delivered on your chosen day, delivery included.</p></section>
+      <section class="card block" style="max-width:720px;margin:0 auto 16px">
+        <div class="kicker">${ico("bag")} Your box</div>
+        ${empty ? `<p class="muted">Your box is empty. <a href="#build">Add meals</a> first.</p>` : itemRows}
+        <div class="billrow total"><span>All-inclusive total</span><span class="tb-amt">${money(totals.total)}</span></div>
+        <div class="billrow muted sm"><span>Delivery (route-batched, live-tracked)</span><span class="accent bold">INCLUDED</span></div>
+      </section>
+      ${empty ? `<div style="text-align:center;padding:20px"><a href="#build" class="btn primary">${ico("plus")} Build your weekly box</a></div>` : `
+      <div style="max-width:720px;margin:0 auto;text-align:center">
+        <a href="#dashboard" class="btn primary" style="width:100%">${ico("check")} Confirm weekly order — ${money(totals.total)}</a>
+        <button class="btn ghost sm" style="margin-top:10px" onclick="flash('Scheduled for your delivery day. Manage anytime.')">${ico("calendar")} Choose delivery day</button>
+      </div>`}
+      <footer class="foot">${versionBadge()}</footer>
+    </div>`;
+}
+
+/* ============================================================================
+   DELIVERY — how your weekly box gets to you (recommendations)
+   ========================================================================== */
+function renderDelivery() {
+  const providers = [
+    { name: "Multi-provider dispatch (best-price routing)", rec: "RECOMMENDED", how: "We quote the same drop across several courier networks and pick the lowest cost + best ETA on every order, with automatic failover. No single provider lock-in.", why: "Why: guarantees the cheapest reliable drop per week, never marooned when one courier is unavailable." },
+    { name: "Restaurant self-delivery (batched routes)", rec: "LOWEST COST", how: "Partner kitchens with their own driver deliver the whole neighborhood's boxes in one scheduled loop.", why: "Why: a single driver doing 6–12 drops in one trip beats per-order couriers — typically $2–$4/drop." },
+    { name: "Scheduled Canadian courier network (e.g. GoFor/Dropoff)", rec: "FOR VOLUME ROUTES", how: "A planned, recurring route provider with Toronto coverage handles bigger weekly volumes.", why: "Why: purpose-built for scheduled/recurring batches — matches our weekly model, negotiable at volume." },
+    { name: "White-label courier engines (Uber Direct / DoorDash Drive)", rec: "COVERAGE FALLBACK", how: "Used as the courier only — the order, branding and customer data stay on Supper Club Direct, never on a marketplace.", why: "Why: full GTA coverage when needed, without restaurant commissions or losing the customer." },
+    { name: "Pickup & pickup-points", rec: "FREE / ZERO-COST", how: "Pick up at the kitchen, a local café, or a community locker.", why: "Why: $0 delivery, always available, and our default fallback for efficiency." },
+  ];
+  const rows = providers.map((p) => `<div class="dlv-row">
+    <div class="dlv-head"><span class="dlv-name">${ico("truck")} ${esc(p.name)}</span><span class="dlv-rec">${esc(p.rec)}</span></div>
+    <div class="dlv-how">${esc(p.how)}</div>
+    <div class="dlv-why">${esc(p.why)}</div>
+  </div>`).join("");
+  return `
+    <div class="consumer-shell">
+      <header class="topbar"><a href="#" class="brand">${ico("sparkle")}<div><b>${esc(BRAND)}</b></div></a>
+        <a href="#" class="navbtn ghost sm">${ico("arrowLeft")} Back</a></header>
+      <section class="build-hero">
+        <div class="eyebrow">Delivery, handled</div><h1>How your weekly box gets to you</h1>
+        <p>Delivery is <b>included</b> — no surprise fees. We optimize the route behind the scenes and you just watch it live-track to your door.</p></section>
+      <section class="card block" style="max-width:820px;margin:0 auto 16px">
+        <div class="kicker">${ico("box")} Our delivery model</div>
+        <div class="billrow"><span>Delivery cost</span><span class="accent bold">INCLUDED</span></div>
+        <div class="billrow muted sm"><span>Pickup option</span><span class="accent bold">$0, always available</span></div>
+        <div class="billrow muted sm"><span>You choose the courier?</span><span>No — we route for lowest cost + reliability</span></div>
+      </section>
+      <section class="content-sec" style="max-width:820px;margin:0 auto">
+        <div class="kicker">${ico("route")} How we choose the delivery option</div>
+        <div class="dlv-board">${rows}</div>
+      </section>
+      <footer class="foot">${versionBadge()}</footer>
+    </div>`;
+}
 
 /* ============================================================================
    ANIMATED DEMO — self-running feature walkthrough (both sides)
@@ -815,7 +952,46 @@ function demoPrev() { demoIdx = demoIdx <= 0 ? 0 : demoIdx - 1; navigate(); }
 /* ============================================================================
    BUILD YOUR BOX
    ========================================================================== */
-const buildState = { selected: {}, rest: "all", area: "all", cuisine: "all", diet: "all", budget: "" };
+const buildState = { selected: {}, rest: "all", area: "all", cuisine: "all", diet: "all", budget: "80" };
+const budgetState = { continue: false }; // after "yes, keep adding" we stop nagging
+function budgetValue() { const v = parseFloat(buildState.budget); return (v && v > 0) ? v : 80; }
+function doAdd(id, delta) {
+  const q = (buildState.selected[id] || 0) + delta;
+  if (q <= 0) delete buildState.selected[id]; else buildState.selected[id] = q;
+  navigate();
+}
+function setQty(id, delta) {
+  if (delta > 0) {
+    const m = meals.find((x) => x.id === id);
+    const budget = budgetValue();
+    const tot = buildTotals();
+    const addPrice = m ? m.price : 0;
+    if (budget && (tot.total + addPrice) > budget && !budgetState.continue) {
+      showModal({
+        ico: "wallet",
+        title: `Weekly budget reached — $${budget}`,
+        message: `Your box is at $${tot.total.toFixed(2)}. Adding “${m ? esc(m.title) : "this item"}” brings it to $${(tot.total + addPrice).toFixed(2)}, past your $${budget} budget. Do you want to keep adding?`,
+        buttons: [
+          { label: "Yes, keep adding", primary: true, action: () => { budgetState.continue = true; doAdd(id, delta); } },
+          { label: "No, stop", action: () => askCheckoutOrChange() },
+        ],
+      });
+      return;
+    }
+  }
+  doAdd(id, delta);
+}
+function askCheckoutOrChange() {
+  showModal({
+    ico: "box",
+    title: "What would you like to do?",
+    message: "Check out with your current box, or change the combination to fit your budget.",
+    buttons: [
+      { label: "Check out now", primary: true, action: () => { budgetState.continue = false; location.hash = "#checkout"; navigate(); } },
+      { label: "Change combination", action: () => { budgetState.continue = false; } },
+    ],
+  });
+}
 function buildMeals() {
   return meals.filter((m) => {
     const r = mealRestaurant(m);
@@ -830,11 +1006,6 @@ function buildTotals() {
   let total = 0, count = 0, veg = 0, nonveg = 0, protein = 0;
   meals.forEach((m) => { const q = buildState.selected[m.id] || 0; if (q > 0) { total += q * m.price; count += q; if (m.type === "veg") veg += q; else nonveg += q; protein += q * m.proteinGrams; } });
   return { total, count, veg, nonveg, protein };
-}
-function setQty(id, delta) {
-  const q = (buildState.selected[id] || 0) + delta;
-  if (q <= 0) delete buildState.selected[id]; else buildState.selected[id] = q;
-  navigate();
 }
 function setBuildFilter(field, val) { buildState[field] = val; navigate(); }
 function quickCombo(kind) {
@@ -853,6 +1024,7 @@ function quickCombo(kind) {
 function applyBudget() {
   const budget = parseFloat(buildState.budget);
   if (!budget) return;
+  budgetState.continue = false;
   buildState.selected = {};
   let spent = 0;
   [...buildMeals()].sort((a, b) => a.price - b.price).forEach((m) => { if (spent + m.price <= budget) { buildState.selected[m.id] = 1; spent += m.price; } });
@@ -877,8 +1049,8 @@ function renderBuild() {
       <header class="topbar"><a href="#" class="brand">${ico("sparkle")}<div><b>${esc(BRAND)}</b></div></a>
         <a href="#partners" class="navbtn link sm">${ico("store")}<span>Restaurant owners</span></a></header>
       <section class="build-hero">
-        <div class="eyebrow">Build your box</div><h1>Pick your meals. See your total <span class="accent">instantly.</span></h1>
-        <p>Mix veg &amp; non-veg, filter by restaurant/area/cuisine/diet, or set a weekly budget.</p></section>
+        <div class="eyebrow">Plan the week, prepped</div><h1>Build your weekly box. See your total <span class="accent">instantly.</span></h1>
+        <p>This is a recurring weekly order — mix veg &amp; non-veg, filter by restaurant/cuisine/diet, or set a weekly budget. We'll warn you when you hit it.</p></section>
       <div class="combo-strip">
         <div class="combo-title">Quick combos</div>
         <button class="btn ghost sm" onclick="quickCombo('2+3')">2 non-veg + 3 veg</button>
@@ -1260,7 +1432,11 @@ window.moduleOn = moduleOn;
 window.setQty = setQty; window.setBuildFilter = setBuildFilter; window.quickCombo = quickCombo; window.applyBudget = applyBudget; window.buildState = buildState;
 window.setDeliveryWindow = setDeliveryWindow; window.setCadence = setCadence; window.toggleWeek = toggleWeek; window.advanceTrack = advanceTrack; window.TRACK = TRACK;
 window.setRestFilter = setRestFilter; window.demoNext = demoNext; window.demoPrev = demoPrev;
+window.meals = meals; window.RESTAURANTS = RESTAURANTS;
 window.homeSearch = homeSearch;
+window.homeFilterType = homeFilterType;
+window.closeModal = closeModal;
+window.modalAction = modalAction;
 window.ownerLogin = ownerLogin;
 window.ownerLogout = ownerLogout;
 window.adminLogin = adminLogin;
