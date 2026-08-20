@@ -776,7 +776,8 @@ button,.btn,.btn.sm,.navbtn,.p-navbtn,.stp-btn,.wp-opt,.addon-opt,.swap-opt,.kit
 /* 13) v11 — UNIFIED big & bold: same style as "My Week. Fully Catered." CTA */
 /* Weekly tier chips match the CTA: full-width, big, bold, teal when selected */
 .order-tier { max-width: 1080px; margin: 0 auto; padding: 0 24px 8px; }
-.ot-tiers { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.ot-tiers { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
+@media (max-width: 640px){ .ot-tiers { grid-template-columns: repeat(2, 1fr); } }
 .tier-chip {
   width: 100%; justify-content: center; align-items: center;
   padding: 16px 20px; font-size: 22px; font-weight: 900; letter-spacing: -.01em;
@@ -791,7 +792,7 @@ button,.btn,.btn.sm,.navbtn,.p-navbtn,.stp-btn,.wp-opt,.addon-opt,.swap-opt,.kit
   box-shadow: 0 8px 24px rgba(13,148,136,.3);
 }
 .tier-chip.on .tier-sub { color: #eafff8 !important; }
-@media (max-width: 640px){ .ot-tiers { grid-template-columns: repeat(3, 1fr); gap: 8px; } .tier-chip { font-size: 18px; padding: 12px 8px; } }
+@media (max-width: 640px){ .ot-tiers { grid-template-columns: repeat(2, 1fr); gap: 8px; } .tier-chip { font-size: 17px; padding: 12px 8px; } }
 
 /* All buttons — bigger & bolder, consistent with the CTA */
 .btn, button { font-weight: 800; }

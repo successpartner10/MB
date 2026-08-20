@@ -1002,7 +1002,7 @@ const buildState = { selected: {}, rest: "all", area: "all", cuisine: "all", die
    ORDERS[restaurantId] = { selected:{mealId:qty}, tier:100 } */
 const ORDERS = {};
 const MIN_ORDER = 100;
-const WEEKLY_TIERS = [100, 200, 300];
+const WEEKLY_TIERS = [100, 150, 200, 250, 300];
 let activeRest = null;
 function openRest(rid) { activeRest = rid; if (!ORDERS[rid]) ORDERS[rid] = { selected: {}, tier: 100 }; }
 function getOrder(rid) { openRest(rid); return ORDERS[rid]; }
