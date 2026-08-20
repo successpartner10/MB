@@ -837,9 +837,20 @@ function renderRestaurantMenu() {
       <div class="build-grid">
         <div class="meals-panel"><div class="meals-count">${menu.length} dishes · ${esc(r.name)}</div><div class="meal-picks">${rows}</div></div>
       </div>
-      <div class="total-bar">
-        <div class="tb-stats"><span><b>${totals.count}</b> meals in box</span><span class="budget-ind ${totals.total > budget ? "over" : "ok"}">$${totals.total.toFixed(2)} / $${budget} budget</span></div>
-        <a href="#checkout" class="btn primary">${ico("box")} Check out ${ico("arrow")}</a>
+      <div class="your-box">
+        <div class="yb-head"><span class="yb-title">${ico("box")} Your box — ${totals.count} ${totals.count === 1 ? "meal" : "meals"}</span>
+          ${totals.count ? `<button class="btn ghost sm" onclick="clearBox()">${ico("arrowLeft")} Clear</button>` : ""}</div>
+        ${totals.count ? `<div class="yb-list">${selectedItems().map((m) => `
+          <div class="yb-row">
+            <span class="yb-qty">${buildState.selected[m.id]}×</span>
+            <span class="yb-name">${esc(m.title)} <span class="muted">· ${esc(restName(m.restaurantId))}</span></span>
+            <span class="yb-price">${money(buildState.selected[m.id] * m.price)}</span>
+          </div>`).join("")}</div>
+        <div class="yb-total">
+          <span class="yb-budget">Box: $${money(totals.total)} / $${budget}${totals.total > budget ? " · over by $" + money(totals.total - budget) : " · $" + money(Math.max(0, budget - totals.total)) + " left"}</span>
+          <span class="yb-amt">${money(totals.total)}</span>
+        </div>` : `<p class="muted">Your box is empty. Tap <b>+</b> on the dishes you want.</p>`}
+        <a href="#checkout" class="btn primary sm" style="margin-top:12px;width:100%">${ico("bagCheck")} Check out — ${money(totals.total)}</a>
       </div>
     </div>`;
 }
@@ -1008,6 +1019,8 @@ function buildTotals() {
   return { total, count, veg, nonveg, protein };
 }
 function setBuildFilter(field, val) { buildState[field] = val; navigate(); }
+function boxTotal() { return buildTotals().total; }
+function selectedItems() { return meals.filter((m) => buildState.selected[m.id] > 0); }
 function quickCombo(kind) {
   buildState.selected = {};
   if (kind === "2+3") {
@@ -1022,17 +1035,17 @@ function quickCombo(kind) {
   navigate();
 }
 function applyBudget() {
-  const budget = parseFloat(buildState.budget);
-  if (!budget) return;
+  // Just records the budget as a target — it never auto-adds meals.
+  // The user chooses what goes in their box; we show live progress against it.
   budgetState.continue = false;
-  buildState.selected = {};
-  let spent = 0;
-  [...buildMeals()].sort((a, b) => a.price - b.price).forEach((m) => { if (spent + m.price <= budget) { buildState.selected[m.id] = 1; spent += m.price; } });
+  flash(`✓ Weekly budget set to $${budgetValue()}. You pick the meals.`);
   navigate();
 }
+function clearBox() { buildState.selected = {}; budgetState.continue = false; flash("Box cleared."); navigate(); }
 function renderBuild() {
   const cuisines = [...new Set(RESTAURANTS.map((r) => r.cuisine))];
   const totals = buildTotals();
+  const budget = budgetValue();
   const list = buildMeals();
   const rows = list.map((m) => {
     const r = mealRestaurant(m); const q = buildState.selected[m.id] || 0;
@@ -1071,10 +1084,25 @@ function renderBuild() {
             <button class="chip ${buildState.diet === "all" ? "on" : ""}" onclick="setBuildFilter('diet','all')">All</button>
             ${["HIGH_PROTEIN", "VEGETARIAN", "VEGAN", "GLUTEN_FREE", "SPICY"].map((d) => `<button class="chip ${buildState.diet === d ? "on" : ""}" onclick="setBuildFilter('diet','${d}')">${esc(d.replace("_", " ").toLowerCase())}</button>`).join("")}</div>
           <div class="budget-box"><div class="kicker">${ico("wallet")} Weekly budget</div>
-            <div class="budget-input"><span>$</span><input type="number" placeholder="e.g. 80" oninput="buildState.budget=this.value" /><button class="btn primary sm" onclick="applyBudget()">What's possible</button></div>
-            <p class="muted sm">We pick the best-value mix under your budget.</p></div>
+            <div class="budget-input"><span>$</span><input type="number" placeholder="e.g. 80" value="${esc(buildState.budget || "")}" oninput="buildState.budget=this.value;document.getElementById('budget-disp').textContent='Box: $'+boxTotal()+' / $'+budgetValue();" onchange="applyBudget()" /><button class="btn primary sm" onclick="applyBudget()">Set budget</button></div>
+            <p class="muted sm">We never auto-add meals — you choose what's in your box. This is just your target.</p></div>
         </div>
         <div class="meals-panel"><div class="meals-count">${list.length} meals shown</div><div class="meal-picks">${rows}</div></div>
+      </div>
+      <div class="your-box">
+        <div class="yb-head"><span class="yb-title">${ico("box")} Your box — ${totals.count} ${totals.count === 1 ? "meal" : "meals"}</span>
+          ${totals.count ? `<button class="btn ghost sm" onclick="clearBox()">${ico("arrowLeft")} Clear</button>` : ""}</div>
+        ${totals.count ? `<div class="yb-list">${selectedItems().map((m) => `
+          <div class="yb-row">
+            <span class="yb-qty">${buildState.selected[m.id]}×</span>
+            <span class="yb-name">${esc(m.title)} <span class="muted">· ${esc(restName(m.restaurantId))}</span></span>
+            <span class="yb-price">${money(buildState.selected[m.id] * m.price)}</span>
+          </div>`).join("")}</div>
+        <div class="yb-total">
+          <span id="budget-disp" class="yb-budget">Box: $${money(totals.total)} / $${budget}${totals.total > budget ? " · over by $" + money(totals.total - budget) : " · $" + money(Math.max(0, budget - totals.total)) + " left"}</span>
+          <span class="yb-amt">${money(totals.total)}</span>
+        </div>` : `<p class="muted">Your box is empty. Tap <b>+</b> on the meals you want below.</p>`}
+        <a href="#checkout" class="btn primary sm" style="margin-top:12px;width:100%">${ico("bagCheck")} Check out — ${money(totals.total)}</a>
       </div>
       <div class="total-bar">
         <div class="tb-stats"><span><b>${totals.count}</b> meals</span><span><b>${totals.veg}</b> veg</span><span><b>${totals.nonveg}</b> non-veg</span><span><b>${totals.protein}</b> g protein</span></div>
@@ -1430,6 +1458,7 @@ window.getModules = getModules;
 window.setModule = setModule;
 window.moduleOn = moduleOn;
 window.setQty = setQty; window.setBuildFilter = setBuildFilter; window.quickCombo = quickCombo; window.applyBudget = applyBudget; window.buildState = buildState;
+window.boxTotal = boxTotal; window.selectedItems = selectedItems; window.clearBox = clearBox;
 window.setDeliveryWindow = setDeliveryWindow; window.setCadence = setCadence; window.toggleWeek = toggleWeek; window.advanceTrack = advanceTrack; window.TRACK = TRACK;
 window.setRestFilter = setRestFilter; window.demoNext = demoNext; window.demoPrev = demoPrev;
 window.meals = meals; window.RESTAURANTS = RESTAURANTS;

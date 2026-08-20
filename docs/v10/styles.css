@@ -738,3 +738,19 @@ button,.btn,.btn.sm,.navbtn,.p-navbtn,.stp-btn,.wp-opt,.addon-opt,.swap-opt,.kit
 /* 10) v10 — CTA stacked: main line + "(Build your meals)" sub-line */
 .navbtn.cta-big .cta-stack { display: flex; flex-direction: column; align-items: center; line-height: 1.2; }
 .navbtn.cta-big .cta-sub { font-size: 0.72em; font-weight: 600; opacity: .85; letter-spacing: .01em; margin-top: 2px; }
+
+/* 11) v10 — "Your box" separate selection list (no auto-add budget) */
+.your-box { max-width: 1080px; margin: 20px auto 0; padding: 0 24px; }
+.yb-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 10px; }
+.yb-title { display: inline-flex; align-items: center; gap: 8px; font-weight: 900; font-size: 18px; color: #0b1220; }
+.yb-title .ic { color: #0d9488; }
+.yb-list { background: #fff; border: 1px solid var(--line); border-radius: 14px !important; padding: 6px 16px; box-shadow: 0 1px 2px rgba(0,0,0,.04), 0 8px 24px rgba(0,0,0,.06); }
+.yb-row { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid #eef2f7; }
+.yb-row:last-child { border-bottom: none; }
+.yb-qty { font-weight: 900; color: #0d9488; min-width: 26px; }
+.yb-name { flex: 1; color: #0b1220; font-size: 14px; min-width: 0; }
+.yb-price { font-weight: 700; color: #0b1220; }
+.yb-total { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 10px; background: #f0fdfa; border: 1px solid #99f6e4; border-radius: 12px !important; padding: 12px 14px; }
+.yb-budget { font-size: 13px; font-weight: 700; color: #0f766e; }
+.yb-amt { font-size: 20px; font-weight: 900; color: #0b1220; }
+@media (max-width: 640px){ .your-box { padding: 0 16px; } }
