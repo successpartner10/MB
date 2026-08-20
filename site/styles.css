@@ -473,3 +473,18 @@ button { font: inherit; cursor: pointer; }
 .auction-bid b { color: #fbbf24; }
 .auction-leader { color: #6ee7b7; font-weight: 700; }
 @media (max-width:760px){ .auction-head,.auction-row{ grid-template-columns: 1fr 70px 90px; } .auction-head span:nth-child(4),.auction-row>div:nth-child(4),.auction-head span:nth-child(5),.auction-row>div:nth-child(5){ display:none; } }
+
+/* bid feed */
+.bid-feed { margin: 12px 24px; background: #0f1730; border: 1px solid #1e293b; border-radius: 18px; padding: 14px 18px; }
+.bid-feed-title { display: flex; align-items: center; gap: 8px; color: #fbbf24; font-weight: 800; font-size: 13px; text-transform: uppercase; letter-spacing: .04em; margin-bottom: 10px; }
+.bid-feed-title .ic { width: 18px; height: 18px; }
+.bid-feed-item { display: flex; gap: 10px; padding: 8px 0; border-bottom: 1px solid #16203a; color: #cbd5e1; font-size: 13.5px; }
+.bid-feed-item:last-child { border-bottom: none; }
+.bf-slot { color: #6ee7b7; font-weight: 700; min-width: 140px; }
+
+/* photo placeholders */
+.fh-photo { width: 180px; height: 120px; border-radius: 16px; display: grid; place-items: center; color: #fff; font-size: 64px; font-weight: 900; position: relative; flex: none; }
+.ph-label { position: absolute; bottom: 8px; left: 0; right: 0; text-align: center; font-size: 10px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; opacity: .9; background: rgba(0,0,0,.25); padding: 2px 0; }
+.dish-img { position: relative; }
+.chef-avatar { position: relative; overflow: hidden; }
+@media (max-width:560px){ .fh-photo{ width: 100%; height: 90px; font-size: 44px; } }

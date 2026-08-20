@@ -10,6 +10,7 @@ import { startCutoffCron } from "./services/cutoff.js";
 import { authRouter } from "./routes/auth.js";
 import { kitchenRouter } from "./routes/kitchen.js";
 import { dashboardRouter } from "./routes/dashboard.js";
+import { contentRouter } from "./routes/content.js";
 import { db, findMeal } from "./db.js";
 
 const app = express();
@@ -26,6 +27,7 @@ seedAll();
 app.use(authRouter);
 app.use(kitchenRouter);
 app.use(dashboardRouter);
+app.use(contentRouter);
 
 // convenience: list meals (used by swap + add-meal UIs), with restaurant info
 app.get("/api/v1/meals", (_req, res) => {

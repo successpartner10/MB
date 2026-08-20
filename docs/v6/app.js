@@ -349,10 +349,12 @@ function renderHome() {
       </div>
     </div>`).join("");
 
-  /* ---- auto-generated content sections (data-driven placeholders) ---- */
+  /* ---- auto-generated content sections (data-driven placeholders) ----
+     Using top Toronto/GTA restaurants for the demo look & feel. */
   const featured = RESTAURANTS.find((r) => r.id === "rest_indian") || RESTAURANTS[0];
-  const dish = { title: "Butter Chicken & Basmati", rest: featured.name, img: "BC", recipe: "Tandoor-grilled chicken, tomato-makhani sauce, basmati. Serves 2. Pair with naan & a squeeze of lime." };
-  const chefStory = { rest: "Sweet Basil", chef: "Aisha B.", line: "Trained in Beirut, cooks plant-forward Mediterranean. 12 years, zero wasted plates." };
+  const dish = { title: "Butter Chicken & Basmati", rest: "Indian Desire", img: "BC", recipe: "Tandoor-grilled chicken, tomato-makhani sauce, basmati. Serves 2. Pair with naan & a squeeze of lime.", photo: "Butter Chicken" };
+  const chefStory = { rest: "Richmond Station", chef: "Carl Heinrich", line: "Top Chef Canada winner, cooks contemporary Canadian with a farm-first ethos at Richmond Station." };
+  const topPhotos = ["Richmond Station", "Pai Northern Thai", "Aloette", "Indian Desire"];
   const whatAte = [
     { dish: "Bulgogi Beef Bowl", rest: "Seoul Food Co.", orders: 214 },
     { dish: "Chicken Tikka Masala", rest: "Indian Desire", orders: 198 },
@@ -396,7 +398,7 @@ function renderHome() {
 
       <!-- FEATURED RESTAURANT (hero) — daily auction winner -->
       <section class="featured-hero">
-        <div class="fh-img">${ico("chef")}</div>
+        <div class="fh-photo" style="background:linear-gradient(135deg,#7c3aed,#0d9488)">${esc(featured.name[0])}<span class="ph-label">Richmond Station · photo</span></div>
         <div class="fh-body">
           <div class="fh-tag">Featured restaurant</div>
           <div class="fh-name">${esc(featured.name)}</div>
@@ -409,7 +411,7 @@ function renderHome() {
       <section class="content-sec">
         <div class="kicker">Dish of the day · by ${esc(dish.rest)}</div>
         <div class="dish-card">
-          <div class="dish-img">${ico("chef")}</div>
+          <div class="dish-img" style="background:linear-gradient(135deg,#0d9488,#f59e0b)">${ico("chef")}<span class="ph-label">Dish photo</span></div>
           <div class="dish-body">
             <div class="dish-title">${esc(dish.title)}</div>
             <div class="dish-recipe">${esc(dish.recipe)}</div>
@@ -421,7 +423,7 @@ function renderHome() {
       <section class="content-sec">
         <div class="kicker">Chef story · ${esc(chefStory.rest)}</div>
         <div class="chef-card">
-          <div class="chef-avatar">${esc(chefStory.chef[0])}</div>
+          <div class="chef-avatar" style="background:linear-gradient(135deg,#7c3aed,#0d9488)">${esc(chefStory.chef[0])}<span class="ph-label">Chef photo</span></div>
           <div><div class="chef-name">${esc(chefStory.chef)}</div><div class="chef-line">${esc(chefStory.line)}</div></div>
         </div>
       </section>
@@ -521,9 +523,9 @@ function renderGives() {
    AUCTION — daily featured/dish/chef bidding (partner portal)
    ========================================================================== */
 const AUCTION_SLOTS = [
-  { slot: "Featured Restaurant", day: "Thursday", topBid: 85, bids: 6, leader: "Indian Desire" },
-  { slot: "Dish of the Day", day: "Thursday", topBid: 70, bids: 4, leader: "Seoul Food Co." },
-  { slot: "Chef Story", day: "Thursday", topBid: 60, bids: 3, leader: "Sweet Basil" },
+  { slot: "Featured Restaurant", day: "Thursday", topBid: 85, bids: 6, leader: "Indian Desire", examples: ["Indian Desire $85", "Richmond Station $70", "Aloette $65"] },
+  { slot: "Dish of the Day", day: "Thursday", topBid: 70, bids: 4, leader: "Richmond Station", examples: ["Richmond Station $70", "Pai $60", "Indian Desire $55"] },
+  { slot: "Chef Story", day: "Thursday", topBid: 60, bids: 3, leader: "Pai", examples: ["Pai $60", "Aloette $55", "Seoul Food Co. $50"] },
 ];
 let auctionWeek = 1;
 function renderAuction() {
@@ -535,17 +537,18 @@ function renderAuction() {
     <div class="auction-leader">${esc(a.leader)}</div>
     <button class="btn p-outline sm" onclick="flash('Bid placed. You must wait for this week to close before bidding another slot.')">${ico("gavel")} Bid</button>
   </div>`).join("");
+  const bidFeed = AUCTION_SLOTS.flatMap((a) => a.examples.map((e) => ({ slot: a.slot, text: e })))
+    .map((b) => `<div class="bid-feed-item"><span class="bf-slot">${esc(b.slot)}</span><span>${esc(b.text)}</span></div>`).join("");
   return `
     <div class="partner-shell">
-      <header class="p-topbar"><div class="p-brand">${ico("store")}<div><b>${esc(BRAND)}</b><span>content auctions</span></div></div>
+      <header class="p-topbar"><div class="p-brand">${ico("store")}<div><b>${esc(BRAND)}</b><span>restaurant owner portal</span></div></div>
         <nav class="p-nav"><a href="#partners" class="p-navbtn" data-nav="partners">${ico("home")} Overview</a>
           <a href="#fleet" class="p-navbtn" data-nav="fleet">${ico("truck")} Fleet</a>
           <a href="#kitchen" class="p-navbtn" data-nav="kitchen">${ico("pot")} Kitchen</a>
           <a href="#payouts" class="p-navbtn" data-nav="payouts">${ico("wallet")} Payouts</a>
-          <a href="#auction" class="p-navbtn" data-nav="auction">${ico("gavel")} Auctions</a>
           <a href="#auction" class="p-navbtn active" data-nav="auction">${ico("gavel")} Auctions</a></nav>
         <a href="#" class="btn p-outline sm">${ico("arrowLeft")} Back to eaters</a></header>
-      <section class="p-hero"><div class="eyebrow dark">Daily content auctions</div>
+      <section class="p-hero"><div class="eyebrow dark">Daily content auctions · restaurant owners only</div>
         <h1>Bid for the homepage — starting at $50</h1>
         <p>One slot per restaurant per week. Bids open Monday–Wednesday. Transparent — you can see every bid. Winner supplies the material for the next day.</p></section>
       <section class="auction-note">
@@ -555,6 +558,10 @@ function renderAuction() {
       <section class="auction-board">
         <div class="auction-head"><span>Slot</span><span>Day</span><span>Top bid</span><span>Bids</span><span>Leader</span><span></span></div>
         ${rows}
+      </section>
+      <section class="bid-feed">
+        <div class="bid-feed-title">${ico("chart")} Live bids this week</div>
+        ${bidFeed}
       </section>
       <footer class="p-foot">Daily auctions · $50 start · one slot per restaurant per week · transparent bids.</footer>
     </div>`;

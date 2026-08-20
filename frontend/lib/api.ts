@@ -174,3 +174,20 @@ export async function chooseRestaurant(userId: string, restaurantId: string) {
 export async function chooseMixed(userId: string) {
   return post("/api/v1/subscription/choose-mixed", { userId });
 }
+
+// ---- v6 content / auction / gives ----
+export async function getContent() {
+  const r = await fetch("/api/v1/content");
+  return r.json();
+}
+export async function getAuctions() {
+  const r = await fetch("/api/v1/auctions");
+  return r.json();
+}
+export async function getGives(q?: string) {
+  const r = await fetch(`/api/v1/gives${q ? `?q=${encodeURIComponent(q)}` : ""}`);
+  return r.json();
+}
+export async function placeBid(restaurantId: string, slot: string, day: string, amount: number) {
+  return post("/api/v1/auctions/bid", { restaurantId, slot, day, amount });
+}

@@ -136,6 +136,7 @@ export default function KitchenPage() {
           </div>
         </div>
         <div className="flex gap-2">
+          <Link href="/auction" className="btn btn-ghost text-sm">🎯 Auctions</Link>
           <Link href="/payouts" className="btn btn-ghost text-sm">💸 Payouts</Link>
           <Link href="/" className="btn btn-ghost text-sm">← Back</Link>
         </div>

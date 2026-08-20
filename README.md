@@ -69,7 +69,7 @@ permanent `/vN/` path** so existing links keep working after you ship a new vers
   - **Dish of the Day with recipe** (daily auction winner).
   - **Chef Story of the Day** (daily auction winner).
   - **"What Toronto Ate"** — auto-generated top-dishes list from order data.
-- **Daily content auctions** — $50 start, Mon–Wed bidding, one slot per restaurant per week (fairness cap), transparent bids, winner supplies next-day material. Empty slots fall back to auto data-picks / giving sponsor.
+- **Daily content auctions** — $50 start, Mon–Wed bidding, one slot per restaurant per week (fairness cap), transparent bids, winner supplies next-day material. Empty slots fall back to auto data-picks / giving sponsor. **Auction is visible to restaurant owners only** (in the partner portal), with a live bid feed showing example bids (e.g. Richmond Station $70, Pai $60, Aloette $65).
 - **Supper Club Gives** — a separate, searchable **public giving ledger** (date + sponsor + restaurant + app + amounts + shelter). Equal three-way $500/wk split.
 - **Flat $500/month membership** — first month free, no commission, no bypass incentive.
 - **24 sample users**, live DineSafe flags (Pass/Conditional), pickup, order cadence (weekly/2-wk/monthly), fleet board, Indian Desire → CN Tower tracking.

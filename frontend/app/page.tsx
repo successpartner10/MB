@@ -59,11 +59,12 @@ export default function LandingPage() {
         <div className="flex items-center gap-2">
           <span className="grid h-9 w-9 place-items-center rounded-xl bg-brand-600 text-white font-black">MB</span>
           <div className="leading-tight">
-            <div className="font-extrabold tracking-tight">Minimal Bites</div>
-            <div className="text-xs text-slate-500">Zero-friction meals · GTA</div>
+            <div className="font-extrabold tracking-tight">Supper Club Direct</div>
+            <div className="text-xs text-slate-500">Curated meals · GTA</div>
           </div>
         </div>
         <nav className="flex gap-2">
+          <Link href="/gives" className="btn btn-ghost">❤️ Gives</Link>
           <Link href="/dashboard" className="btn btn-ghost">My Meals</Link>
           <Link href="/kitchen" className="btn btn-ghost border-slate-800 bg-slate-900 text-white hover:bg-slate-800">
             Restaurant owners →
