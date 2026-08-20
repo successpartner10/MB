@@ -805,3 +805,17 @@ button,.btn,.btn.sm,.navbtn,.p-navbtn,.stp-btn,.wp-opt,.addon-opt,.swap-opt,.kit
 }
 .frow .chip.on, .filters .chip.on, .filters-panel .chip.on { background: #0d9488 !important; color: #fff !important; border-color: #0f766e; box-shadow: 0 4px 12px rgba(13,148,136,.25); }
 .frow-label { font-weight: 800; font-size: 14px; }
+
+/* 14) v11 — restaurants page cuisine filter buttons: same big/bold style as bold-chips */
+.filters { gap: 10px !important; padding-bottom: 4px; }
+.filters .chip, .filters button.chip {
+  font-size: 15px !important; font-weight: 800 !important;
+  padding: 11px 18px !important; border-radius: 999px !important;
+  border: 2px solid #e2e8f0 !important; background: #fff !important; color: #334155 !important;
+  cursor: pointer; transition: all .15s ease;
+}
+.filters .chip:hover { border-color: #0d9488 !important; color: #0f766e !important; }
+.filters .chip.on, .filters button.chip.on {
+  background: #0d9488 !important; color: #fff !important; border-color: #0f766e !important;
+  box-shadow: 0 4px 12px rgba(13,148,136,.25);
+}
