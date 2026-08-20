@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
-import { post } from "@/lib/api";
+import { useEffect, useState } from "react";
+import { post, getContent } from "@/lib/api";
 
 const TIERS = [
   { id: "MEALS_4", meals: 4, perMeal: 14, total: 56 },
@@ -21,6 +21,11 @@ export default function LandingPage() {
     cutoffAt: string;
   }>(null);
   const [error, setError] = useState("");
+  const [content, setContent] = useState<any>(null);
+
+  useEffect(() => {
+    getContent().then(setContent).catch(() => {});
+  }, []);
 
   async function checkout() {
     setBusy(true);
@@ -90,6 +95,48 @@ export default function LandingPage() {
           </div>
         ))}
       </section>
+
+      {/* Live content sections (from API) */}
+      {content && (
+        <>
+          {/* Featured restaurant hero */}
+          <section className="mb-6 flex flex-wrap items-center gap-5 rounded-3xl bg-gradient-to-br from-slate-900 to-teal-700 p-6 text-white">
+            <div className="grid h-24 w-24 flex-none place-items-center rounded-2xl bg-white/15 text-5xl font-black">
+              {content.featured.name[0]}
+            </div>
+            <div>
+              <div className="text-xs font-bold uppercase tracking-wider text-teal-300">Featured restaurant</div>
+              <div className="text-3xl font-black">{content.featured.name}</div>
+              <div className="mt-1 text-sm opacity-90">{content.featured.cuisine} · {content.featured.neighborhood} · ★ {content.featured.google}</div>
+            </div>
+          </section>
+
+          {/* Dish of the day */}
+          <section className="mb-6 card flex items-start gap-4 p-5">
+            <div className="grid h-24 w-24 flex-none place-items-center rounded-2xl bg-teal-50 text-3xl font-black text-teal-700">{content.dishOfTheDay.title[0]}</div>
+            <div>
+              <div className="text-xs font-bold uppercase tracking-wider text-slate-400">Dish of the day · by {content.dishOfTheDay.restaurant}</div>
+              <div className="text-xl font-extrabold">{content.dishOfTheDay.title}</div>
+              <p className="mt-1 text-sm text-slate-500">{content.dishOfTheDay.recipe}</p>
+            </div>
+          </section>
+
+          {/* What Toronto ate */}
+          <section className="mb-6 card p-5">
+            <div className="text-xs font-bold uppercase tracking-wider text-slate-400">What Toronto ate this week · auto-generated</div>
+            <div className="mt-3 space-y-2">
+              {(content.whatTorontoAte ?? []).map((w: any, i: number) => (
+                <div key={i} className="flex items-center gap-3 border-b border-slate-100 pb-2 text-sm">
+                  <span className="grid h-6 w-6 place-items-center rounded-full bg-teal-600 text-xs font-bold text-white">{i + 1}</span>
+                  <span className="font-semibold">{w.dish}</span>
+                  <span className="text-slate-400">{w.restaurant}</span>
+                  <span className="ml-auto font-bold text-teal-700">{w.orders} orders</span>
+                </div>
+              ))}
+            </div>
+          </section>
+        </>
+      )}
 
       <section className="grid gap-6 lg:grid-cols-2">
         <div>

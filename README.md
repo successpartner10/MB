@@ -307,3 +307,17 @@ git add -A && git commit -m "update PWA" && git push origin main
 
 **Aria Chen** — `usr_99812`, MEALS_6, TUESDAY_PM, concierge drop-off,
 120 Bay St Suite 1402 (M5J 2R8), $78.00/week all-inclusive.
+
+## 🔒 Security
+
+See **`supper-club-security.md`** (in the repo/workspace) for a full hardening guide.
+
+Key points applied so far:
+- **Static PWA** on GitHub Pages = HTTPS by default, no database to attack on the live site.
+- **CSP + security meta tags** (nosniff, referrer, frame-ancestors 'none') added to the PWA.
+- **Backend rate-limiting** on auth/subscription/auction/kitchen routes (protects against brute-force & abuse).
+- **Zod input validation + HTML escaping** throughout (prevents injection/XSS).
+- **`.env` is git-ignored** — never commit secrets.
+
+**Action needed:** revoke the GitHub token that was shared earlier and use a scoped, expiring PAT.
+When adding a real backend/payments, follow the Tier 2 checklist (vetted auth provider, Stripe, headers, backups).

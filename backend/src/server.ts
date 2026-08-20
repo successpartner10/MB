@@ -5,6 +5,7 @@
 
 import express from "express";
 import cors from "cors";
+import rateLimit from "express-rate-limit";
 import { seedAll } from "./seed.js";
 import { startCutoffCron } from "./services/cutoff.js";
 import { authRouter } from "./routes/auth.js";
@@ -19,6 +20,14 @@ const HOST = "0.0.0.0";
 
 app.use(cors());
 app.use(express.json());
+
+// ---- security hardening: rate limiting (protect auth/bids/writes from abuse) ----
+const authLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 50, standardHeaders: true, legacyHeaders: false, message: { status: "ERROR", message: "Too many requests. Try again later." } });
+const writeLimiter = rateLimit({ windowMs: 60 * 1000, max: 120, standardHeaders: true, legacyHeaders: false, message: { status: "ERROR", message: "Too many requests." } });
+app.use("/api/v1/auth", authLimiter);
+app.use("/api/v1/subscription", writeLimiter);
+app.use("/api/v1/auctions", writeLimiter);
+app.use("/api/v1/kitchen", writeLimiter);
 
 // Seed the demo dataset on boot (idempotent).
 seedAll();
