@@ -1022,13 +1022,12 @@ function setBuildFilter(field, val) { buildState[field] = val; navigate(); }
 function boxTotal() { return buildTotals().total; }
 function selectedItems() { return meals.filter((m) => buildState.selected[m.id] > 0); }
 function quickCombo(kind) {
+  if (kind === "budget") { applyBudget(); return; } // budget is only a target — never auto-adds
   buildState.selected = {};
   if (kind === "2+3") {
     const vegs = meals.filter((m) => m.type === "veg").sort((a, b) => a.price - b.price);
     const meats = meals.filter((m) => m.type === "nonveg").sort((a, b) => a.price - b.price);
     [...meats.slice(0, 2), ...vegs.slice(0, 3)].forEach((m) => (buildState.selected[m.id] = 1));
-  } else if (kind === "budget") {
-    meals.sort((a, b) => a.price - b.price).slice(0, 6).forEach((m) => (buildState.selected[m.id] = 1));
   } else if (kind === "all") {
     buildMeals().forEach((m) => (buildState.selected[m.id] = 1));
   }
@@ -1065,10 +1064,10 @@ function renderBuild() {
         <div class="eyebrow">My Week. Fully Catered.</div><h1>Build your weekly box. See your total <span class="accent">instantly.</span></h1>
         <p>This is a recurring weekly order — mix veg &amp; non-veg, filter by restaurant/cuisine/diet, or set a weekly budget. We'll warn you when you hit it.</p></section>
       <div class="combo-strip">
-        <div class="combo-title">Quick combos</div>
+        <div class="combo-title">Quick add</div>
         <button class="btn ghost sm" onclick="quickCombo('2+3')">2 non-veg + 3 veg</button>
-        <button class="btn ghost sm" onclick="quickCombo('budget')">Best value ×6</button>
         <button class="btn ghost sm" onclick="quickCombo('all')">Add all shown</button>
+        <span class="muted sm">Tip: set a weekly budget and pick exactly what fits.</span>
       </div>
       <div class="build-grid">
         <div class="filters-panel">
