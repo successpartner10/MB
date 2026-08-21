@@ -1032,3 +1032,27 @@ body { color: #0b1220; font-size: 17px; line-height: 1.55; }
 .rest-profile a { color: #0d9488; text-decoration: none; font-weight: 500; }
 .rest-profile .ic { color: #0d9488; }
 .admin-head { padding: 12px 18px; }
+
+/* 27) v12 — DARK TEXT EVERYWHERE: no light-grey shades. Dark grey or black. */
+:root { --muted: #1f2937 !important; --ink: #000000 !important; }
+body { color: #000 !important; }
+h1,h2,h3,.h1,.h2,.h3,.fh-name,.dish-title,.chef-name,.rest-name,.gs-title,.step-t,.pstep-t,
+.meal-title,.mp-title,.oc-brand,.ko-id,.cta-bold,.p-cta-t,.pay-hero-amt,.tb-amt,.yb-amt { color: #000 !important; }
+.muted, .muted.sm, .p-muted, .rest-meta, .meal-rest, .mp-rest, .step-d, .tier-desc,
+.dish-recipe, .chef-line, .feat-d, .gs-sub, .tb-note, .dlv-why, .wp-label, .dish-chips .dish-chip,
+.hero-title p, .build-hero p, .rest-meta, .meal-meta, .mp-meta, .rest-profile, .min-ok, .min-warn,
+.billrow.muted, .fp-d, .p-cta-d, .p-step-d, .fleet-count, .ml-count, .mr-cat, .dlv-why, .dlv-how,
+.yb-name, .yb-price, .billrow, .billrow span, .ko-cust, .ko-date, .p-foot, .oc-min {
+  color: #000 !important;
+}
+.brand .sub, .brand span { color: #1f2937 !important; }
+a, .navbtn.link, .navbtn.ghost, .btn.ghost, .tier-chip, .date-chip, .wp-opt, .chip {
+  color: #000 !important;
+}
+/* ensure chip backgrounds stay light so black text is readable */
+.chip, .dish-chip, .wp-opt, .date-chip { background: #eef2f7 !important; border-color: #cbd5e1 !important; }
+.rest-full-head .rest-name.lg, .rest-full .rest-name.lg { color: #000 !important; }
+
+/* 28) v12 — distance/postal filter input */
+.postal-input { display: inline-flex; align-items: center; }
+.postal-input input { width: 90px; padding: 8px 10px; border: 2px solid #cbd5e1; border-radius: 10px; font-size: 15px; font-weight: 600; text-transform: uppercase; }

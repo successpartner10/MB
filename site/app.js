@@ -1203,7 +1203,7 @@ function demoPrev() { demoIdx = demoIdx <= 0 ? 0 : demoIdx - 1; navigate(); }
 /* ============================================================================
    BUILD YOUR BOX
    ========================================================================== */
-const buildState = { selected: {}, rest: "all", area: "all", cuisine: "all", diet: "all", budget: "80" };
+const buildState = { selected: {}, rest: "all", area: "all", cuisines: [], distance: 0, postal: "", budget: "80" };
 /* ---- Single-restaurant weekly orders (v11 model) ----
    Each weekly order comes from ONE restaurant. A customer can hold several,
    one per restaurant. Minimum $40/order; weekly tier $100/$200/$300 per restaurant.
@@ -1349,7 +1349,8 @@ function buildMeals() {
     const r = mealRestaurant(m);
     if (buildState.rest !== "all" && m.restaurantId !== buildState.rest) return false;
     if (buildState.area !== "all" && (buildState.area === "nearby" ? r.radius >= 6 : r.radius < 6)) return false;
-    if (buildState.cuisine !== "all" && r.cuisine !== buildState.cuisine) return false;
+    if (buildState.distance > 0 && r.radius > buildState.distance) return false;
+    if (buildState.cuisines.length && !buildState.cuisines.includes(r.cuisine)) return false;
     if (buildState.diet !== "all" && !m.badges.includes(buildState.diet)) return false;
     return true;
   });
@@ -1360,6 +1361,21 @@ function buildTotals() {
   return { total, count, veg, nonveg, protein };
 }
 function setBuildFilter(field, val) { buildState[field] = val; navigate(); }
+function toggleCuisine(c) {
+  const arr = buildState.cuisines.slice();
+  const i = arr.indexOf(c);
+  if (i >= 0) arr.splice(i, 1); else arr.push(c);
+  buildState.cuisines = arr;
+  navigate();
+}
+function applyPostal() {
+  // Demo: derive a rough distance radius from the first letter of the postal area.
+  // In production this geocodes the postal code to lat/lng and filters by true distance.
+  const p = (buildState.postal || "").trim().toUpperCase();
+  if (p.length >= 1) { buildState.distance = p.charCodeAt(0) % 3 === 0 ? 12 : (p.charCodeAt(0) % 2 === 0 ? 8 : 5); }
+  flash(`✓ Delivery radius set around ${p || "your area"}.`);
+  navigate();
+}
 function boxTotal() { return buildTotals().total; }
 function selectedItems() { return meals.filter((m) => buildState.selected[m.id] > 0); }
 function quickCombo(kind) {
@@ -1413,13 +1429,15 @@ function renderBuild() {
       <div class="build-grid">
         <div class="filters-panel">
           <div class="kicker">${ico("gear")} Filters</div>
-          <div class="frow"><span class="frow-label">Area</span>
-            <button class="chip ${buildState.area === "all" ? "on" : ""}" onclick="setBuildFilter('area','all')">All</button>
-            <button class="chip ${buildState.area === "nearby" ? "on" : ""}" onclick="setBuildFilter('area','nearby')">Nearby</button>
-            <button class="chip ${buildState.area === "further" ? "on" : ""}" onclick="setBuildFilter('area','further')">Further</button></div>
-          <div class="frow"><span class="frow-label">Cuisine</span>
-            <button class="chip ${buildState.cuisine === "all" ? "on" : ""}" onclick="setBuildFilter('cuisine','all')">All</button>
-            ${cuisines.map((c) => `<button class="chip ${buildState.cuisine === c ? "on" : ""}" onclick="setBuildFilter('cuisine','${esc(c)}')">${esc(c)}</button>`).join("")}</div>
+          <div class="frow"><span class="frow-label">Near me — distance</span>
+            <button class="chip ${buildState.distance === 0 ? "on" : ""}" onclick="setBuildFilter('distance',0)">Any</button>
+            <button class="chip ${buildState.distance === 5 ? "on" : ""}" onclick="setBuildFilter('distance',5)">≤ 5 km</button>
+            <button class="chip ${buildState.distance === 8 ? "on" : ""}" onclick="setBuildFilter('distance',8)">≤ 8 km</button>
+            <button class="chip ${buildState.distance === 12 ? "on" : ""}" onclick="setBuildFilter('distance',12)">≤ 12 km</button>
+            <span class="postal-input"><input id="postal" type="text" placeholder="Postal code e.g. M5V" value="${esc(buildState.postal)}" oninput="buildState.postal=this.value;applyPostal()" maxlength="3" /></span></div>
+          <div class="frow"><span class="frow-label">Cuisine — pick 2+</span>
+            <button class="chip ${!buildState.cuisines.length ? "on" : ""}" onclick="setBuildFilter('cuisines',[] )">All</button>
+            ${cuisines.map((c) => `<button class="chip ${buildState.cuisines.includes(c) ? "on" : ""}" onclick="toggleCuisine('${esc(c)}')">${esc(c)}</button>`).join("")}</div>
           <div class="frow"><span class="frow-label">Diet</span>
             <button class="chip ${buildState.diet === "all" ? "on" : ""}" onclick="setBuildFilter('diet','all')">All</button>
             ${["HIGH_PROTEIN", "VEGETARIAN", "VEGAN", "GLUTEN_FREE", "SPICY"].map((d) => `<button class="chip ${buildState.diet === d ? "on" : ""}" onclick="setBuildFilter('diet','${d}')">${esc(d.replace("_", " ").toLowerCase())}</button>`).join("")}</div>
@@ -2044,6 +2062,7 @@ window.getModules = getModules;
 window.setModule = setModule;
 window.moduleOn = moduleOn;
 window.setQty = setQty; window.setBuildFilter = setBuildFilter; window.quickCombo = quickCombo; window.applyBudget = applyBudget; window.buildState = buildState;
+window.toggleCuisine = toggleCuisine; window.applyPostal = applyPostal;
 window.boxTotal = boxTotal; window.selectedItems = selectedItems; window.clearBox = clearBox;
 window.orderAdd = orderAdd; window.setTier = setTier; window.clearOrder = clearOrder; window.ORDERS = ORDERS;
 window.placeOrders = placeOrders; window.CONFIRMED_ORDERS = CONFIRMED_ORDERS; window.confirmDelivery = confirmDelivery; window.changeWindow = changeWindow; window.confirmAndPlace = confirmAndPlace; window.setDeliveryDate = setDeliveryDate;
