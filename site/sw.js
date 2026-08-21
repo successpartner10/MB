@@ -1,5 +1,5 @@
 /* Minimal Bites — static PWA service worker (cache-first; fully offline-capable) */
-const CACHE = "supper-club-v142";
+const CACHE = "supper-club-v143";
 const PRECACHE = [
   "./",
   "index.html",
