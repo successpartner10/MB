@@ -453,13 +453,15 @@ function consumerTopbar(active) {
   return `
     <header class="topbar">
       <a href="#" class="brand">${ico("sparkle")}<div><b>${esc(BRAND)}</b><span class="sub">Curated weekly meals · GTA</span></div></a>
-      <nav class="consumer-nav">
-        <a href="#restaurants" class="navbtn primary cta-big"><span class="cta-stack"><span class="cta-bold">My Week. Fully Catered.</span><span class="cta-sub">(Pick a kitchen, then your meals)</span></span></a>
+      <nav class="consumer-nav top-links">
         ${A("auction", "#auction-deals", "gavel", "Sliding Scale", "ghost")}
         ${A("restaurants", "#restaurants", "store", "Restaurants", "ghost")}
         ${A("search", "#restaurants", "search", "Search", "ghost")}
         ${A("delivery", "#delivery", "truck", "Delivery", "link")}
         ${A("gives", "#gives", "heart", "Gives", "link")}
+      </nav>
+      <nav class="consumer-nav cta-row">
+        <a href="#restaurants" class="navbtn primary cta-big"><span class="cta-stack"><span class="cta-bold">My Week. Fully Catered.</span><span class="cta-sub">(Pick a kitchen, then your meals)</span></span></a>
       </nav>
     </header>`;
 }

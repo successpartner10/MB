@@ -1094,3 +1094,14 @@ a, .navbtn.link, .navbtn.ghost, .btn.ghost, .tier-chip, .date-chip, .wp-opt, .ch
 .ab-level input { padding: 9px; border: 1px solid #334155; border-radius: 8px; background: #0b1020; color: #fff; }
 @media (max-width: 760px){ .ab-levels { grid-template-columns: 1fr; } }
 .active-nav { color: #0d9488 !important; font-weight: 800 !important; }
+
+/* 31) v13 — topbar: menu links ABOVE the big CTA */
+.topbar { flex-direction: column; align-items: stretch; gap: 8px; }
+.topbar .brand { align-self: flex-start; }
+.consumer-nav.top-links { order: 0; justify-content: flex-start; }
+.consumer-nav.cta-row { order: 1; flex: 1 1 100%; }
+.consumer-nav.cta-row .navbtn.cta-big { order: 0; flex-basis: 100%; width: 100%; }
+@media (max-width: 760px){
+  .consumer-nav.top-links { justify-content: flex-start; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .consumer-nav.top-links .navbtn { flex: none; white-space: nowrap; }
+}
