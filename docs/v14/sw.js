@@ -1,5 +1,5 @@
 /* Minimal Bites — static PWA service worker (cache-first; fully offline-capable) */
-const CACHE = "supper-club-v141";
+const CACHE = "supper-club-v142";
 const PRECACHE = [
   "./",
   "index.html",
@@ -24,6 +24,7 @@ self.addEventListener("activate", (event) => {
       .keys()
       .then((keys) => Promise.all(keys.filter((k) => k !== CACHE).map((k) => caches.delete(k))))
       .then(() => self.clients.claim())
+      .then(() => self.skipWaiting())
   );
 });
 
