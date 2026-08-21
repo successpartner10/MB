@@ -1175,3 +1175,9 @@ a, .navbtn.link, .navbtn.ghost, .btn.ghost, .tier-chip, .date-chip, .wp-opt, .ch
 .howto-step b { font-size: 15px; }
 .howto-step span { font-size: 13px; color: #1f2937; }
 @media (max-width: 640px){ .howto-grid { grid-template-columns: 1fr; } }
+
+/* 39) v15 — audio explainer play button */
+.explainer-btn { display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px; flex: none; border-radius: 999px; background: #0d9488; color: #fff; border: none; cursor: pointer; box-shadow: 0 4px 12px rgba(13,148,136,.3); transition: transform .15s ease, box-shadow .15s ease; vertical-align: middle; }
+.explainer-btn:hover { transform: scale(1.08); box-shadow: 0 6px 16px rgba(13,148,136,.4); }
+.explainer-btn .ic { width: 16px; height: 16px; }
+.wa-title .explainer-btn, .pay-hero-label .explainer-btn, .p-hero h1 + .explainer-btn { margin-left: 4px; }

@@ -1,5 +1,5 @@
 /* Minimal Bites — static PWA service worker (cache-first; fully offline-capable) */
-const CACHE = "supper-club-v153";
+const CACHE = "supper-club-v154";
 const PRECACHE = [
   "./",
   "index.html",
@@ -9,7 +9,12 @@ const PRECACHE = [
   "icon-192.png",
   "icon-512.png",
   "icon-maskable-512.png",
-  "apple-touch-icon.png"
+  "apple-touch-icon.png",
+  "audio/week.mp3",
+  "audio/sliding.mp3",
+  "audio/howto.mp3",
+  "audio/owner.mp3",
+  "audio/delivery.mp3"
 ];
 
 self.addEventListener("install", (event) => {

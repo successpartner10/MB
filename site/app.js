@@ -448,6 +448,17 @@ function flash(msg) {
   t.textContent = msg; t.classList.add("show");
   clearTimeout(t._tm); t._tm = setTimeout(() => t.classList.remove("show"), 2400);
 }
+/* ---- audio explainers (small 🔊 play button per section) ---- */
+let _audioEl = null;
+function playAudio(src) {
+  if (!_audioEl) { _audioEl = new Audio(); _audioEl.preload = "auto"; document.body.appendChild(_audioEl); }
+  if (_audioEl.src && _audioEl.src.includes(src) && !_audioEl.paused) { _audioEl.pause(); _audioEl.currentTime = 0; return; }
+  _audioEl.src = src;
+  _audioEl.play().catch(() => flash("Audio is unavailable."));
+}
+function explainer(src) {
+  return `<button class="explainer-btn" onclick="playAudio('${src}')" title="Hear this explained" aria-label="Play audio explainer">${ico("play")}</button>`;
+}
 /* shared consumer topbar — critical links on every consumer page */
 function consumerTopbar(active) {
   const A = (k, href, icon, label, cls) => `<a href="${href}" class="navbtn ${cls || "link"} ${active === k ? "active-nav" : ""}">${ico(icon)}<span>${label}</span></a>`;
@@ -701,7 +712,7 @@ function renderHome() {
           <div class="eyebrow">Just 3 things. That's it.</div>
           <h1>Chef-prepared meals.<br/><span class="accent">One box, once a week.</span></h1>
           <p>Your week, delivered in one drop — not a different courier every day. Pick a kitchen, build your box (min. $80), get it on your day. No forms, no surprise fees, every kitchen live-vetted.</p>
-          <a href="#restaurants" class="btn primary" style="margin-top:18px">${ico("arrow")} Plan your week</a>
+          <div style="display:flex;gap:12px;align-items:center;margin-top:18px;flex-wrap:wrap"><a href="#restaurants" class="btn primary">${ico("arrow")} Plan your week</a>${explainer("audio/week.mp3")}</div>
         </div>
         <div class="steps hero-steps">${steps}</div>
       </section>
@@ -789,7 +800,7 @@ function renderHome() {
 
       <section class="week-auction">
         <div class="wa-head">
-          <div class="wa-title">${ico("gavel")} Sliding Scale</div>
+          <div class="wa-title">${ico("gavel")} Sliding Scale ${explainer("audio/sliding.mp3")}</div>
           <div class="wa-sub">Best price when we hit the numbers · closes Monday · delivers Wednesday</div>
         </div>
         <div class="wa-grid">
@@ -844,11 +855,11 @@ function renderAuctionDeals() {
       ${consumerTopbar("auction")}
       <section class="build-hero">
         <div class="eyebrow">Sliding Scale · closes Monday · delivers Wednesday</div>
-        <h1>Best price when we hit the numbers.</h1>
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><h1 style="margin:0">Best price when we hit the numbers.</h1>${explainer("audio/sliding.mp3")}</div>
         <p>Restaurants set a low price only if enough of you commit. A deal fires on card-confirmed orders — the price settles to the level the real demand reaches.</p>
       </section>
       <section class="wa-howto" style="max-width:1080px;margin:0 auto;padding:0 24px">
-        <div class="h2" style="margin-bottom:10px">How it works</div>
+        <div style="display:flex;gap:10px;align-items:center;margin-bottom:10px"><div class="h2" style="margin:0">How it works</div>${explainer("audio/howto.mp3")}</div>
         <div class="howto-grid">
           <div class="howto-step">${ico("tap")}<b>1 · Pledge</b><span>Say you're in (free, no card). Shows interest.</span></div>
           <div class="howto-step">${ico("lock")}<b>2 · Add a card hold</b><span>Only card-confirmed orders count toward the deal. No hold = no count.</span></div>
@@ -1861,7 +1872,7 @@ function renderPartners() {
           <a href="#menu" class="p-navbtn" data-nav="menu">${ico("bag")} Menu</a>
         <a href="#" class="btn p-outline sm" onclick="ownerLogout()">${ico("arrowLeft")} Sign out</a></header>
       <section class="p-hero"><div class="eyebrow dark">Get on the GTA's zero-friction meal box</div>
-        <h1>Run your kitchen on ${esc(BRAND)}</h1>
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><h1 style="margin:0">Run your kitchen on ${esc(BRAND)}</h1>${explainer("audio/owner.mp3")}</div>
         <p>Committed weekly customers, consolidated batch orders, automated vetting, and automatic payouts. You just cook.</p></section>
       <section class="p-steps"><div class="p-label">It's 3 steps to your first payout</div>${steps}</section>
       <section class="pricing-band">
@@ -2130,7 +2141,7 @@ function renderPayouts() {
           <a href="#auction" class="p-navbtn" data-nav="auction">${ico("gavel")} Auctions</a>
           <a href="#menu" class="p-navbtn" data-nav="menu">${ico("bag")} Menu</a>
         <a href="#" class="btn p-outline sm">${ico("arrowLeft")} Back to eaters</a></header>
-      <section class="pay-hero"><div class="pay-hero-label">Net paid to you this month</div><div class="pay-hero-amt">${money(net)}</div>
+      <section class="pay-hero"><div class="pay-hero-label">Net paid to you this month ${explainer("audio/owner.mp3")}</div><div class="pay-hero-amt">${money(net)}</div>
         <div class="pay-hero-sub">That's 10% of your platform sales — and it INCLUDES your credit-card fees. No card fees on top, no hidden charges. Auto-deducted before payout.</div></section>
       <section class="p-table-card"><div class="p-table-head"><span class="bold">${ico("chart")} Payout breakdown</span></div>${rows}</section>
       <footer class="p-foot">You pay 10% of monthly platform sales — and that 10% INCLUDES your credit-card fees. Auto-deducted before payout. No card fees on top, no hidden charges.</footer>
@@ -2231,6 +2242,7 @@ window.meals = meals; window.RESTAURANTS = RESTAURANTS;
 window.homeSearch = homeSearch;
 window.homeFilterType = homeFilterType;
 window.closeModal = closeModal;
+window.playAudio = playAudio; window.explainer = explainer;
 window.modalAction = modalAction;
 window.ownerLogin = ownerLogin;
 window.ownerLogout = ownerLogout;
