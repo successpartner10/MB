@@ -1228,3 +1228,9 @@ a, .navbtn.link, .navbtn.ghost, .btn.ghost, .tier-chip, .date-chip, .wp-opt, .ch
 .rest-dod-recipe { color: #1f2937; font-size: 14px; line-height: 1.5; }
 .rest-dod-cta { display: inline-flex; align-items: center; gap: 6px; margin-top: 10px; color: #0d9488; font-weight: 800; }
 @media (max-width: 640px){ .rest-dod-card { flex-direction: column; } .rest-dod-img { width: 100%; height: 160px; } }
+
+/* 42) v16 — hero DineSafe tiny bottom-right corner badge */
+.hero-dinesafe { position: absolute; right: 12px; bottom: 12px; }
+.hero-dinesafe .dinesafe { background: rgba(11,18,32,.85); color: #fff !important; border-radius: 999px; padding: 3px 9px; font-size: 10px !important; display: inline-flex; align-items: center; gap: 4px; font-weight: 600; }
+.hero-dinesafe .dinesafe .ic { width: 11px; height: 11px; }
+.hero-slide { position: relative; }

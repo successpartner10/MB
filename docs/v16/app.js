@@ -126,8 +126,8 @@ const DISH_SLOTS = [
 let dishIdx = 0;
 let DISH_DATA = DISH_SLOTS[0];
 function currentDish() { return DISH_SLOTS[dishIdx % DISH_SLOTS.length]; }
-function dishNext() { dishIdx++; navigate(); }
-function dishGo(i) { dishIdx = i; navigate(); }
+function dishNext() { dishIdx++; navNoScroll=true; navigate(); }
+function dishGo(i) { dishIdx = i; navNoScroll=true; navigate(); }
 function dishRestId(d) { return d.rid || "rest_indian"; }
 function dishImage(d) { return d.image || "img/dish-butter-chicken.jpg"; }
 
@@ -652,6 +652,7 @@ function ownerLogout() {
   flash("Signed out.");
   navigate();
 }
+let navNoScroll = false;
 function navigate() {
   const r = currentRoute();
   const app = document.getElementById("app");
@@ -707,7 +708,8 @@ function navigate() {
   document.querySelectorAll("[data-nav]").forEach((a) => a.classList.toggle("active", a.dataset.nav === r));
   app.className = PARTNER_ROUTES.includes(r) ? "partner" : "consumer";
   app.innerHTML = routes[r]();
-  window.scrollTo(0, 0);
+  if (!navNoScroll) window.scrollTo(0, 0);
+  navNoScroll = false;
 }
 
 /* ============================================================================
@@ -725,8 +727,8 @@ const HERO_SLIDES = [
 ];
 function heroStart() { clearInterval(heroTimer); heroTimer = setInterval(heroNext, 6000); }
 function heroStop() { clearInterval(heroTimer); heroTimer = null; }
-function heroNext() { heroIdx = (heroIdx + 1) % HERO_SLIDES.length; navigate(); }
-function heroGo(i) { heroIdx = i; navigate(); }
+function heroNext() { heroIdx = (heroIdx + 1) % HERO_SLIDES.length; navNoScroll=true; navigate(); }
+function heroGo(i) { heroIdx = i; navNoScroll=true; navigate(); }
 function renderHero() {
   const filled = HERO_SLIDES.filter((h) => h.rid && restVisible(h.rid));
   if (!filled.length) return "";
@@ -739,8 +741,9 @@ function renderHero() {
         <div class="hero-slide-overlay">
           <div class="hero-slide-tag">${esc(cur.tag)} · ${esc(r.name || "")}</div>
           <div class="hero-slide-title">${esc(r.name || "")} — ${esc(r.cuisine || "")}</div>
-          <div class="hero-slide-sub">${googleHtml(r)} ${dineSafeHtml(r)}</div>
+          <div class="hero-slide-sub">${googleHtml(r)}</div>
           <span class="hero-slide-cta">${ico("arrow")} Order from ${esc(r.name || "this restaurant")}</span>
+          <div class="hero-dinesafe">${dineSafeHtml(r)}</div>
         </div>
       </a>
       <div class="hero-dots">${dots}</div>
