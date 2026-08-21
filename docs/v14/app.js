@@ -1289,33 +1289,30 @@ function confirmAndPlace() {
    DELIVERY — how your weekly box gets to you (recommendations)
    ========================================================================== */
 function renderDelivery() {
-  const providers = [
-    { name: "Multi-provider dispatch (best-price routing)", rec: "RECOMMENDED", how: "We quote the same drop across several courier networks and pick the lowest cost + best ETA on every order, with automatic failover. No single provider lock-in.", why: "Why: guarantees the cheapest reliable drop per week, never marooned when one courier is unavailable." },
-    { name: "Restaurant self-delivery (batched routes)", rec: "LOWEST COST", how: "Partner kitchens with their own driver deliver the whole neighborhood's boxes in one scheduled loop.", why: "Why: a single driver doing 6–12 drops in one trip beats per-order couriers — typically $2–$4/drop." },
-    { name: "Scheduled Canadian courier network (e.g. GoFor/Dropoff)", rec: "FOR VOLUME ROUTES", how: "A planned, recurring route provider with Toronto coverage handles bigger weekly volumes.", why: "Why: purpose-built for scheduled/recurring batches — matches our weekly model, negotiable at volume." },
-    { name: "White-label courier engines (Uber Direct / DoorDash Drive)", rec: "COVERAGE FALLBACK", how: "Used as the courier only — the order, branding and customer data stay on Supper Club Direct, never on a marketplace.", why: "Why: full GTA coverage when needed, without restaurant commissions or losing the customer." },
-    { name: "Pickup & pickup-points", rec: "FREE / ZERO-COST", how: "Pick up at the kitchen, a local café, or a community locker.", why: "Why: $0 delivery, always available, and our default fallback for efficiency." },
-  ];
-  const rows = providers.map((p) => `<div class="dlv-row">
-    <div class="dlv-head"><span class="dlv-name">${ico("truck")} ${esc(p.name)}</span><span class="dlv-rec">${esc(p.rec)}</span></div>
-    <div class="dlv-how">${esc(p.how)}</div>
-    <div class="dlv-why">${esc(p.why)}</div>
-  </div>`).join("");
   return `
     <div class="consumer-shell">
       ${consumerTopbar("delivery")}
       <section class="build-hero">
         <div class="eyebrow">Delivery, handled</div><h1>How your weekly box gets to you</h1>
-        <p>Delivery is <b>included</b> — no surprise fees. We optimize the route behind the scenes and you just watch it live-track to your door.</p></section>
-      <section class="card block" style="max-width:820px;margin:0 auto 16px">
-        <div class="kicker">${ico("box")} Our delivery model</div>
-        <div class="billrow"><span>Delivery cost</span><span class="accent bold">INCLUDED</span></div>
-        <div class="billrow muted sm"><span>Pickup option</span><span class="accent bold">$0, always available</span></div>
-        <div class="billrow muted sm"><span>You choose the courier?</span><span>No — we route for lowest cost + reliability</span></div>
+        <p>Delivery is <b>included</b> — no surprise fees. We pick the best route behind the scenes and you just watch it live-track to your door. No choices for you to make.</p></section>
+      <section class="dlv-recommended" style="max-width:820px;margin:0 auto 16px">
+        <div class="dr-badge">${ico("check")} Our recommended option</div>
+        <div class="dr-card">
+          <div class="dr-head"><span class="dr-title">${ico("route")} Smart multi-provider delivery</span><span class="dlv-rec">BEST PRICE + RELIABILITY</span></div>
+          <p class="dr-body">We quote your drop across the best courier networks and automatically pick the <b>lowest cost with the fastest ETA</b> — with instant fallback if one is unavailable. You always see one live ETA and one tracking map, under our brand.</p>
+          <ul class="dr-list">
+            <li>${ico("check")} Cheapest reliable delivery every week</li>
+            <li>${ico("check")} Never stranded if one courier is busy</li>
+            <li>${ico("check")} Live-tracked, same experience every time</li>
+            <li>${ico("check")} Pickup option is always free if you'd rather</li>
+          </ul>
+        </div>
       </section>
-      <section class="content-sec" style="max-width:820px;margin:0 auto">
-        <div class="kicker">${ico("route")} How we choose the delivery option</div>
-        <div class="dlv-board">${rows}</div>
+      <section class="card block" style="max-width:820px;margin:0 auto 16px">
+        <div class="kicker">${ico("box")} Good to know</div>
+        <div class="billrow"><span>Delivery cost</span><span class="accent bold">INCLUDED</span></div>
+        <div class="billrow muted sm"><span>Pickup</span><span class="accent bold">$0, always available</span></div>
+        <div class="billrow muted sm"><span>Do I choose a courier?</span><span>No — we handle it</span></div>
       </section>
       <footer class="foot">${versionBadge()}</footer>
     </div>`;

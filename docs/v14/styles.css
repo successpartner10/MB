@@ -1105,3 +1105,22 @@ a, .navbtn.link, .navbtn.ghost, .btn.ghost, .tier-chip, .date-chip, .wp-opt, .ch
   .consumer-nav.top-links { justify-content: flex-start; overflow-x: auto; -webkit-overflow-scrolling: touch; }
   .consumer-nav.top-links .navbtn { flex: none; white-space: nowrap; }
 }
+
+/* 32) v14 — aligned top menu buttons (even row) */
+.consumer-nav.top-links { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; width: 100%; padding: 2px 0 4px; }
+.consumer-nav.top-links .navbtn { justify-content: center; padding: 11px 8px; font-size: 15px; font-weight: 500; border-radius: 12px; text-align: center; }
+@media (max-width: 760px){
+  .consumer-nav.top-links { display: flex; overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 6px; }
+  .consumer-nav.top-links .navbtn { flex: 1 0 auto; min-width: 96px; }
+}
+
+/* 33) v14 — simplified delivery page (single recommendation) */
+.dlv-recommended .dr-badge { display: inline-flex; align-items: center; gap: 6px; background: #0d9488; color: #fff; font-weight: 800; font-size: 13px; padding: 6px 12px; border-radius: 999px; margin-bottom: 10px; }
+.dr-card { background: #fff; border: 2px solid #0d9488; border-radius: 18px; padding: 20px; box-shadow: 0 8px 24px rgba(13,148,136,.12); }
+.dr-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 8px; }
+.dr-title { display: inline-flex; align-items: center; gap: 8px; font-size: 20px; font-weight: 800; color: #000; }
+.dr-title .ic { color: #0d9488; }
+.dr-body { color: #1f2937; font-size: 16px; line-height: 1.6; margin-bottom: 10px; }
+.dr-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 6px; }
+.dr-list li { display: flex; align-items: center; gap: 8px; color: #000; font-size: 15px; font-weight: 500; }
+.dr-list li .ic { color: #0d9488; }
