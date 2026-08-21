@@ -414,11 +414,11 @@ const FLEET = [
 ];
 
 /* ============================================================================
-   PRICING — flat $500/month, first month free (no commission)
+   PRICING — 10% of monthly sales, all-in (card + delivery + platform), auto-deducted
    ========================================================================== */
 const PRICING = {
-  base: 500,
-  orderFeePct: 0,
+  base: 0,
+  orderFeePct: 10,
   firstMonthFree: true,
 };
 function partnerMonthlyFee() {
@@ -1772,7 +1772,7 @@ function renderPartners() {
   const steps = [
     ["1", "Set up", "Profile, menu & zones. Automated DineSafe + rating vetting.", "store"],
     ["2", "Fulfill orders", "Committed weekly volume + one consolidated prep list.", "pot"],
-    ["3", "Get paid", "Flat $500/month. First month free.", "wallet"],
+    ["3", "Get paid", "10% of sales — INCLUDING your credit-card fees. Auto-deducted before payout.", "wallet"],
   ].map(([n, t, d, ic]) => `<div class="pstep"><span class="pstep-num">${n}</span><div class="pstep-body"><div class="pstep-t">${ico(ic)} ${t}</div><div class="pstep-d">${d}</div></div></div>`).join("");
   return `
     <div class="partner-shell">
@@ -1789,9 +1789,9 @@ function renderPartners() {
         <p>Committed weekly customers, consolidated batch orders, automated vetting, and automatic payouts. You just cook.</p></section>
       <section class="p-steps"><div class="p-label">It's 3 steps to your first payout</div>${steps}</section>
       <section class="pricing-band">
-        <div class="pb-item"><span class="pb-num">$500</span><span class="pb-l">/ month</span></div>
+        <div class="pb-item"><span class="pb-num">10%</span><span class="pb-l">of your monthly sales</span></div>
         <div class="pb-plus">=</div>
-        <div class="pb-item accent"><span class="pb-num">First month</span><span class="pb-l">free</span></div>
+        <div class="pb-item accent"><span class="pb-num">10% includes</span><span class="pb-l">your credit-card fees</span></div>
       </section>
       <section class="p-cta"><div class="p-cta-left"><div class="p-label">Automated vetting — no manual checks</div>
         <div class="p-cta-t">DineSafe &amp; Google rating, verified nightly</div>
@@ -2041,7 +2041,7 @@ function renderPayouts() {
   const net = sales - fee;
   const rows = [
     [`Gross platform sales (month)`, money(sales), ""],
-    [`Supper Club fee (${feeRate * 100}%, all-in — card + delivery + platform)`, money(fee), "deduct"],
+    [`Supper Club fee (${feeRate * 100}% — INCLUDES credit-card fees)`, money(fee), "deduct"],
     [`Net paid to you`, money(net), "total"],
   ].map(([l, v, c]) => `<div class="pay-row"><span>${l}</span><span class="pay-val">${v} ${c === "total" ? `<span class="pay-dir up">▲</span>` : c === "deduct" ? `<span class="pay-dir down">▼</span>` : ""}</span></div>`).join("");
   return `
@@ -2055,9 +2055,9 @@ function renderPayouts() {
           <a href="#menu" class="p-navbtn" data-nav="menu">${ico("bag")} Menu</a>
         <a href="#" class="btn p-outline sm">${ico("arrowLeft")} Back to eaters</a></header>
       <section class="pay-hero"><div class="pay-hero-label">Net paid to you this month</div><div class="pay-hero-amt">${money(net)}</div>
-        <div class="pay-hero-sub">10% of platform sales, all-in — covers card fees, delivery &amp; platform. Auto-deducted before payout. No surprises, no per-order fees.</div></section>
+        <div class="pay-hero-sub">That's 10% of your platform sales — and it INCLUDES your credit-card fees. No card fees on top, no hidden charges. Auto-deducted before payout.</div></section>
       <section class="p-table-card"><div class="p-table-head"><span class="bold">${ico("chart")} Payout breakdown</span></div>${rows}</section>
-      <footer class="p-foot">You pay 10% of monthly platform sales (all-in). It's auto-deducted before we pay you — simple, fair, no hidden fees.</footer>
+      <footer class="p-foot">You pay 10% of monthly platform sales — and that 10% INCLUDES your credit-card fees. Auto-deducted before payout. No card fees on top, no hidden charges.</footer>
     </div>`;
 }
 
