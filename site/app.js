@@ -792,32 +792,7 @@ function renderHome() {
           <div class="wa-sub">Best price when we hit the numbers · closes Monday · delivers Wednesday</div>
         </div>
         <div class="wa-grid">
-          ${WEEK_AUCTION.map((a) => {
-            const { unlocked, next } = auctionLevelLabel(a);
-            return `<div class="wa-card">
-              <div class="wa-img"><img src="${a.image}" alt="${esc(a.dish)}" loading="lazy" /></div>
-              <div class="wa-body">
-                <div class="wa-rest">${esc(a.rest)}</div>
-                <div class="wa-dish">${esc(a.dish)}</div>
-                <div class="wa-levels">
-                  ${a.levels.map((l, i) => {
-                    const on = a.ordered >= l.qty;
-                    const isBest = i === a.levels.length - 1;
-                    return `<div class="wa-level ${on ? "hit" : ""}">
-                      <span class="wl-price">$${l.price}</span>
-                      <span class="wl-qty">at ${l.qty}+</span>
-                      ${isBest && on ? `<span class="wl-badge">unlocked</span>` : ""}
-                    </div>`;
-                  }).join("")}
-                </div>
-                <div class="wa-progress">
-                  <div class="wa-bar"><div class="wa-fill" style="width:${Math.min(100, (a.ordered / (next ? next.qty : a.levels[a.levels.length-1].qty)) * 100)}%"></div></div>
-                  <span class="wa-count">${a.ordered}/${next ? next.qty : a.levels[a.levels.length-1].qty} committed</span>
-                </div>
-                <button class="btn primary sm wa-join" onclick="auctionJoin('${a.id}')">${ico("check")} Join at $${unlocked.price}</button>
-              </div>
-            </div>`;
-          }).join("")}
+          ${WEEK_AUCTION.map((a) => slidingCard(a)).join("")}
         </div>
       </section>
 
@@ -831,30 +806,36 @@ function homeSearch(q) {
   homeFilter.q = (q || "").toLowerCase().trim();
   navigate();
 }
-function renderAuctionDeals() {
-  const cards = WEEK_AUCTION.map((a) => {
-    const { unlocked, next } = auctionLevelLabel(a);
-    return `<div class="wa-card">
-      <div class="wa-img"><img src="${a.image}" alt="${esc(a.dish)}" loading="lazy" /></div>
-      <div class="wa-body">
-        <div class="wa-rest">${esc(a.rest)}</div>
-        <div class="wa-dish">${esc(a.dish)}</div>
-        <div class="wa-listed">Listed $${a.listed} · now $${unlocked.price}</div>
-        <div class="wa-levels">
-          ${a.levels.map((l, i) => {
-            const on = a.ordered >= l.qty;
-            const isBest = i === a.levels.length - 1;
-            return `<div class="wa-level ${on ? "hit" : ""}">
-              <span class="wl-price">$${l.price}</span><span class="wl-qty">at ${l.qty}+</span>
-              ${isBest && on ? `<span class="wl-badge">unlocked</span>` : ""}
-            </div>`;
-          }).join("")}
-        </div>
-        <div class="wa-progress"><div class="wa-bar"><div class="wa-fill" style="width:${Math.min(100, (a.ordered / (next ? next.qty : a.levels[a.levels.length-1].qty)) * 100)}%"></div></div><span class="wa-count">${a.ordered}/${next ? next.qty : a.levels[a.levels.length-1].qty} committed</span></div>
-        <button class="btn primary sm wa-join" onclick="auctionJoin('${a.id}')">${ico("check")} Join at $${unlocked.price}</button>
+function slidingCard(a) {
+  const { next } = auctionLevelLabel(a);
+  const chosen = a._chosen != null ? a._chosen : a.levels[a.levels.length - 1].price; // default = lowest
+  return `<div class="wa-card">
+    <div class="wa-img"><img src="${a.image}" alt="${esc(a.dish)}" loading="lazy" /></div>
+    <div class="wa-body">
+      <div class="wa-rest">${esc(a.rest)}</div>
+      <div class="wa-dish">${esc(a.dish)}</div>
+      <div class="wa-listed">Listed $${a.listed}</div>
+      <div class="wa-pick">${ico("tap")} Choose your price</div>
+      <div class="wa-levels">
+        ${a.levels.map((l, i) => {
+          const hit = a.ordered >= l.qty;
+          const sel = l.price === chosen;
+          const isBest = i === a.levels.length - 1;
+          return `<button class="wa-level ${sel ? "sel" : ""} ${hit ? "hit" : ""}" onclick="auctionPick('${a.id}', ${l.price})">
+            <span class="wl-price">$${l.price}</span>
+            <span class="wl-qty">at ${l.qty}+</span>
+            ${sel ? `<span class="wl-badge sel-b">✓ chosen</span>` : ""}
+            ${isBest && hit ? `<span class="wl-badge">unlocked</span>` : ""}
+          </button>`;
+        }).join("")}
       </div>
-    </div>`;
-  }).join("");
+      <div class="wa-progress"><div class="wa-bar"><div class="wa-fill" style="width:${Math.min(100, (a.ordered / (next ? next.qty : a.levels[a.levels.length-1].qty)) * 100)}%"></div></div><span class="wa-count">${a.ordered}/${next ? next.qty : a.levels[a.levels.length-1].qty} committed</span></div>
+      <button class="btn primary sm wa-join" onclick="auctionJoin('${a.id}')">${ico("check")} Join at $${chosen}</button>
+    </div>
+  </div>`;
+}
+function renderAuctionDeals() {
+  const cards = WEEK_AUCTION.map((a) => slidingCard(a)).join("");
   return `
     <div class="consumer-shell">
       ${consumerTopbar("auction")}
@@ -965,7 +946,21 @@ const WEEK_AUCTION = [
   { id: "wa9", rest: "Bar Raval", dish: "Gambas al Ajillo", image: "img/chef-2.jpg", listed: 19, levels: [ { qty: 35, price: 15 }, { qty: 55, price: 13 }, { qty: 80, price: 11 } ], ordered: 0 },
   { id: "wa10", rest: "Pai Northern Thai Kitchen", dish: "Tom Yum Soup", image: "img/dish-poke.jpg", listed: 12, levels: [ { qty: 50, price: 9 }, { qty: 80, price: 8 }, { qty: 110, price: 7 } ], ordered: 4 },
 ];
-function auctionJoin(waId) { const a = WEEK_AUCTION.find((x) => x.id === waId); if (a) a.ordered++; flash(`✓ You're in on ${a.dish} (${a.ordered} committed). Payment confirms at your level.`); navigate(); }
+function auctionJoin(waId) {
+  const a = WEEK_AUCTION.find((x) => x.id === waId);
+  if (!a) return;
+  const chosen = a._chosen != null ? a._chosen : a.levels[a.levels.length - 1].price; // default lowest
+  const chosenLvl = a.levels.find((l) => l.price === chosen) || a.levels[a.levels.length - 1];
+  a.ordered++;
+  flash(`✓ You're in on ${a.dish} at $${chosenLvl.price} (${a.ordered}/${chosenLvl.qty} toward that level). Payment confirms when reached.`);
+  navigate();
+}
+function auctionPick(waId, price) {
+  const a = WEEK_AUCTION.find((x) => x.id === waId);
+  if (!a) return;
+  a._chosen = price;
+  navigate();
+}
 function auctionLevelLabel(a) {
   // Find the highest level the current ordered count has unlocked
   let unlocked = a.levels[0];
@@ -2200,7 +2195,7 @@ window.orderAdd = orderAdd; window.clearOrder = clearOrder; window.ORDERS = ORDE
 window.placeOrders = placeOrders; window.CONFIRMED_ORDERS = CONFIRMED_ORDERS; window.confirmDelivery = confirmDelivery; window.changeWindow = changeWindow; window.confirmAndPlace = confirmAndPlace; window.setDeliveryDate = setDeliveryDate; window.setPayMethod = setPayMethod;
 window.setMenuRest = setMenuRest; window.menuFindByName = menuFindByName; window.menuAddManual = menuAddManual; window.menuToggleHidden = menuToggleHidden; window.menuDelete = menuDelete; window.menuEditPrice = menuEditPrice; window.MENU_STORE = MENU_STORE;
 window.setRestVisible = setRestVisible; window.restVisible = restVisible; window.visibleRestaurants = visibleRestaurants;
-window.auctionJoin = auctionJoin; window.WEEK_AUCTION = WEEK_AUCTION;
+window.auctionJoin = auctionJoin; window.auctionPick = auctionPick; window.WEEK_AUCTION = WEEK_AUCTION;
 window.submitAuctionBid = submitAuctionBid; window.buyPlacement = buyPlacement;
 window.setDeliveryWindow = setDeliveryWindow; window.setCadence = setCadence; window.toggleWeek = toggleWeek; window.advanceTrack = advanceTrack; window.TRACK = TRACK;
 window.setRestFilter = setRestFilter; window.demoNext = demoNext; window.demoPrev = demoPrev;

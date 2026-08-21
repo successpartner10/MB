@@ -1155,3 +1155,12 @@ a, .navbtn.link, .navbtn.ghost, .btn.ghost, .tier-chip, .date-chip, .wp-opt, .ch
 .pm-opt .pm-s { display: block; font-size: 13px; color: #1f2937; margin-top: 3px; }
 .pm-opt.on { border-color: #0d9488; background: #f0fdfa; box-shadow: 0 4px 12px rgba(13,148,136,.15); }
 @media (max-width: 560px){ .pm-opts { grid-template-columns: 1fr; } }
+
+/* 37) v15 — Sliding Scale: choose your preferred price (selectable levels) */
+.wa-pick { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 700; color: #1f2937; margin-bottom: 8px; }
+.wa-pick .ic { color: #0d9488; }
+.wa-level { cursor: pointer; border: 2px solid #cbd5e1; background: #fff; }
+.wa-level:hover { border-color: #0d9488; }
+.wa-level.sel { border-color: #0d9488; background: #f0fdfa; box-shadow: 0 4px 12px rgba(13,148,136,.18); }
+.wa-level.sel .wl-price { color: #0f766e; }
+.wa-level .wl-badge.sel-b { display: block; color: #0d9488; }
