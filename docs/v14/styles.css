@@ -1145,3 +1145,12 @@ a, .navbtn.link, .navbtn.ghost, .btn.ghost, .tier-chip, .date-chip, .wp-opt, .ch
 /* 35) v14 — $80 minimum banner (shown upfront, before customer starts) */
 .min-banner { display: inline-flex; align-items: center; gap: 8px; background: #f0fdfa; border: 1px solid #99f6e4; color: #0f766e; font-weight: 700; font-size: 14px; padding: 8px 14px; border-radius: 12px; margin: 10px 0 4px; }
 .min-banner .ic { color: #0d9488; }
+
+/* 36) v14 — payment methods (pay in full / BNPL) at checkout */
+.pay-methods { margin-top: 14px; }
+.pm-opts { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.pm-opt { border: 2px solid #cbd5e1; background: #fff; border-radius: 14px; padding: 14px; text-align: left; cursor: pointer; transition: all .15s ease; }
+.pm-opt .pm-t { display: block; font-size: 16px; font-weight: 800; color: #000; }
+.pm-opt .pm-s { display: block; font-size: 13px; color: #1f2937; margin-top: 3px; }
+.pm-opt.on { border-color: #0d9488; background: #f0fdfa; box-shadow: 0 4px 12px rgba(13,148,136,.15); }
+@media (max-width: 560px){ .pm-opts { grid-template-columns: 1fr; } }

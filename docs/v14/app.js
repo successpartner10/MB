@@ -1262,8 +1262,22 @@ function renderCheckout() {
       </section>
       ${confirmBlock}
       ${placed ? `<div style="max-width:720px;margin:0 auto;text-align:center"><a href="#dashboard" class="btn ghost" style="width:100%">${ico("arrow")} Go to your week</a></div>` : `
+      <section class="card block pay-methods" style="max-width:720px;margin:0 auto 16px">
+        <div class="kicker">${ico("wallet")} How you'd like to pay</div>
+        <div class="pm-opts">
+          <button class="pm-opt ${payMethod === "full" ? "on" : ""}" onclick="setPayMethod('full')">
+            <span class="pm-t">Pay in full</span>
+            <span class="pm-s">${money(grandTotal)} today · via card/Stripe</span>
+          </button>
+          <button class="pm-opt ${payMethod === "bnpl" ? "on" : ""}" onclick="setPayMethod('bnpl')">
+            <span class="pm-t">Pay in 4 (BNPL)</span>
+            <span class="pm-s">4 payments of ${money(grandTotal / 4)} · no interest</span>
+          </button>
+        </div>
+        <p class="muted sm" style="margin-top:8px">Powered by Stripe + BNPL partners. Pay on the app — restaurants are paid separately.</p>
+      </section>
       <div style="max-width:720px;margin:0 auto;text-align:center">
-        <button class="btn primary" style="width:100%" onclick="confirmAndPlace()">${ico("check")} Confirm window & place all orders — ${money(grandTotal)}</button>
+        <button class="btn primary" style="width:100%" onclick="confirmAndPlace()">${ico("check")} ${payMethod === "bnpl" ? "Confirm & start BNPL — " + money(grandTotal / 4) + "/mo × 4" : "Confirm & pay " + money(grandTotal)}</button>
         <p class="muted sm" style="margin-top:8px">Each restaurant is notified by email &amp; text. You'll see a confirmation with your delivery date, time, and price.</p>
       </div>`}`}
       <footer class="foot">${versionBadge()}</footer>
@@ -1531,6 +1545,8 @@ function renderBuild() {
    ========================================================================== */
 let chosenWindow = "5-7";
 let chosenDateIdx = 0; // index into available delivery dates (earliest first)
+let payMethod = "full"; // "full" | "bnpl"
+function setPayMethod(m) { payMethod = m; navigate(); }
 let cadence = "weekly";
 function deliveryDates() {
   const out = [];
@@ -2122,7 +2138,7 @@ window.setQty = setQty; window.setBuildFilter = setBuildFilter; window.quickComb
 window.toggleCuisine = toggleCuisine; window.applyPostal = applyPostal;
 window.boxTotal = boxTotal; window.selectedItems = selectedItems; window.clearBox = clearBox;
 window.orderAdd = orderAdd; window.clearOrder = clearOrder; window.ORDERS = ORDERS;
-window.placeOrders = placeOrders; window.CONFIRMED_ORDERS = CONFIRMED_ORDERS; window.confirmDelivery = confirmDelivery; window.changeWindow = changeWindow; window.confirmAndPlace = confirmAndPlace; window.setDeliveryDate = setDeliveryDate;
+window.placeOrders = placeOrders; window.CONFIRMED_ORDERS = CONFIRMED_ORDERS; window.confirmDelivery = confirmDelivery; window.changeWindow = changeWindow; window.confirmAndPlace = confirmAndPlace; window.setDeliveryDate = setDeliveryDate; window.setPayMethod = setPayMethod;
 window.setMenuRest = setMenuRest; window.menuFindByName = menuFindByName; window.menuAddManual = menuAddManual; window.menuToggleHidden = menuToggleHidden; window.menuDelete = menuDelete; window.menuEditPrice = menuEditPrice; window.MENU_STORE = MENU_STORE;
 window.setRestVisible = setRestVisible; window.restVisible = restVisible; window.visibleRestaurants = visibleRestaurants;
 window.auctionJoin = auctionJoin; window.WEEK_AUCTION = WEEK_AUCTION;
