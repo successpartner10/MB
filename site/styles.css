@@ -1107,7 +1107,7 @@ a, .navbtn.link, .navbtn.ghost, .btn.ghost, .tier-chip, .date-chip, .wp-opt, .ch
 }
 
 /* 32) v14 — aligned top menu buttons (even row) */
-.consumer-nav.top-links { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; width: 100%; padding: 2px 0 4px; }
+.consumer-nav.top-links { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; width: 100%; padding: 2px 0 4px; }
 .consumer-nav.top-links .navbtn { justify-content: center; padding: 11px 8px; font-size: 15px; font-weight: 500; border-radius: 12px; text-align: center; }
 @media (max-width: 760px){
   .consumer-nav.top-links { display: flex; overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 6px; }
@@ -1141,3 +1141,7 @@ a, .navbtn.link, .navbtn.ghost, .btn.ghost, .tier-chip, .date-chip, .wp-opt, .ch
   color: #fff !important;
 }
 .consumer-nav.top-links .navbtn .ic { color: inherit !important; }
+
+/* 35) v14 — $80 minimum banner (shown upfront, before customer starts) */
+.min-banner { display: inline-flex; align-items: center; gap: 8px; background: #f0fdfa; border: 1px solid #99f6e4; color: #0f766e; font-weight: 700; font-size: 14px; padding: 8px 14px; border-radius: 12px; margin: 10px 0 4px; }
+.min-banner .ic { color: #0d9488; }

@@ -457,11 +457,10 @@ function consumerTopbar(active) {
         ${A("auction", "#auction-deals", "gavel", "Sliding Scale", "ghost")}
         ${A("restaurants", "#restaurants", "store", "Restaurants", "ghost")}
         ${A("search", "#restaurants", "search", "Search", "ghost")}
-        ${A("delivery", "#delivery", "truck", "Delivery", "link")}
         ${A("gives", "#gives", "heart", "Gives", "link")}
       </nav>
       <nav class="consumer-nav cta-row">
-        <a href="#restaurants" class="navbtn primary cta-big"><span class="cta-stack"><span class="cta-bold">My Week. Fully Catered.</span><span class="cta-sub">(Pick a kitchen, then your meals)</span></span></a>
+        <a href="#restaurants" class="navbtn primary cta-big"><span class="cta-stack"><span class="cta-bold">My Week. Fully Catered.</span><span class="cta-sub">One box, once a week. Delivered on your day.</span></span></a>
       </nav>
     </header>`;
 }
@@ -496,7 +495,7 @@ function modalAction(i) {
 const routes = {
   "": renderHome, restaurants: renderRestaurants, build: renderBuild, dashboard: renderDashboard,
   schedule: renderSchedule, track: renderTrack, demo: renderDemo, gives: renderGives,
-  "restaurant-menu": renderRestaurantMenu, checkout: renderCheckout, delivery: renderDelivery,
+  "restaurant-menu": renderRestaurantMenu, checkout: renderCheckout,
   "auction-deals": renderAuctionDeals,
   partners: renderPartners, kitchen: renderKitchen, fleet: renderFleet, payouts: renderPayouts, auction: renderAuction, menu: renderMenu,
   admin: renderAdmin,
@@ -699,9 +698,9 @@ function renderHome() {
       <section class="hero">
         <div class="hero-title">
           <div class="eyebrow">Just 3 things. That's it.</div>
-          <h1>Chef-prepared meals.<br/><span class="accent">3 easy steps.</span></h1>
-          <p>Register, choose, get delivery — weekly, every two weeks, or monthly. No forms. No surprise fees. Every kitchen shows live DineSafe status &amp; ratings.</p>
-          <a href="#demo" class="btn primary" style="margin-top:18px">${ico("play")} Watch the 60-second demo</a>
+          <h1>Chef-prepared meals.<br/><span class="accent">One box, once a week.</span></h1>
+          <p>Your week, delivered in one drop — not a different courier every day. Pick a kitchen, build your box (min. $80), get it on your day. No forms, no surprise fees, every kitchen live-vetted.</p>
+          <a href="#restaurants" class="btn primary" style="margin-top:18px">${ico("arrow")} Plan your week</a>
         </div>
         <div class="steps hero-steps">${steps}</div>
       </section>
@@ -1127,7 +1126,6 @@ function renderRestaurantMenu() {
   const o = getOrder(rid);
   const menu = meals.filter((m) => m.restaurantId === r.id);
   const tot = orderTotals(rid);
-  const tier = o.tier;
   const rows = menu.map((m) => {
     const q = o.selected[m.id] || 0;
     return `<div class="meal-pick ${q ? "on" : ""}">
@@ -1136,12 +1134,10 @@ function renderRestaurantMenu() {
       <div class="stepper"><button class="stp-btn" onclick="orderAdd('${rid}','${m.id}',-1)">−</button><span class="stp-val">${q}</span><button class="stp-btn" onclick="orderAdd('${rid}','${m.id}',1)">+</button></div>
     </div>`;
   }).join("");
-  const tierBtns = WEEKLY_TIERS.map((t) => `<button class="tier-chip ${tier === t ? "on" : ""}" onclick="setTier('${rid}',${t})">$${t}<span class="tier-sub">/week</span></button>`).join("");
   const meetsMin = tot.total >= MIN_ORDER;
   const minNote = meetsMin
     ? `<span class="min-ok">${ico("check")} Meets the $${MIN_ORDER} minimum</span>`
-    : `<span class="min-warn">Need at least $${MIN_ORDER} in this order (${money(Math.max(0, MIN_ORDER - tot.total))} more)</span>`;
-  const tierState = tot.total >= tier ? "met" : "pending";
+    : `<span class="min-warn">Closing in on the $${MIN_ORDER} minimum — ${money(Math.max(0, MIN_ORDER - tot.total))} to go</span>`;
   return `
     <div class="consumer-shell">
       ${consumerTopbar("restaurants")}
@@ -1149,22 +1145,18 @@ function renderRestaurantMenu() {
         <div class="eyebrow">${esc(r.cuisine)} · ${esc(r.neighborhood)}${r.price ? " · " + esc(r.price) : ""}</div>
         <h1>${esc(r.name)}</h1>
         <p>${googleHtml(r)} ${dineSafeHtml(r)}</p>
+        <div class="min-banner">${ico("info")} Every weekly order meets a $${MIN_ORDER} minimum · delivered in one weekly drop on your day.</div>
         <div class="rest-profile">
           ${r.address ? `<span>${ico("pin")} ${esc(r.address)}</span>` : ""}
           ${r.phone ? `<a href="tel:${esc(r.phone.replace(/[^0-9+]/g, ""))}">${ico("tap")} ${esc(r.phone)}</a>` : ""}
           ${r.hours ? `<span>${ico("clock")} ${esc(r.hours)}</span>` : ""}
         </div>
       </section>
-      <section class="order-tier">
-        <div class="ot-label">${ico("calendar")} Your weekly order from ${esc(r.name)} — pick a plan</div>
-        <div class="ot-tiers">${tierBtns}</div>
-        <p class="muted sm">One order = one restaurant. You can add a different kitchen as its own weekly order. Committing at least $100/week keeps every kitchen worth its $500/month membership.</p>
-      </section>
       <div class="build-grid">
         <div class="meals-panel"><div class="meals-count">${menu.length} dishes · ${esc(r.name)}</div><div class="meal-picks">${rows}</div></div>
       </div>
       <div class="your-box">
-        <div class="yb-head"><span class="yb-title">${ico("box")} This week from ${esc(r.name)} — ${tot.count} ${tot.count === 1 ? "meal" : "meals"}</span>
+        <div class="yb-head"><span class="yb-title">${ico("box")} Your week from ${esc(r.name)} — ${tot.count} ${tot.count === 1 ? "meal" : "meals"}</span>
           ${tot.count ? `<button class="btn ghost sm" onclick="clearOrder('${rid}')">${ico("arrowLeft")} Clear</button>` : ""}</div>
         ${tot.count ? `<div class="yb-list">${menu.filter((m) => o.selected[m.id] > 0).map((m) => `
           <div class="yb-row">
@@ -1173,16 +1165,16 @@ function renderRestaurantMenu() {
             <span class="yb-price">${money(o.selected[m.id] * m.price)}</span>
           </div>`).join("")}</div>
         <div class="yb-total">
-          <span class="yb-budget">Order: $${money(tot.total)} / $${tier} plan · ${minNote}</span>
+          <span class="yb-budget">Order: $${money(tot.total)} · ${minNote}</span>
           <span class="yb-amt">${money(tot.total)}</span>
-        </div>` : `<p class="muted">Your order is empty. Tap <b>+</b> on dishes from ${esc(r.name)}. Minimum order $${MIN_ORDER}.</p>`}
+        </div>` : `<p class="muted">Your order is empty. Tap <b>+</b> on dishes from ${esc(r.name)}. Minimum order $${MIN_ORDER}, delivered weekly.</p>`}
         ${meetsMin
           ? `<a href="#checkout" class="btn primary sm" style="margin-top:12px;width:100%">${ico("bagCheck")} Check out this order — ${money(tot.total)}</a>`
           : `<button class="btn primary sm disabled" style="margin-top:12px;width:100%" onclick="flash('Add at least $${MIN_ORDER} of dishes from ${esc(r.name)} first.')">${ico("bagCheck")} Add more (min $${MIN_ORDER})</button>`}
       </div>
     </div>`;
 }
-function clearOrder(rid) { ORDERS[rid] = { selected: {}, tier: 100 }; navigate(); }
+function clearOrder(rid) { ORDERS[rid] = { selected: {} }; navigate(); }
 
 /* ============================================================================
    CHECKOUT — review weekly box + delivery, then confirm
@@ -1200,11 +1192,9 @@ function renderCheckout() {
     const items = meals.filter((m) => o.selected[m.id] > 0);
     grandTotal += tot.total;
     const meetsMin = tot.total >= MIN_ORDER;
-    const tier = o.tier || 100;
     return `
       <section class="order-card ${meetsMin ? "" : "below-min"}">
-        <div class="oc-head"><div class="oc-brand">${esc(r.name || "Kitchen")}</div>
-          <span class="oc-plan">$${tier}<span class="tier-sub">/week plan</span></span></div>
+        <div class="oc-head"><div class="oc-brand">${esc(r.name || "Kitchen")}</div></div>
         ${items.map((m) => `<div class="billrow"><span>${o.selected[m.id]}× ${esc(m.title)}</span><span class="bold">${money(o.selected[m.id] * m.price)}</span></div>`).join("")}
         <div class="billrow total"><span>${esc(r.name || "Kitchen")} subtotal</span><span class="tb-amt">${money(tot.total)}</span></div>
         <div class="oc-min">${meetsMin ? `<span class="min-ok">${ico("check")} Meets $${MIN_ORDER} minimum</span>` : `<span class="min-warn">Below $${MIN_ORDER} minimum — add more or remove this order</span>`}</div>
@@ -1216,8 +1206,7 @@ function renderCheckout() {
     grandTotal += o.total;
     return `
       <section class="order-card">
-        <div class="oc-head"><div class="oc-brand">${esc(o.rest)} <span class="oc-tag">confirmed</span></div>
-          <span class="oc-plan">$${o.tier}<span class="tier-sub">/week plan</span></span></div>
+        <div class="oc-head"><div class="oc-brand">${esc(o.rest)} <span class="oc-tag">confirmed</span></div></div>
         ${o.items.map((it) => `<div class="billrow"><span>${it.qty}× ${esc(it.title)}</span><span class="bold">${money(it.qty * it.price)}</span></div>`).join("")}
         <div class="billrow total"><span>${esc(o.rest)} subtotal</span><span class="tb-amt">${money(o.total)}</span></div>
         <div class="billrow muted sm"><span>Delivery (single kitchen → you)</span><span class="accent bold">INCLUDED</span></div>
@@ -1288,49 +1277,6 @@ function confirmAndPlace() {
 /* ============================================================================
    DELIVERY — how your weekly box gets to you (recommendations)
    ========================================================================== */
-function renderDelivery() {
-  return `
-    <div class="consumer-shell">
-      ${consumerTopbar("delivery")}
-      <section class="build-hero">
-        <div class="eyebrow">Delivery, handled</div><h1>How your weekly box gets to you</h1>
-        <p>Delivery is <b>included</b> — no surprise fees. We pick the best route behind the scenes and you just watch it live-track to your door. No choices for you to make.</p></section>
-      <section class="dlv-recommended" style="max-width:820px;margin:0 auto 16px">
-        <div class="dr-badge">${ico("check")} Our recommended option</div>
-        <div class="dr-card">
-          <div class="dr-head"><span class="dr-title">${ico("route")} Smart multi-provider delivery</span><span class="dlv-rec">BEST PRICE + RELIABILITY</span></div>
-          <p class="dr-body">We quote your drop across the best courier networks and automatically pick the <b>lowest cost with the fastest ETA</b> — with instant fallback if one is unavailable. You always see one live ETA and one tracking map, under our brand.</p>
-          <ul class="dr-list">
-            <li>${ico("check")} Cheapest reliable delivery every week</li>
-            <li>${ico("check")} Never stranded if one courier is busy</li>
-            <li>${ico("check")} Live-tracked, same experience every time</li>
-            <li>${ico("check")} Pickup option is always free if you'd rather</li>
-          </ul>
-        </div>
-      </section>
-      <section class="card block" style="max-width:820px;margin:0 auto 16px">
-        <div class="kicker">${ico("box")} Good to know</div>
-        <div class="billrow"><span>Delivery cost</span><span class="accent bold">INCLUDED</span></div>
-        <div class="billrow muted sm"><span>Pickup</span><span class="accent bold">$0, always available</span></div>
-        <div class="billrow muted sm"><span>Do I choose a courier?</span><span>No — we handle it</span></div>
-      </section>
-      <footer class="foot">${versionBadge()}</footer>
-    </div>`;
-}
-
-/* ============================================================================
-   ANIMATED DEMO — self-running feature walkthrough (both sides)
-   ========================================================================== */
-const DEMO_SCRIPT = [
-  { side: "sub", icon: "bolt", title: "1 · Register", text: "One-tap Apple Pay / Google Pay. Your account & address are created automatically — no forms." },
-  { side: "sub", icon: "store", title: "2 · Choose a kitchen", text: "Browse 15 vetted restaurants. See live DineSafe status & ratings before you commit." },
-  { side: "sub", icon: "box", title: "3 · Build your box", text: "Pick 6 meals, filter by budget/area/diet, and see your all-inclusive total instantly." },
-  { side: "sub", icon: "truck", title: "4 · Live delivery", text: "Track your courier live — e.g. Indian Desire on Bloor St all the way to the CN Tower." },
-  { side: "owner", icon: "factory", title: "A · Owner: batch orders", text: "One consolidated prep list per kitchen. No chaotic per-order tickets." },
-  { side: "owner", icon: "truck", title: "B · Owner: fleet board", text: "See every order out at once — courier, live map, ETA, status." },
-  { side: "owner", icon: "wallet", title: "C · Owner: get paid", text: "Flat $500/month. First month free. No commissions. Predictable." },
-];
-let demoIdx = 0;
 function renderDemo() {
   const d = DEMO_SCRIPT[Math.min(demoIdx, DEMO_SCRIPT.length - 1)];
   const dots = DEMO_SCRIPT.map((_, i) => `<span class="demo-dot ${i === demoIdx ? "on" : ""}"></span>`).join("");
@@ -1361,38 +1307,16 @@ function demoPrev() { demoIdx = demoIdx <= 0 ? 0 : demoIdx - 1; navigate(); }
 const buildState = { selected: {}, rest: "all", area: "all", cuisines: [], distance: 0, postal: "", budget: "80" };
 /* ---- Single-restaurant weekly orders (v11 model) ----
    Each weekly order comes from ONE restaurant. A customer can hold several,
-   one per restaurant. Minimum $40/order; weekly tier $100/$200/$300 per restaurant.
-   ORDERS[restaurantId] = { selected:{mealId:qty}, tier:100 } */
+   one per restaurant. Minimum $80/order.
+   ORDERS[restaurantId] = { selected:{mealId:qty} } */
 const ORDERS = {};
-const MIN_ORDER = 100;
-const WEEKLY_TIERS = [100, 150, 200, 250, 300];
+const MIN_ORDER = 80;
 let activeRest = null;
-function openRest(rid) { activeRest = rid; if (!ORDERS[rid]) ORDERS[rid] = { selected: {}, tier: 100 }; }
+function openRest(rid) { activeRest = rid; if (!ORDERS[rid]) ORDERS[rid] = { selected: {} }; }
 function getOrder(rid) { openRest(rid); return ORDERS[rid]; }
 function orderTotals(rid) { const o = ORDERS[rid]; if (!o) return { total: 0, count: 0 }; let t = 0, c = 0; meals.forEach((m) => { const q = o.selected[m.id] || 0; if (q > 0) { t += q * m.price; c += q; } }); return { total: t, count: c }; }
 function orderTotal(rid) { return orderTotals(rid).total; }
-function setTier(rid, tier) { const o = getOrder(rid); o.tier = tier; o.continue = false; flash(`✓ Weekly order set to $${tier}/week from ${esc(restName(rid))}.`); navigate(); }
 function orderAdd(rid, mid, delta) {
-  const o = getOrder(rid);
-  const q = (o.selected[mid] || 0) + delta;
-  if (delta > 0) {
-    const m = meals.find((x) => x.id === mid);
-    const tier = o.tier || WEEKLY_TIERS[0];
-    const tot = orderTotals(rid);
-    const addPrice = m ? m.price : 0;
-    if (tier && (tot.total + addPrice) > tier && !o.continue) {
-      showModal({
-        ico: "calendar",
-        title: `Weekly order reached — $${tier}`,
-        message: `Your order from ${esc(restName(rid))} is at $${tot.total.toFixed(2)}. Adding “${m ? esc(m.title) : "this item"}” brings it to $${(tot.total + addPrice).toFixed(2)}, past your $${tier}/week plan. Do you want to continue or reconsider?`,
-        buttons: [
-          { label: "Yes, continue", primary: true, action: () => { o.continue = true; doOrderAdd(rid, mid, delta); } },
-          { label: "Reconsider items", action: () => askOrderCheckoutOrChange(rid) },
-        ],
-      });
-      return;
-    }
-  }
   doOrderAdd(rid, mid, delta);
 }
 function doOrderAdd(rid, mid, delta) {
@@ -1434,7 +1358,7 @@ function placeOrders() {
     const total = items.reduce((a, it) => a + it.qty * it.price, 0);
     const order = {
       id: "ORD-" + (++orderSeq),
-      rid, rest: r.name, tier: o.tier || 100, total,
+      rid, rest: r.name, total,
       items, customer, deliveryDate: d, window: slot, status: "received",
       placedAt: new Date().toLocaleString("en-CA"),
     };
@@ -1442,7 +1366,7 @@ function placeOrders() {
     CONFIRMED_ORDERS[rid].push(order);
   });
   // clear drafts once placed
-  ids.forEach((rid) => { ORDERS[rid] = { selected: {}, tier: 100 }; });
+  ids.forEach((rid) => { ORDERS[rid] = { selected: {} }; });
   windowConfirmed = true;
   flash("✓ Orders placed — restaurants notified.");
   location.hash = "#checkout";
@@ -1456,7 +1380,7 @@ function allRestaurantOrders() {
 }
 function notifyRestaurant(order, mode) {
   // Real build: POST to a webhook/email/SMS provider. Here we build the message + links.
-  const body = `New order received at ${order.rest}:\n\nOrder #${order.id}\nCustomer: ${order.customer.name} · ${order.customer.addr} ${order.customer.postal}\nDelivery: ${order.deliveryDate}, ${order.window}\n\n${order.items.map((it) => `${it.qty}× ${it.title} — $${(it.qty * it.price).toFixed(2)}`).join("\n")}\n\nTotal: $${order.total.toFixed(2)}\nPlan: $${order.tier}/week`;
+  const body = `New order received at ${order.rest}:\n\nOrder #${order.id}\nCustomer: ${order.customer.name} · ${order.customer.addr} ${order.customer.postal}\nDelivery: ${order.deliveryDate}, ${order.window}\n\n${order.items.map((it) => `${it.qty}× ${it.title} — $${(it.qty * it.price).toFixed(2)}`).join("\n")}\n\nTotal: $${order.total.toFixed(2)}`;
   if (mode === "email") return "mailto:kitchen@" + order.rid + ".com?subject=" + encodeURIComponent("New order " + order.id + " — " + order.rest) + "&body=" + encodeURIComponent(body);
   return "sms:?body=" + encodeURIComponent(body);
 }
@@ -1468,24 +1392,6 @@ function doAdd(id, delta) {
   navigate();
 }
 function setQty(id, delta) {
-  if (delta > 0) {
-    const m = meals.find((x) => x.id === id);
-    const budget = budgetValue();
-    const tot = buildTotals();
-    const addPrice = m ? m.price : 0;
-    if (budget && (tot.total + addPrice) > budget && !budgetState.continue) {
-      showModal({
-        ico: "wallet",
-        title: `Weekly budget reached — $${budget}`,
-        message: `Your box is at $${tot.total.toFixed(2)}. Adding “${m ? esc(m.title) : "this item"}” brings it to $${(tot.total + addPrice).toFixed(2)}, past your $${budget} budget. Do you want to keep adding?`,
-        buttons: [
-          { label: "Yes, keep adding", primary: true, action: () => { budgetState.continue = true; doAdd(id, delta); } },
-          { label: "No, stop", action: () => askCheckoutOrChange() },
-        ],
-      });
-      return;
-    }
-  }
   doAdd(id, delta);
 }
 function askCheckoutOrChange() {
@@ -1573,12 +1479,12 @@ function renderBuild() {
       ${consumerTopbar("build")}
       <section class="build-hero">
         <div class="eyebrow">My Week. Fully Catered.</div><h1>Build your weekly box. See your total <span class="accent">instantly.</span></h1>
-        <p>This is a recurring weekly order — mix veg &amp; non-veg, filter by restaurant/cuisine/diet, or set a weekly budget. We'll warn you when you hit it.</p></section>
+        <p>This is a recurring weekly order — mix veg &amp; non-veg, filter by restaurant/cuisine/diet. Each order meets an $80 weekly minimum, delivered in one drop.</p></section>
       <div class="combo-strip">
         <div class="combo-title">Quick add</div>
         <button class="btn ghost sm" onclick="quickCombo('2+3')">2 non-veg + 3 veg</button>
         <button class="btn ghost sm" onclick="quickCombo('all')">Add all shown</button>
-        <span class="muted sm">Tip: set a weekly budget and pick exactly what fits.</span>
+
       </div>
       <div class="build-grid">
         <div class="filters-panel">
@@ -1595,9 +1501,6 @@ function renderBuild() {
           <div class="frow"><span class="frow-label">Diet</span>
             <button class="chip ${buildState.diet === "all" ? "on" : ""}" onclick="setBuildFilter('diet','all')">All</button>
             ${["HIGH_PROTEIN", "VEGETARIAN", "VEGAN", "GLUTEN_FREE", "SPICY"].map((d) => `<button class="chip ${buildState.diet === d ? "on" : ""}" onclick="setBuildFilter('diet','${d}')">${esc(d.replace("_", " ").toLowerCase())}</button>`).join("")}</div>
-          <div class="budget-box"><div class="kicker">${ico("wallet")} Weekly budget</div>
-            <div class="budget-input"><span>$</span><input type="number" placeholder="e.g. 80" value="${esc(buildState.budget || "")}" oninput="buildState.budget=this.value;document.getElementById('budget-disp').textContent='Box: $'+boxTotal()+' / $'+budgetValue();" onchange="applyBudget()" /><button class="btn primary sm" onclick="applyBudget()">Set budget</button></div>
-            <p class="muted sm">We never auto-add meals — you choose what's in your box. This is just your target.</p></div>
         </div>
         <div class="meals-panel"><div class="meals-count">${list.length} meals shown</div><div class="meal-picks">${rows}</div></div>
       </div>
@@ -1611,7 +1514,7 @@ function renderBuild() {
             <span class="yb-price">${money(buildState.selected[m.id] * m.price)}</span>
           </div>`).join("")}</div>
         <div class="yb-total">
-          <span id="budget-disp" class="yb-budget">Box: $${money(totals.total)} / $${budget}${totals.total > budget ? " · over by $" + money(totals.total - budget) : " · $" + money(Math.max(0, budget - totals.total)) + " left"}</span>
+          <span class="yb-budget">Your week · $${money(totals.total)} · delivered in one weekly drop</span>
           <span class="yb-amt">${money(totals.total)}</span>
         </div>` : `<p class="muted">Your box is empty. Tap <b>+</b> on the meals you want below.</p>`}
         <a href="#checkout" class="btn primary sm" style="margin-top:12px;width:100%">${ico("bagCheck")} Check out — ${money(totals.total)}</a>
@@ -1651,12 +1554,12 @@ function orderSummary() {
     let sub = 0;
     items.forEach((m) => { const q = o.selected[m.id]; sub += q * m.price; count += q; });
     total += sub;
-    lines.push({ rest: r.name, tier: o.tier, sub, items, status: "draft" });
+    lines.push({ rest: r.name, sub, items, status: "draft" });
   });
   confirmed.forEach((o) => {
     const items = o.items.map((it) => { const m = meals.find((x) => x.title === it.title); return { id: m ? m.id : "x", title: it.title, price: it.price, restaurantId: o.rid, qty: it.qty }; });
     total += o.total; count += o.items.reduce((a, it) => a + it.qty, 0);
-    lines.push({ rest: o.rest, tier: o.tier, sub: o.total, items, status: "confirmed", oid: o.id });
+    lines.push({ rest: o.rest, sub: o.total, items, status: "confirmed", oid: o.id });
   });
   return { ids, lines, total, count, confirmed: confirmed.length > 0 };
 }
@@ -1679,7 +1582,7 @@ function calendarLink() {
 }
 function emailLink() {
   const s = orderSummary();
-  const body = encodeURIComponent(`My Week. Fully Catered.\n\n${s.lines.map((l) => `• ${l.rest}: $${l.sub.toFixed(2)} ($${l.tier}/week plan)`).join("\n")}\n\nTotal: $${s.total.toFixed(2)}\nDelivery: ${fmtDate(nextDeliveryDate())}, ${deliveryWindowSlot()}\nAddress: 120 Bay St, Unit 1402, Toronto`);
+  const body = encodeURIComponent(`My Week. Fully Catered.\n\n${s.lines.map((l) => `• ${l.rest}: $${l.sub.toFixed(2)}`).join("\n")}\n\nTotal: $${s.total.toFixed(2)}\nDelivery: ${fmtDate(nextDeliveryDate())}, ${deliveryWindowSlot()}\nAddress: 120 Bay St, Unit 1402, Toronto`);
   return `mailto:?subject=${encodeURIComponent("My Week. Fully Catered. delivery — " + fmtDate(nextDeliveryDate()))}&body=${body}`;
 }
 function smsLink() {
@@ -1701,7 +1604,7 @@ function renderDashboard() {
   const items = s.lines.map((l) => `
     <section class="card meal">
       <div class="meal-top"><div><div class="meal-title"><span class="slot">${ico("store")}</span> ${esc(l.rest)}</div>
-        <div class="meal-rest">${ico("calendar")} $${l.tier}/week plan</div></div>
+        <div class="meal-rest">${ico("calendar")} ${esc(BRAND)} weekly</div></div>
         <span class="acc-amt">$${l.sub.toFixed(2)}</span></div>
       <div class="yb-list">${l.items.map((m) => {
         const q = (m.qty != null) ? m.qty : (ORDERS[s.ids[s.lines.indexOf(l)]] || {}).selected?.[m.id] || 0;
@@ -1965,7 +1868,7 @@ function renderKitchen() {
       </div>
       <div class="ko-cust">${ico("pin")} <b>${esc(o.customer.name)}</b> — ${esc(o.customer.addr)} ${esc(o.customer.postal)}</div>
       <div class="ko-items">${o.items.map((it) => `<div class="billrow"><span>${it.qty}× ${esc(it.title)}</span><span class="bold">${money(it.qty * it.price)}</span></div>`).join("")}</div>
-      <div class="ko-total"><span>Total (${o.items.reduce((a, i) => a + i.qty, 0)} items · $${o.tier}/wk plan)</span><span class="tb-amt">${money(o.total)}</span></div>
+      <div class="ko-total"><span>Total (${o.items.reduce((a, i) => a + i.qty, 0)} items)</span><span class="tb-amt">${money(o.total)}</span></div>
       <div class="ko-notify">
         <a class="btn ghost sm" href="${notifyRestaurant(o, "email")}">${ico("printer")} Email owner</a>
         <a class="btn ghost sm" href="${notifyRestaurant(o, "sms")}">${ico("tap")} Text owner</a>
@@ -2218,7 +2121,7 @@ window.moduleOn = moduleOn;
 window.setQty = setQty; window.setBuildFilter = setBuildFilter; window.quickCombo = quickCombo; window.applyBudget = applyBudget; window.buildState = buildState;
 window.toggleCuisine = toggleCuisine; window.applyPostal = applyPostal;
 window.boxTotal = boxTotal; window.selectedItems = selectedItems; window.clearBox = clearBox;
-window.orderAdd = orderAdd; window.setTier = setTier; window.clearOrder = clearOrder; window.ORDERS = ORDERS;
+window.orderAdd = orderAdd; window.clearOrder = clearOrder; window.ORDERS = ORDERS;
 window.placeOrders = placeOrders; window.CONFIRMED_ORDERS = CONFIRMED_ORDERS; window.confirmDelivery = confirmDelivery; window.changeWindow = changeWindow; window.confirmAndPlace = confirmAndPlace; window.setDeliveryDate = setDeliveryDate;
 window.setMenuRest = setMenuRest; window.menuFindByName = menuFindByName; window.menuAddManual = menuAddManual; window.menuToggleHidden = menuToggleHidden; window.menuDelete = menuDelete; window.menuEditPrice = menuEditPrice; window.MENU_STORE = MENU_STORE;
 window.setRestVisible = setRestVisible; window.restVisible = restVisible; window.visibleRestaurants = visibleRestaurants;
