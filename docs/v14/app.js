@@ -2035,9 +2035,15 @@ function renderMenu() {
 
 /* PAYOUTS */
 function renderPayouts() {
+  const sales = 4200; // example monthly platform sales for this kitchen
+  const feeRate = 0.10;
+  const fee = Math.round(sales * feeRate);
+  const net = sales - fee;
   const rows = [
-    ["Flat membership", "$500", "fixed"], ["Total this month", "$500", "total"],
-  ].map(([l, v, c]) => `<div class="pay-row"><span>${l}</span><span class="pay-val">${v} ${c === "total" ? `<span class="pay-dir up">▲</span>` : ""}</span></div>`).join("");
+    [`Gross platform sales (month)`, money(sales), ""],
+    [`Supper Club fee (${feeRate * 100}%, all-in — card + delivery + platform)`, money(fee), "deduct"],
+    [`Net paid to you`, money(net), "total"],
+  ].map(([l, v, c]) => `<div class="pay-row"><span>${l}</span><span class="pay-val">${v} ${c === "total" ? `<span class="pay-dir up">▲</span>` : c === "deduct" ? `<span class="pay-dir down">▼</span>` : ""}</span></div>`).join("");
   return `
     <div class="partner-shell">
       <header class="p-topbar"><div class="p-brand">${ico("store")}<div><b>${esc(BRAND)}</b><span>partner payouts</span></div></div>
@@ -2048,10 +2054,10 @@ function renderPayouts() {
           <a href="#auction" class="p-navbtn" data-nav="auction">${ico("gavel")} Auctions</a>
           <a href="#menu" class="p-navbtn" data-nav="menu">${ico("bag")} Menu</a>
         <a href="#" class="btn p-outline sm">${ico("arrowLeft")} Back to eaters</a></header>
-      <section class="pay-hero"><div class="pay-hero-label">Your membership fee</div><div class="pay-hero-amt">$500</div>
-        <div class="pay-hero-sub">Flat $500/month · first month free · no commission, ever · deposited Thu, Aug 20</div></section>
-      <section class="p-table-card"><div class="p-table-head"><span class="bold">${ico("chart")} Fee breakdown</span></div>${rows}</section>
-      <footer class="p-foot">Predictable: flat $500/month, first month free. No commission.</footer>
+      <section class="pay-hero"><div class="pay-hero-label">Net paid to you this month</div><div class="pay-hero-amt">${money(net)}</div>
+        <div class="pay-hero-sub">10% of platform sales, all-in — covers card fees, delivery &amp; platform. Auto-deducted before payout. No surprises, no per-order fees.</div></section>
+      <section class="p-table-card"><div class="p-table-head"><span class="bold">${ico("chart")} Payout breakdown</span></div>${rows}</section>
+      <footer class="p-foot">You pay 10% of monthly platform sales (all-in). It's auto-deducted before we pay you — simple, fair, no hidden fees.</footer>
     </div>`;
 }
 
