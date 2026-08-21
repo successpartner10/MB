@@ -12,6 +12,9 @@ import { authRouter } from "./routes/auth.js";
 import { kitchenRouter } from "./routes/kitchen.js";
 import { dashboardRouter } from "./routes/dashboard.js";
 import { contentRouter } from "./routes/content.js";
+import { paymentsRouter } from "./routes/payments.js";
+import { deliveryRouter } from "./routes/delivery.js";
+import { requireAuth } from "./lib/auth.js";
 import { db, findMeal } from "./db.js";
 
 const app = express();
@@ -19,7 +22,18 @@ const PORT = Number(process.env.PORT || 4000);
 const HOST = "0.0.0.0";
 
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: "1mb" }));
+
+// ---- security / compliance headers (PIPEDA, PCI-friendly) ----
+app.use((_req, res, next) => {
+  res.setHeader("X-Content-Type-Options", "nosniff");
+  res.setHeader("X-Frame-Options", "DENY");
+  res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
+  res.setHeader("Permissions-Policy", "camera=(), microphone=(), geolocation=()");
+  res.setHeader("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
+  res.setHeader("Content-Security-Policy", "default-src 'self'");
+  next();
+});
 
 // ---- security hardening: rate limiting (protect auth/bids/writes from abuse) ----
 const authLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 50, standardHeaders: true, legacyHeaders: false, message: { status: "ERROR", message: "Too many requests. Try again later." } });
@@ -37,6 +51,13 @@ app.use(authRouter);
 app.use(kitchenRouter);
 app.use(dashboardRouter);
 app.use(contentRouter);
+app.use(paymentsRouter);
+app.use(deliveryRouter);
+
+// Protected example: require a valid JWT (used by restaurant owner tools)
+app.get("/api/v1/me", requireAuth, (req: any, res) => {
+  res.json({ status: "OK", auth: req.auth });
+});
 
 // convenience: list meals (used by swap + add-meal UIs), with restaurant info
 app.get("/api/v1/meals", (_req, res) => {

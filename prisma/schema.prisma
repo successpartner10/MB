@@ -1,6 +1,6 @@
 // ============================================================================
-// MINIMAL BITES — Prisma Schema (Section 3 of the System Requirements)
-// PostgreSQL + Prisma ORM
+// SUPPER CLUB DIRECT — Prisma Schema (multi-brand, multi-location, payments,
+// delivery, security) — production data model
 // ============================================================================
 
 datasource db {
@@ -38,6 +38,7 @@ enum OrderStatus {
   OUT_FOR_DELIVERY
   DELIVERED
   SKIPPED
+  CANCELLED
 }
 
 enum BoxMode {
@@ -45,13 +46,70 @@ enum BoxMode {
   MIXED
 }
 
+enum Role {
+  CUSTOMER
+  RESTAURANT_OWNER
+  ADMIN
+}
+
+enum DeliveryProvider {
+  UBER_DIRECT
+  DOORDASH_DRIVE
+  ORDEROUT
+  GOFOR
+  SELF
+  PICKUP
+}
+
+// ---- MULTI-BRAND / MULTI-LOCATION (franchise model) ----
+model Brand {
+  id          String       @id @default(uuid())
+  name        String       @unique
+  slug        String       @unique
+  primaryColor String       @default("#0d9488")
+  createdAt   DateTime     @default(now())
+  locations   Location[]
+  restaurants Restaurant[]
+  users       User[]
+}
+
+model Location {
+  id           String       @id @default(uuid())
+  brandId      String
+  brand        Brand        @relation(fields: [brandId], references: [id])
+  name         String       // e.g. "Toronto Downtown"
+  address      String
+  city         String       @default("Toronto")
+  province     String       @default("ON")
+  postalCode   String
+  isActive     Boolean      @default(true)
+  restaurants  Restaurant[]
+  deliveryZone DeliveryZone?
+  createdAt    DateTime     @default(now())
+}
+
+// Delivery zones: which locations/areas a location can serve (radius-bounded)
+model DeliveryZone {
+  id         String    @id @default(uuid())
+  locationId String    @unique
+  location   Location  @relation(fields: [locationId], references: [id])
+  radiusKm   Float     @default(8)
+  baseFee    Decimal   @default(8.0) // base delivery fee for this zone
+  isActive   Boolean   @default(true)
+  restaurants Restaurant[]
+}
+
 model User {
   id                String            @id @default(uuid())
   phone             String            @unique
   email             String?           @unique
   fullName          String
+  role              Role              @default(CUSTOMER)
+  passwordHash      String?           // restaurant/admin accounts (bcrypt)
+  brandId           String?
+  brand             Brand?            @relation(fields: [brandId], references: [id])
   stripeCustomerId  String?           @unique
-  dietaryBadges     String[] // e.g. ["GLUTEN_FREE", "HIGH_PROTEIN"]
+  dietaryBadges     String[]
   dropoffPreference DropoffPreference @default(CONCIERGE)
   deliveryAddress   Address?
   subscription      Subscription?
@@ -68,7 +126,7 @@ model Address {
   unit         String?
   city         String   @default("Toronto")
   province     String   @default("ON")
-  postalCode   String // e.g. M5J 2R8
+  postalCode   String
   buzzerCode   String?
   instructions String?
 }
@@ -80,7 +138,7 @@ model Subscription {
   planTier              PlanTier    @default(MEALS_6)
   deliveryDay           DeliveryDay @default(TUESDAY_PM)
   isPaused              Boolean     @default(false)
-  boxMode               BoxMode     @default(MIXED)
+  boxMode               BoxMode     @default(SINGLE_RESTAURANT)
   preferredRestaurantId String?
   stripeSubscriptionId  String?     @unique
   currentPeriodEnd      DateTime
@@ -89,13 +147,28 @@ model Subscription {
 }
 
 model Restaurant {
-  id             String   @id @default(uuid())
-  name           String
-  cuisine        String?
-  neighborhood   String?
-  postalPrefixes String[] // delivery zones this kitchen serves
-  isActive       Boolean  @default(true)
-  meals          Meal[]
+  id            String         @id @default(uuid())
+  brandId       String
+  brand         Brand          @relation(fields: [brandId], references: [id])
+  locationId    String?
+  location      Location?      @relation(fields: [locationId], references: [id])
+  deliveryZoneId String?
+  deliveryZone  DeliveryZone?  @relation(fields: [deliveryZoneId], references: [id])
+  name          String
+  cuisine       String?
+  neighborhood  String?
+  address       String?
+  phone         String?
+  hours         String?
+  priceLevel    String?
+  googleRating  Decimal?       @db.Decimal(3,1)
+  reviewCount   Int            @default(0)
+  dineSafe      String?
+  postalPrefixes String[]
+  isActive      Boolean        @default(true)
+  meals         Meal[]
+  payments      RestaurantPayout[]
+  createdAt     DateTime       @default(now())
 }
 
 model Meal {
@@ -109,21 +182,25 @@ model Meal {
   carbsGrams   Int
   fatGrams     Int
   imageUrl     String
-  badges       String[] // e.g. ["KETO", "GLUTEN_FREE"]
+  price        Decimal     @default(12.0)
+  badges       String[]
   isActive     Boolean     @default(true)
   orderItems   OrderItem[]
 }
 
 model Order {
-  id           String      @id @default(uuid())
-  userId       String
-  user         User        @relation(fields: [userId], references: [id])
-  deliveryDate DateTime
-  status       OrderStatus @default(SCHEDULED)
-  totalAmount  Decimal     @db.Decimal(10, 2)
-  items        OrderItem[]
-  cutoffAt     DateTime
-  createdAt    DateTime    @default(now())
+  id              String          @id @default(uuid())
+  userId          String
+  user            User            @relation(fields: [userId], references: [id])
+  deliveryDate    DateTime
+  status          OrderStatus     @default(SCHEDULED)
+  totalAmount     Decimal         @db.Decimal(10, 2)
+  deliveryFee     Decimal         @default(0)
+  items           OrderItem[]
+  cutoffAt        DateTime
+  stripePaymentId String?         @unique
+  delivery        Delivery?
+  createdAt       DateTime        @default(now())
 }
 
 model OrderItem {
@@ -133,4 +210,34 @@ model OrderItem {
   mealId   String
   meal     Meal   @relation(fields: [mealId], references: [id])
   quantity Int    @default(1)
+}
+
+// ---- DELIVERY (provider-agnostic tracking) ----
+model Delivery {
+  id            String            @id @default(uuid())
+  orderId       String            @unique
+  order         Order             @relation(fields: [orderId], references: [id])
+  provider      DeliveryProvider
+  providerRef   String?           // Uber Direct / OrderOut external id
+  status        String            @default("created")
+  etaMin        Int               @default(0)
+  trackingUrl   String?
+  quoteCost     Decimal           @default(0)
+  createdAt     DateTime          @default(now())
+}
+
+// ---- RESTAURANT PAYOUTS (10% fee model) ----
+model RestaurantPayout {
+  id             String    @id @default(uuid())
+  restaurantId   String
+  restaurant     Restaurant @relation(fields: [restaurantId], references: [id])
+  periodStart    DateTime
+  periodEnd      DateTime
+  grossSales     Decimal   @default(0)
+  platformFee    Decimal   @default(0) // 10% of gross
+  cardFees       Decimal   @default(0)
+  netPayout      Decimal   @default(0)
+  status         String    @default("pending")
+  paidAt         DateTime?
+  createdAt      DateTime  @default(now())
 }

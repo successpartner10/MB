@@ -191,3 +191,40 @@ export async function getGives(q?: string) {
 export async function placeBid(restaurantId: string, slot: string, day: string, amount: number) {
   return post("/api/v1/auctions/bid", { restaurantId, slot, day, amount });
 }
+
+// ---- v14 payments (Stripe) ----
+export interface PaymentIntent {
+  clientSecret: string;
+  paymentId: string;
+  demo?: boolean;
+}
+export async function createPaymentIntent(amountCents: number, orderId?: string, customerId?: string) {
+  const r = await fetch("/api/v1/payments/intent", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ amountCents, orderId, customerId }),
+  });
+  const j = await r.json();
+  return j as { status: string; clientSecret: string; paymentId: string; demo?: boolean };
+}
+
+// ---- v14 delivery (OrderOut / Uber Direct best-price) ----
+export interface DeliveryQuote {
+  provider: "UBER_DIRECT" | "DOORDASH_DRIVE" | "ORDEROUT";
+  priceCents: number;
+  etaMin: number;
+  providerRef?: string;
+}
+export interface DeliveryItem { qty: number; name: string; }
+export async function quoteDelivery(pickupAddress: string, dropoffAddress: string, pickupPostal: string, dropoffPostal: string, items: DeliveryItem[], scheduledAt?: string) {
+  const r = await fetch("/api/v1/delivery/quote", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ pickupAddress, dropoffAddress, pickupPostal, dropoffPostal, items, scheduledAt }),
+  });
+  const j = await r.json();
+  return j as { status: string; quote: DeliveryQuote };
+}
+export async function createDelivery(provider: string, pickupAddress: string, dropoffAddress: string, pickupPostal: string, dropoffPostal: string, items: DeliveryItem[]) {
+  return post("/api/v1/delivery/create", { provider, pickupAddress, dropoffAddress, pickupPostal, dropoffPostal, items });
+}
