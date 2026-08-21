@@ -55,6 +55,7 @@ function ico(name, cls = "") {
     eye: `<path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6-10-6-10-6z"/><circle cx="12" cy="12" r="2.5"/>`,
     eyeOff: `<path d="M3 3l18 18"/><path d="M10.5 5.2A10 10 0 0 1 12 5c6.5 0 10 6 10 6a15 15 0 0 1-2.5 3.5M6.6 6.6A15 15 0 0 0 2 12s3.5 6 10 6a10 10 0 0 0 3.4-.6"/><path d="M9.9 9.9a2.5 2.5 0 0 0 3.2 3.2"/>`,
     x: `<path d="M6 6l12 12M18 6L6 18"/>`,
+    lock: `<rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>`,
   };
   return S + (paths[name] || `<circle cx="12" cy="12" r="8"/>`) + E;
 }
@@ -809,27 +810,29 @@ function homeSearch(q) {
 function slidingCard(a) {
   const { next } = auctionLevelLabel(a);
   const chosen = a._chosen != null ? a._chosen : a.levels[a.levels.length - 1].price; // default = lowest
+  const need = next ? next.qty : a.levels[a.levels.length - 1].qty;
   return `<div class="wa-card">
     <div class="wa-img"><img src="${a.image}" alt="${esc(a.dish)}" loading="lazy" /></div>
     <div class="wa-body">
       <div class="wa-rest">${esc(a.rest)}</div>
       <div class="wa-dish">${esc(a.dish)}</div>
       <div class="wa-listed">Listed $${a.listed}</div>
+      <div class="wa-holdnote">${ico("lock")} Card hold required to count. No hold = no count. Charged only if the deal fires — else released.</div>
       <div class="wa-pick">${ico("tap")} Choose your price</div>
       <div class="wa-levels">
         ${a.levels.map((l, i) => {
-          const hit = a.ordered >= l.qty;
+          const hit = a.confirmed >= l.qty;
           const sel = l.price === chosen;
           const isBest = i === a.levels.length - 1;
           return `<button class="wa-level ${sel ? "sel" : ""} ${hit ? "hit" : ""}" onclick="auctionPick('${a.id}', ${l.price})">
             <span class="wl-price">$${l.price}</span>
-            <span class="wl-qty">at ${l.qty}+</span>
+            <span class="wl-qty">at ${l.qty}+ card-confirmed</span>
             ${sel ? `<span class="wl-badge sel-b">✓ chosen</span>` : ""}
             ${isBest && hit ? `<span class="wl-badge">unlocked</span>` : ""}
           </button>`;
         }).join("")}
       </div>
-      <div class="wa-progress"><div class="wa-bar"><div class="wa-fill" style="width:${Math.min(100, (a.ordered / (next ? next.qty : a.levels[a.levels.length-1].qty)) * 100)}%"></div></div><span class="wa-count">${a.ordered}/${next ? next.qty : a.levels[a.levels.length-1].qty} committed</span></div>
+      <div class="wa-progress"><div class="wa-bar"><div class="wa-fill" style="width:${Math.min(100, (a.confirmed / need) * 100)}%"></div></div><span class="wa-count"><b>${a.confirmed}</b> confirmed (${a.pledged} pledged) · ${need} needed to fire</span></div>
       <button class="btn primary sm wa-join" onclick="auctionJoin('${a.id}')">${ico("check")} Join at $${chosen}</button>
     </div>
   </div>`;
@@ -842,7 +845,15 @@ function renderAuctionDeals() {
       <section class="build-hero">
         <div class="eyebrow">Sliding Scale · closes Monday · delivers Wednesday</div>
         <h1>Best price when we hit the numbers.</h1>
-        <p>Restaurants set a low price only if enough of you commit. Every level shows its target — join, and if we reach it the deal unlocks. If not, no charge.</p>
+        <p>Restaurants set a low price only if enough of you commit. A deal fires on card-confirmed orders — the price settles to the level the real demand reaches.</p>
+      </section>
+      <section class="wa-howto" style="max-width:1080px;margin:0 auto;padding:0 24px">
+        <div class="h2" style="margin-bottom:10px">How it works</div>
+        <div class="howto-grid">
+          <div class="howto-step">${ico("tap")}<b>1 · Pledge</b><span>Say you're in (free, no card). Shows interest.</span></div>
+          <div class="howto-step">${ico("lock")}<b>2 · Add a card hold</b><span>Only card-confirmed orders count toward the deal. No hold = no count.</span></div>
+          <div class="howto-step">${ico("check")}<b>3 · Deal fires</b><span>When enough confirm, you're charged at your level. If not reached, your hold is released — no charge.</span></div>
+        </div>
       </section>
       <section class="week-auction" style="margin-top:16px"><div class="wa-grid">${cards}</div></section>
       <footer class="foot">${versionBadge()}</footer>
@@ -935,24 +946,41 @@ let auctionWeek = 1;
    Restaurant bids how FEW orders unlock a discount. 3 price levels (listed/mid/lowest),
    each with a min-order count. Transparent live totals. Closes Mon, delivers Wed. */
 const WEEK_AUCTION = [
-  { id: "wa1", rest: "Indian Desire", dish: "Butter Chicken & Basmati", image: "img/dish-butter-chicken.jpg", listed: 20, levels: [ { qty: 40, price: 19 }, { qty: 60, price: 17 }, { qty: 100, price: 15 } ], ordered: 47 },
-  { id: "wa2", rest: "Pai Northern Thai Kitchen", dish: "Khao Soi", image: "img/dish-poke.jpg", listed: 19, levels: [ { qty: 40, price: 16 }, { qty: 70, price: 14 }, { qty: 100, price: 12 } ], ordered: 35 },
-  { id: "wa3", rest: "Sweet Basil", dish: "Mediterranean Falafel Plate", image: "img/dish-veggie-bowl.jpg", listed: 12, levels: [ { qty: 50, price: 10 }, { qty: 80, price: 9 }, { qty: 120, price: 8 } ], ordered: 21 },
-  { id: "wa4", rest: "R&D", dish: "Dan Dan Noodles", image: "img/chef-2.jpg", listed: 18, levels: [ { qty: 40, price: 15 }, { qty: 60, price: 13 }, { qty: 90, price: 11 } ], ordered: 12 },
-  { id: "wa5", rest: "Quetzal", dish: "Al Pastor", image: "img/chef-3.jpg", listed: 24, levels: [ { qty: 30, price: 20 }, { qty: 50, price: 17 }, { qty: 80, price: 15 } ], ordered: 8 },
-  { id: "wa6", rest: "Black and Blue", dish: "Truffle Fries", image: "img/chef.jpg", listed: 13, levels: [ { qty: 40, price: 10 }, { qty: 70, price: 9 }, { qty: 100, price: 8 } ], ordered: 3 },
-  { id: "wa7", rest: "Seoul Food Co.", dish: "Bulgogi Beef Bowl", image: "img/dish-indian-2.jpg", listed: 13, levels: [ { qty: 50, price: 11 }, { qty: 80, price: 10 }, { qty: 110, price: 9 } ], ordered: 0 },
-  { id: "wa8", rest: "Don Alfonso 1890", dish: "Risotto alla Milanese", image: "img/featured-restaurant.jpg", listed: 34, levels: [ { qty: 25, price: 28 }, { qty: 40, price: 25 }, { qty: 60, price: 22 } ], ordered: 2 },
-  { id: "wa9", rest: "Bar Raval", dish: "Gambas al Ajillo", image: "img/chef-2.jpg", listed: 19, levels: [ { qty: 35, price: 15 }, { qty: 55, price: 13 }, { qty: 80, price: 11 } ], ordered: 0 },
-  { id: "wa10", rest: "Pai Northern Thai Kitchen", dish: "Tom Yum Soup", image: "img/dish-poke.jpg", listed: 12, levels: [ { qty: 50, price: 9 }, { qty: 80, price: 8 }, { qty: 110, price: 7 } ], ordered: 4 },
+  { id: "wa1", rest: "Indian Desire", dish: "Butter Chicken & Basmati", image: "img/dish-butter-chicken.jpg", listed: 20, levels: [ { qty: 40, price: 19 }, { qty: 60, price: 17 }, { qty: 100, price: 15 } ], pledged: 47, confirmed: 18 },
+  { id: "wa2", rest: "Pai Northern Thai Kitchen", dish: "Khao Soi", image: "img/dish-poke.jpg", listed: 19, levels: [ { qty: 40, price: 16 }, { qty: 70, price: 14 }, { qty: 100, price: 12 } ], pledged: 35, confirmed: 12 },
+  { id: "wa3", rest: "Sweet Basil", dish: "Mediterranean Falafel Plate", image: "img/dish-veggie-bowl.jpg", listed: 12, levels: [ { qty: 50, price: 10 }, { qty: 80, price: 9 }, { qty: 120, price: 8 } ], pledged: 21, confirmed: 6 },
+  { id: "wa4", rest: "R&D", dish: "Dan Dan Noodles", image: "img/chef-2.jpg", listed: 18, levels: [ { qty: 40, price: 15 }, { qty: 60, price: 13 }, { qty: 90, price: 11 } ], pledged: 12, confirmed: 4 },
+  { id: "wa5", rest: "Quetzal", dish: "Al Pastor", image: "img/chef-3.jpg", listed: 24, levels: [ { qty: 30, price: 20 }, { qty: 50, price: 17 }, { qty: 80, price: 15 } ], pledged: 8, confirmed: 2 },
+  { id: "wa6", rest: "Black and Blue", dish: "Truffle Fries", image: "img/chef.jpg", listed: 13, levels: [ { qty: 40, price: 10 }, { qty: 70, price: 9 }, { qty: 100, price: 8 } ], pledged: 3, confirmed: 1 },
+  { id: "wa7", rest: "Seoul Food Co.", dish: "Bulgogi Beef Bowl", image: "img/dish-indian-2.jpg", listed: 13, levels: [ { qty: 50, price: 11 }, { qty: 80, price: 10 }, { qty: 110, price: 9 } ], pledged: 0, confirmed: 0 },
+  { id: "wa8", rest: "Don Alfonso 1890", dish: "Risotto alla Milanese", image: "img/featured-restaurant.jpg", listed: 34, levels: [ { qty: 25, price: 28 }, { qty: 40, price: 25 }, { qty: 60, price: 22 } ], pledged: 2, confirmed: 1 },
+  { id: "wa9", rest: "Bar Raval", dish: "Gambas al Ajillo", image: "img/chef-2.jpg", listed: 19, levels: [ { qty: 35, price: 15 }, { qty: 55, price: 13 }, { qty: 80, price: 11 } ], pledged: 0, confirmed: 0 },
+  { id: "wa10", rest: "Pai Northern Thai Kitchen", dish: "Tom Yum Soup", image: "img/dish-poke.jpg", listed: 12, levels: [ { qty: 50, price: 9 }, { qty: 80, price: 8 }, { qty: 110, price: 7 } ], pledged: 4, confirmed: 2 },
 ];
 function auctionJoin(waId) {
   const a = WEEK_AUCTION.find((x) => x.id === waId);
   if (!a) return;
-  const chosen = a._chosen != null ? a._chosen : a.levels[a.levels.length - 1].price; // default lowest
-  const chosenLvl = a.levels.find((l) => l.price === chosen) || a.levels[a.levels.length - 1];
-  a.ordered++;
-  flash(`✓ You're in on ${a.dish} at $${chosenLvl.price} (${a.ordered}/${chosenLvl.qty} toward that level). Payment confirms when reached.`);
+  a.pledged++;
+  flash(`✓ You're pledged on ${a.dish}. To count, add a card hold — no hold, no count.`);
+  showModal({
+    ico: "lock",
+    title: "Add a card hold to count",
+    message: `You're pledged at $${a._chosen != null ? a._chosen : a.levels[a.levels.length-1].price}. To count toward this deal you need a card hold. You're only charged if the deal fires — otherwise it's released, no charge.`,
+    buttons: [
+      { label: "Add card hold now", primary: true, action: () => auctionConfirm(waId) },
+      { label: "Just pledge (doesn't count)", action: () => {} },
+    ],
+  });
+}
+function auctionConfirm(waId) {
+  const a = WEEK_AUCTION.find((x) => x.id === waId);
+  if (!a) return;
+  a.confirmed++;
+  flash(`✓ Card hold added — you count toward ${a.dish}. Charged only if the deal fires.`);
+  // In production this calls the backend Stripe hold for the chosen level.
+  apiPaymentIntent(Math.round((a._chosen != null ? a._chosen : a.levels[a.levels.length-1].price) * 100)).then((intent) => {
+    if (intent) { /* hold created; captured when threshold reached, refunded if not */ }
+  });
   navigate();
 }
 function auctionPick(waId, price) {
@@ -962,10 +990,10 @@ function auctionPick(waId, price) {
   navigate();
 }
 function auctionLevelLabel(a) {
-  // Find the highest level the current ordered count has unlocked
-  let unlocked = a.levels[0];
-  for (const l of a.levels) { if (a.ordered >= l.qty) unlocked = l; }
-  const next = a.levels.find((l) => a.ordered < l.qty);
+  // A level is reachable if confirmed count (card-holds) reaches its min
+  let unlocked = null;
+  for (const l of a.levels) { if (a.confirmed >= l.qty) unlocked = l; }
+  const next = a.levels.find((l) => a.confirmed < l.qty);
   return { unlocked, next };
 }
 function submitAuctionBid() {
@@ -977,7 +1005,7 @@ function submitAuctionBid() {
   const q3 = parseInt(g("ab-q3")); const p3 = parseFloat(g("ab-p3"));
   if (!dish || !listed || !q1 || !p1 || !q3 || !p3) { flash("Fill the dish name, listed price, and at least level 1 & 3."); return; }
   // Bid = how FEW orders unlock the best price (q3). Lower q3 = stronger bid.
-  const a = { id: "wa" + Date.now(), rest: menuRest ? restName(menuRest) : "Indian Desire", dish, image: "img/dish-butter-chicken.jpg", listed, levels: [ { qty: q1, price: p1 }, { qty: q2 || q1, price: p2 || p1 }, { qty: q3, price: p3 } ], ordered: 0 };
+  const a = { id: "wa" + Date.now(), rest: menuRest ? restName(menuRest) : "Indian Desire", dish, image: "img/dish-butter-chicken.jpg", listed, levels: [ { qty: q1, price: p1 }, { qty: q2 || q1, price: p2 || p1 }, { qty: q3, price: p3 } ], pledged: 0, confirmed: 0 };
   WEEK_AUCTION.push(a);
   flash(`✓ Submitted "${dish}" — bids to unlock at ${q3}+ orders.`);
   navigate();
@@ -2195,7 +2223,7 @@ window.orderAdd = orderAdd; window.clearOrder = clearOrder; window.ORDERS = ORDE
 window.placeOrders = placeOrders; window.CONFIRMED_ORDERS = CONFIRMED_ORDERS; window.confirmDelivery = confirmDelivery; window.changeWindow = changeWindow; window.confirmAndPlace = confirmAndPlace; window.setDeliveryDate = setDeliveryDate; window.setPayMethod = setPayMethod;
 window.setMenuRest = setMenuRest; window.menuFindByName = menuFindByName; window.menuAddManual = menuAddManual; window.menuToggleHidden = menuToggleHidden; window.menuDelete = menuDelete; window.menuEditPrice = menuEditPrice; window.MENU_STORE = MENU_STORE;
 window.setRestVisible = setRestVisible; window.restVisible = restVisible; window.visibleRestaurants = visibleRestaurants;
-window.auctionJoin = auctionJoin; window.auctionPick = auctionPick; window.WEEK_AUCTION = WEEK_AUCTION;
+window.auctionJoin = auctionJoin; window.auctionPick = auctionPick; window.auctionConfirm = auctionConfirm; window.WEEK_AUCTION = WEEK_AUCTION;
 window.submitAuctionBid = submitAuctionBid; window.buyPlacement = buyPlacement;
 window.setDeliveryWindow = setDeliveryWindow; window.setCadence = setCadence; window.toggleWeek = toggleWeek; window.advanceTrack = advanceTrack; window.TRACK = TRACK;
 window.setRestFilter = setRestFilter; window.demoNext = demoNext; window.demoPrev = demoPrev;
