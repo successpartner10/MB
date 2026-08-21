@@ -447,6 +447,22 @@ function flash(msg) {
   t.textContent = msg; t.classList.add("show");
   clearTimeout(t._tm); t._tm = setTimeout(() => t.classList.remove("show"), 2400);
 }
+/* shared consumer topbar — critical links on every consumer page */
+function consumerTopbar(active) {
+  const A = (k, href, icon, label, cls) => `<a href="${href}" class="navbtn ${cls || "link"} ${active === k ? "active-nav" : ""}">${ico(icon)}<span>${label}</span></a>`;
+  return `
+    <header class="topbar">
+      <a href="#" class="brand">${ico("sparkle")}<div><b>${esc(BRAND)}</b><span class="sub">Curated weekly meals · GTA</span></div></a>
+      <nav class="consumer-nav">
+        <a href="#restaurants" class="navbtn primary cta-big"><span class="cta-stack"><span class="cta-bold">My Week. Fully Catered.</span><span class="cta-sub">(Pick a kitchen, then your meals)</span></span></a>
+        ${A("auction", "#auction-deals", "gavel", "Sliding Scale", "ghost")}
+        ${A("restaurants", "#restaurants", "store", "Restaurants", "ghost")}
+        ${A("search", "#restaurants", "search", "Search", "ghost")}
+        ${A("delivery", "#delivery", "truck", "Delivery", "link")}
+        ${A("gives", "#gives", "heart", "Gives", "link")}
+      </nav>
+    </header>`;
+}
 function courierMapX(p) { return 20 + (265 * (p / 100)); }
 function courierMapY(p) { return 130 - (105 * (p / 100)); }
 
@@ -479,6 +495,7 @@ const routes = {
   "": renderHome, restaurants: renderRestaurants, build: renderBuild, dashboard: renderDashboard,
   schedule: renderSchedule, track: renderTrack, demo: renderDemo, gives: renderGives,
   "restaurant-menu": renderRestaurantMenu, checkout: renderCheckout, delivery: renderDelivery,
+  "auction-deals": renderAuctionDeals,
   partners: renderPartners, kitchen: renderKitchen, fleet: renderFleet, payouts: renderPayouts, auction: renderAuction, menu: renderMenu,
   admin: renderAdmin,
 };
@@ -662,15 +679,7 @@ function renderHome() {
 
   return `
     <div class="consumer-shell">
-      <header class="topbar">
-        <a href="#" class="brand">${ico("sparkle")}<div><b>${esc(BRAND)}</b><span class="sub">Curated weekly meals · GTA</span></div></a>
-        <nav class="consumer-nav">
-          <a href="#restaurants" class="navbtn primary cta-big">${ico("plus")}<span class="cta-stack"><span class="cta-bold">My Week. Fully Catered.</span><span class="cta-sub">(Pick a kitchen, then your meals)</span></span></a>
-          <a href="#restaurants" class="navbtn ghost">${ico("store")}<span>Restaurants</span></a>
-          <a href="#gives" class="navbtn link">${ico("heart")}<span>Gives</span></a>
-          <a href="#delivery" class="navbtn link">${ico("truck")}<span>Delivery</span></a>
-        </nav>
-      </header>
+      ${consumerTopbar("")}
 
       ${moduleOn("search") ? `
       <!-- search bar -->
@@ -731,11 +740,17 @@ function renderHome() {
       </section>` : ""}
 
       ${moduleOn("whatAte") ? `
-      <!-- WHAT TORONTO ATE (auto-generated from data) -->
+      <!-- WHAT THE GTA ATE (top 3 from on-platform orders) -->
       <section class="content-sec">
-        <div class="kicker">${ico("chart")} What Toronto ate this week · <em>auto-generated</em></div>
+        <div class="kicker">${ico("chart")} What the GTA ate last week · <em>ranked from on-platform orders</em></div>
         <div class="top-dishes">
-          ${whatAte.map((w, i) => `<div class="top-dish"><span class="td-rank">${i + 1}</span><span class="td-name">${esc(w.dish)}</span><span class="td-rest">${esc(w.rest)}</span><span class="td-orders">${w.orders} orders</span></div>`).join("")}
+          ${(() => {
+            const total = whatAte.reduce((a, w) => a + w.orders, 0);
+            return whatAte.slice(0, 3).map((w, i) => {
+              const pct = total ? Math.round((w.orders / total) * 100) : 0;
+              return `<div class="top-dish"><span class="td-rank">${i + 1}</span><span class="td-name">${esc(w.dish)}</span><span class="td-rest">${esc(w.rest)}</span><span class="td-orders">${w.orders} orders · ${pct}%</span></div>`;
+            }).join("");
+          })()}
         </div>
       </section>` : ""}
 
@@ -772,7 +787,7 @@ function renderHome() {
 
       <section class="week-auction">
         <div class="wa-head">
-          <div class="wa-title">${ico("gavel")} This Week Auction</div>
+          <div class="wa-title">${ico("gavel")} Sliding Scale</div>
           <div class="wa-sub">Best price when we hit the numbers · closes Monday · delivers Wednesday</div>
         </div>
         <div class="wa-grid">
@@ -814,6 +829,42 @@ function renderHome() {
 function homeSearch(q) {
   homeFilter.q = (q || "").toLowerCase().trim();
   navigate();
+}
+function renderAuctionDeals() {
+  const cards = WEEK_AUCTION.map((a) => {
+    const { unlocked, next } = auctionLevelLabel(a);
+    return `<div class="wa-card">
+      <div class="wa-img"><img src="${a.image}" alt="${esc(a.dish)}" loading="lazy" /></div>
+      <div class="wa-body">
+        <div class="wa-rest">${esc(a.rest)}</div>
+        <div class="wa-dish">${esc(a.dish)}</div>
+        <div class="wa-listed">Listed $${a.listed} · now $${unlocked.price}</div>
+        <div class="wa-levels">
+          ${a.levels.map((l, i) => {
+            const on = a.ordered >= l.qty;
+            const isBest = i === a.levels.length - 1;
+            return `<div class="wa-level ${on ? "hit" : ""}">
+              <span class="wl-price">$${l.price}</span><span class="wl-qty">at ${l.qty}+</span>
+              ${isBest && on ? `<span class="wl-badge">unlocked</span>` : ""}
+            </div>`;
+          }).join("")}
+        </div>
+        <div class="wa-progress"><div class="wa-bar"><div class="wa-fill" style="width:${Math.min(100, (a.ordered / (next ? next.qty : a.levels[a.levels.length-1].qty)) * 100)}%"></div></div><span class="wa-count">${a.ordered}/${next ? next.qty : a.levels[a.levels.length-1].qty} committed</span></div>
+        <button class="btn primary sm wa-join" onclick="auctionJoin('${a.id}')">${ico("check")} Join at $${unlocked.price}</button>
+      </div>
+    </div>`;
+  }).join("");
+  return `
+    <div class="consumer-shell">
+      ${consumerTopbar("auction")}
+      <section class="build-hero">
+        <div class="eyebrow">Sliding Scale · closes Monday · delivers Wednesday</div>
+        <h1>Best price when we hit the numbers.</h1>
+        <p>Restaurants set a low price only if enough of you commit. Every level shows its target — join, and if we reach it the deal unlocks. If not, no charge.</p>
+      </section>
+      <section class="week-auction" style="margin-top:16px"><div class="wa-grid">${cards}</div></section>
+      <footer class="foot">${versionBadge()}</footer>
+    </div>`;
 }
 function homeFilterType(type) {
   homeFilter.type = type;
@@ -866,8 +917,7 @@ function renderGives() {
   </div>`).join("");
   return `
     <div class="consumer-shell">
-      <header class="topbar"><a href="#" class="brand">${ico("heart")}<div><b>${esc(BRAND)}</b></div></a>
-        <a href="#" class="navbtn ghost sm">${ico("arrowLeft")} Back</a></header>
+      ${consumerTopbar("gives")}
       <section class="build-hero">
         <div class="eyebrow">Supper Club Gives</div>
         <h1>Feeding our community, transparently</h1>
@@ -899,7 +949,7 @@ const AUCTION_SLOTS = [
   { slot: "Chef Story", day: "Thursday", topBid: 60, bids: 3, leader: "Pai", examples: ["Pai $60", "Aloette $55", "Seoul Food Co. $50"] },
 ];
 let auctionWeek = 1;
-/* ---- This Week Auction (reverse/group-buy) ----
+/* ---- Sliding Scale (reverse/group-buy) ----
    Restaurant bids how FEW orders unlock a discount. 3 price levels (listed/mid/lowest),
    each with a min-order count. Transparent live totals. Closes Mon, delivers Wed. */
 const WEEK_AUCTION = [
@@ -922,6 +972,34 @@ function auctionLevelLabel(a) {
   const next = a.levels.find((l) => a.ordered < l.qty);
   return { unlocked, next };
 }
+function submitAuctionBid() {
+  const g = (id) => { const e = document.getElementById(id); return e ? e.value : ""; };
+  const dish = g("ab-dish").trim();
+  const listed = parseFloat(g("ab-listed"));
+  const q1 = parseInt(g("ab-q1")); const p1 = parseFloat(g("ab-p1"));
+  const q2 = parseInt(g("ab-q2")); const p2 = parseFloat(g("ab-p2"));
+  const q3 = parseInt(g("ab-q3")); const p3 = parseFloat(g("ab-p3"));
+  if (!dish || !listed || !q1 || !p1 || !q3 || !p3) { flash("Fill the dish name, listed price, and at least level 1 & 3."); return; }
+  // Bid = how FEW orders unlock the best price (q3). Lower q3 = stronger bid.
+  const a = { id: "wa" + Date.now(), rest: menuRest ? restName(menuRest) : "Indian Desire", dish, image: "img/dish-butter-chicken.jpg", listed, levels: [ { qty: q1, price: p1 }, { qty: q2 || q1, price: p2 || p1 }, { qty: q3, price: p3 } ], ordered: 0 };
+  WEEK_AUCTION.push(a);
+  flash(`✓ Submitted "${dish}" — bids to unlock at ${q3}+ orders.`);
+  navigate();
+}
+function buyPlacement(kind) {
+  const prices = { hero: 200, dod: 50, auction: 100 };
+  const labels = { hero: "Hero slot", dod: "Dish of the Day", auction: "Reverse-auction listing" };
+  const img = document.getElementById("pl-img");
+  if (!img || !img.value.trim()) { flash("⚠ Sized image required — attach one or there's no refund."); return; }
+  showModal({
+    ico: "gavel", title: `Buy ${labels[kind]} — $${prices[kind]}/week`,
+    message: `Charge card on file? Sized image is required. No refund if it's not provided on time.`,
+    buttons: [
+      { label: `Pay $${prices[kind]} & confirm`, primary: true, action: () => { flash(`✓ ${labels[kind]} purchased — sized image required weekly, no refund on forfeit.`); } },
+      { label: "Cancel", action: () => {} },
+    ],
+  });
+}
 function renderAuction() {
   const rows = AUCTION_SLOTS.map((a) => `<div class="auction-row">
     <div class="auction-slot">${esc(a.slot)}</div>
@@ -943,13 +1021,39 @@ function renderAuction() {
           <a href="#auction" class="p-navbtn active" data-nav="auction">${ico("gavel")} Auctions</a>
           <a href="#menu" class="p-navbtn" data-nav="menu">${ico("bag")} Menu</a></nav>
         <a href="#" class="btn p-outline sm">${ico("arrowLeft")} Back to eaters</a></header>
-      <section class="p-hero"><div class="eyebrow dark">Daily content auctions · restaurant owners only</div>
-        <h1>Bid for the homepage — starting at $50</h1>
-        <p>One slot per restaurant per week. Bids open Monday–Wednesday. Transparent — you can see every bid. Winner supplies the material for the next day.</p></section>
+      <section class="p-hero"><div class="eyebrow dark">Placements &amp; Sliding Scale · restaurant owners only</div>
+        <h1>Buy placements &amp; bid your dishes</h1>
+        <p>Hero ×4, Dish of the Day, and reverse-auction listings. All require sized images or no refund. Placements re-bid every week.</p></section>
+
+      <section class="pl-buy p-dark-card">
+        <div class="mf-label">${ico("chef")} Buy a placement — sized image required (no refund if not provided)</div>
+        <div class="pl-row">
+          <button class="btn p-primary" onclick="buyPlacement('hero')">Hero ×4 — $200/wk</button>
+          <button class="btn p-primary" onclick="buyPlacement('dod')">Dish of the Day — $50/wk</button>
+          <button class="btn p-primary" onclick="buyPlacement('auction')">Auction listing — $100/wk</button>
+        </div>
+        <div class="pl-img"><input id="pl-img" type="text" placeholder="Attach sized image URL (required)" /></div>
+      </section>
+
       <section class="auction-note">
-        <span>${ico("shield")} Fairness rule: you can win ONE slot per week. Once you've bid, you can't bid another slot until next week.</span>
+        <span>${ico("shield")} Sliding Scale closes Monday · delivers Wednesday · one slot per restaurant per week · payments confirmed on app.</span>
         <button class="btn p-outline sm" onclick="flash('Week cycles automatically')">Week ${auctionWeek} of the month</button>
       </section>
+
+      <section class="ab-form p-dark-card">
+        <div class="mf-label">${ico("gavel")} Submit a reverse-auction dish (bid = how few orders unlock best price)</div>
+        <div class="ab-grid">
+          <input id="ab-dish" type="text" placeholder="Dish name" />
+          <input id="ab-listed" type="number" placeholder="Listed price $" />
+        </div>
+        <div class="ab-levels">
+          <div class="ab-level"><span class="ab-l">Level 1</span><input id="ab-q1" type="number" placeholder="min orders" /><input id="ab-p1" type="number" placeholder="price $" /></div>
+          <div class="ab-level"><span class="ab-l">Level 2</span><input id="ab-q2" type="number" placeholder="min orders" /><input id="ab-p2" type="number" placeholder="price $" /></div>
+          <div class="ab-level"><span class="ab-l">Level 3 (best)</span><input id="ab-q3" type="number" placeholder="min orders" /><input id="ab-p3" type="number" placeholder="price $" /></div>
+        </div>
+        <button class="btn p-primary" style="margin-top:12px" onclick="submitAuctionBid()">${ico("gavel")} Submit to Sliding Scale</button>
+      </section>
+
       <section class="auction-board">
         <div class="auction-head"><span>Slot</span><span>Day</span><span>Top bid</span><span>Bids</span><span>Leader</span><span></span></div>
         ${rows}
@@ -958,7 +1062,7 @@ function renderAuction() {
         <div class="bid-feed-title">${ico("chart")} Live bids this week</div>
         ${bidFeed}
       </section>
-      <footer class="p-foot">Daily auctions · $50 start · one slot per restaurant per week · transparent bids.</footer>
+      <footer class="p-foot">Placements: Hero $200/wk · Dish of Day $50/wk · Auction $100/wk · sized image required (no refund).</footer>
     </div>`;
 }
 
@@ -995,10 +1099,7 @@ function renderRestaurants() {
 
   return `
     <div class="consumer-shell">
-      <header class="topbar">
-        <a href="#" class="brand">${ico("sparkle")}<div><b>${esc(BRAND)}</b></div></a>
-        <a href="#partners" class="navbtn link sm">${ico("store")}<span>Restaurant owners</span></a>
-      </header>
+      ${consumerTopbar("restaurants")}
       <section class="build-hero">
         <div class="eyebrow">Partner kitchens</div>
         <h1>Choose where your food comes from</h1>
@@ -1041,8 +1142,7 @@ function renderRestaurantMenu() {
   const tierState = tot.total >= tier ? "met" : "pending";
   return `
     <div class="consumer-shell">
-      <header class="topbar"><a href="#restaurants" class="brand">${ico("arrowLeft")}<div><b>${esc(BRAND)}</b></div></a>
-        <a href="#restaurants" class="navbtn ghost sm">${ico("store")} All restaurants</a></header>
+      ${consumerTopbar("restaurants")}
       <section class="build-hero">
         <div class="eyebrow">${esc(r.cuisine)} · ${esc(r.neighborhood)}${r.price ? " · " + esc(r.price) : ""}</div>
         <h1>${esc(r.name)}</h1>
@@ -1156,8 +1256,7 @@ function renderCheckout() {
     </section>` : "";
   return `
     <div class="consumer-shell">
-      <header class="topbar"><a href="#restaurants" class="brand">${ico("arrowLeft")}<div><b>${esc(BRAND)}</b></div></a>
-        <a href="#restaurants" class="navbtn ghost sm">${ico("store")} Add another kitchen</a></header>
+      ${consumerTopbar("checkout")}
       <section class="build-hero">
         <div class="eyebrow">Checkout · your weekly orders</div><h1>Review, choose a window, confirm.</h1>
         <p>Each order is delivered separately from its kitchen. Pick your delivery window and confirm below.</p></section>
@@ -1202,8 +1301,7 @@ function renderDelivery() {
   </div>`).join("");
   return `
     <div class="consumer-shell">
-      <header class="topbar"><a href="#" class="brand">${ico("sparkle")}<div><b>${esc(BRAND)}</b></div></a>
-        <a href="#" class="navbtn ghost sm">${ico("arrowLeft")} Back</a></header>
+      ${consumerTopbar("delivery")}
       <section class="build-hero">
         <div class="eyebrow">Delivery, handled</div><h1>How your weekly box gets to you</h1>
         <p>Delivery is <b>included</b> — no surprise fees. We optimize the route behind the scenes and you just watch it live-track to your door.</p></section>
@@ -1473,8 +1571,7 @@ function renderBuild() {
 
   return `
     <div class="consumer-shell">
-      <header class="topbar"><a href="#" class="brand">${ico("sparkle")}<div><b>${esc(BRAND)}</b></div></a>
-        <a href="#partners" class="navbtn link sm">${ico("store")}<span>Restaurant owners</span></a></header>
+      ${consumerTopbar("build")}
       <section class="build-hero">
         <div class="eyebrow">My Week. Fully Catered.</div><h1>Build your weekly box. See your total <span class="accent">instantly.</span></h1>
         <p>This is a recurring weekly order — mix veg &amp; non-veg, filter by restaurant/cuisine/diet, or set a weekly budget. We'll warn you when you hit it.</p></section>
@@ -2127,6 +2224,7 @@ window.placeOrders = placeOrders; window.CONFIRMED_ORDERS = CONFIRMED_ORDERS; wi
 window.setMenuRest = setMenuRest; window.menuFindByName = menuFindByName; window.menuAddManual = menuAddManual; window.menuToggleHidden = menuToggleHidden; window.menuDelete = menuDelete; window.menuEditPrice = menuEditPrice; window.MENU_STORE = MENU_STORE;
 window.setRestVisible = setRestVisible; window.restVisible = restVisible; window.visibleRestaurants = visibleRestaurants;
 window.auctionJoin = auctionJoin; window.WEEK_AUCTION = WEEK_AUCTION;
+window.submitAuctionBid = submitAuctionBid; window.buyPlacement = buyPlacement;
 window.setDeliveryWindow = setDeliveryWindow; window.setCadence = setCadence; window.toggleWeek = toggleWeek; window.advanceTrack = advanceTrack; window.TRACK = TRACK;
 window.setRestFilter = setRestFilter; window.demoNext = demoNext; window.demoPrev = demoPrev;
 window.meals = meals; window.RESTAURANTS = RESTAURANTS;

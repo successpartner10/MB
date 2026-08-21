@@ -1081,3 +1081,16 @@ a, .navbtn.link, .navbtn.ghost, .btn.ghost, .tier-chip, .date-chip, .wp-opt, .ch
 .wa-fill { height: 100%; background: linear-gradient(90deg,#14b8a6,#0d9488); }
 .wa-count { font-size: 12px; font-weight: 700; color: #1f2937; }
 .wa-join { width: 100%; }
+
+/* 30) v13 — placement buy + auction bid form + active nav */
+.pl-buy, .ab-form { margin: 12px 24px; }
+.pl-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 8px; }
+.pl-img input { width: 100%; margin-top: 10px; padding: 11px; border: 1px solid #334155; border-radius: 10px; background: #0b1020; color: #fff; }
+.ab-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.ab-grid input { padding: 11px; border: 1px solid #334155; border-radius: 10px; background: #0b1020; color: #fff; }
+.ab-levels { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin-top: 10px; }
+.ab-level { display: flex; flex-direction: column; gap: 6px; background: #111a33; border: 1px solid #1e293b; border-radius: 12px; padding: 12px; }
+.ab-level .ab-l { color: #fff; font-weight: 700; font-size: 13px; }
+.ab-level input { padding: 9px; border: 1px solid #334155; border-radius: 8px; background: #0b1020; color: #fff; }
+@media (max-width: 760px){ .ab-levels { grid-template-columns: 1fr; } }
+.active-nav { color: #0d9488 !important; font-weight: 800 !important; }
