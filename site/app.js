@@ -116,6 +116,16 @@ const RESTAURANTS = [
 ];
 const restName = (id) => (RESTAURANTS.find((r) => r.id === id) || {}).name || "Partner kitchen";
 const restOf = (id) => RESTAURANTS.find((r) => r.id === id) || {};
+/* ---- global Dish of the Day (paid slot, $200/week) ---- */
+const DISH_DATA = {
+  title: "Butter Chicken & Basmati",
+  rest: "Indian Desire",
+  rid: "rest_indian",
+  recipe: "Tandoor-grilled chicken, tomato-makhani sauce, basmati. Serves 2. Pair with naan & a squeeze of lime.",
+  image: "img/dish-butter-chicken.jpg",
+};
+function dishRestId(d) { return d.rid || "rest_indian"; }
+function dishImage(d) { return d.image || "img/dish-butter-chicken.jpg"; }
 
 /* ---------- DineSafe live badge ---------- */
 function dineSafeHtml(r) {
@@ -697,8 +707,41 @@ function navigate() {
 }
 
 /* ============================================================================
-   HOME (rebranded)
+   HERO ×4 AUTO-SLIDER — restaurants buy these slots ($200/wk). Only FILLED
+   slots show; auto-rotates; tap opens the restaurant; touch/hover pauses.
    ========================================================================== */
+let heroIdx = 0;
+let heroTimer = null;
+// filled hero slots (in a real build this comes from paid placements)
+const HERO_SLIDES = [
+  { rid: "rest_indian", image: "img/featured-restaurant.jpg", tag: "Featured restaurant" },
+  { rid: "rest_pai", image: "img/dish-poke.jpg", tag: "Dish of the Day" },
+  { rid: "rest_black_blue", image: "img/chef.jpg", tag: "Steakhouse feature" },
+  { rid: "rest_alo_canoe", image: "img/featured-chef.jpg", tag: "Fine dining feature" },
+];
+function heroStart() { clearInterval(heroTimer); heroTimer = setInterval(heroNext, 6000); }
+function heroStop() { clearInterval(heroTimer); heroTimer = null; }
+function heroNext() { heroIdx = (heroIdx + 1) % HERO_SLIDES.length; navigate(); }
+function heroGo(i) { heroIdx = i; navigate(); }
+function renderHero() {
+  const filled = HERO_SLIDES.filter((h) => h.rid && restVisible(h.rid));
+  if (!filled.length) return "";
+  const cur = filled[heroIdx % filled.length];
+  const r = RESTAURANTS.find((x) => x.id === cur.rid) || {};
+  const dots = filled.map((_, i) => `<button class="hero-dot ${i === heroIdx % filled.length ? "on" : ""}" onclick="heroGo(${i})"></button>`).join("");
+  return `
+    <section class="hero-slider" onmouseenter="heroStop()" onmouseleave="heroStart()" ontouchstart="heroStop()" ontouchend="setTimeout(heroStart,3000)">
+      <a href="#restaurant-menu?rest=${cur.rid}" class="hero-slide" style="background-image:url('${cur.image}')">
+        <div class="hero-slide-overlay">
+          <div class="hero-slide-tag">${esc(cur.tag)} · ${esc(r.name || "")}</div>
+          <div class="hero-slide-title">${esc(r.name || "")} — ${esc(r.cuisine || "")}</div>
+          <div class="hero-slide-sub">${googleHtml(r)} ${dineSafeHtml(r)}</div>
+          <span class="hero-slide-cta">${ico("arrow")} Order from ${esc(r.name || "this restaurant")}</span>
+        </div>
+      </a>
+      <div class="hero-dots">${dots}</div>
+    </section>`;
+}
 function renderHome() {
   const steps = [
     ["1", "Register", "One-tap Apple Pay / Google Pay. No forms.", "bolt"],
@@ -730,8 +773,8 @@ function renderHome() {
     ? { name: live.featured.name, cuisine: live.featured.cuisine, neighborhood: live.featured.neighborhood, google: live.featured.google, dineSafe: live.featured.dineSafe }
     : (RESTAURANTS.find((r) => r.id === "rest_indian") || RESTAURANTS[0]);
   const dish = live.dishOfTheDay
-    ? { title: live.dishOfTheDay.title, rest: live.dishOfTheDay.restaurant, recipe: live.dishOfTheDay.recipe }
-    : { title: "Butter Chicken & Basmati", rest: "Indian Desire", recipe: "Tandoor-grilled chicken, tomato-makhani sauce, basmati. Serves 2. Pair with naan & a squeeze of lime." };
+    ? { title: live.dishOfTheDay.title, rest: live.dishOfTheDay.restaurant, recipe: live.dishOfTheDay.recipe, rid: live.dishOfTheDay.restaurantId || "rest_indian", image: "img/dish-butter-chicken.jpg" }
+    : DISH_DATA;
   const chefStory = live.chefStory
     ? { rest: live.chefStory.restaurant, chef: live.chefStory.chef, line: live.chefStory.line }
     : { rest: "Richmond Station", chef: "Carl Heinrich", line: "Top Chef Canada winner, cooks contemporary Canadian with a farm-first ethos at Richmond Station." };
@@ -771,30 +814,7 @@ function renderHome() {
         <div class="steps hero-steps">${steps}</div>
       </section>
 
-      ${moduleOn("featured") ? `
-      <!-- FEATURED RESTAURANT (hero) — daily auction winner -->
-      <section class="featured-hero">
-        <div class="fh-photo"><img src="img/featured-restaurant.jpg" alt="${esc(featured.name)} — ${esc(featured.cuisine)}" loading="lazy" /></div>
-        <div class="fh-body">
-          <div class="fh-tag">Featured restaurant of the day</div>
-          <div class="fh-name">${esc(featured.name)}</div>
-          <div class="fh-meta">${esc(featured.cuisine)} · ${esc(featured.neighborhood)} ${googleHtml(featured)}</div>
-          <a href="#restaurants" class="btn primary sm" style="margin-top:12px">Order from ${esc(featured.name)} ${ico("arrow")}</a>
-        </div>
-      </section>` : ""}
-
-      ${moduleOn("dishOfDay") ? `
-      <!-- DISH OF THE DAY (with recipe) — daily auction winner -->
-      <section class="content-sec">
-        <div class="kicker">Dish of the day · by ${esc(dish.rest)}</div>
-        <div class="dish-card">
-          <div class="dish-img"><img src="img/dish-butter-chicken.jpg" alt="${esc(dish.title)}" /></div>
-          <div class="dish-body">
-            <div class="dish-title">${esc(dish.title)}</div>
-            <div class="dish-recipe">${esc(dish.recipe)}</div>
-          </div>
-        </div>
-      </section>` : ""}
+      ${moduleOn("featured") ? renderHero() : ""}
 
       ${moduleOn("chefStory") ? `
       <!-- CHEF STORY OF THE DAY — daily auction winner -->
@@ -1201,6 +1221,19 @@ function renderRestaurants() {
         <h1>Choose where your food comes from</h1>
         <p>Every kitchen is vetted with live DineSafe inspection status and Google ratings — updated nightly. Pickup available.</p>
       </section>
+      ${moduleOn("dishOfDay") ? `
+      <!-- DISH OF THE DAY + recipe (paid slot) — on the restaurant selection page for visibility -->
+      <section class="rest-dod" style="max-width:1080px;margin:14px auto 0;padding:0 24px">
+        <a href="#restaurant-menu?rest=${dishRestId(DISH_DATA)}" class="rest-dod-card">
+          <div class="rest-dod-img"><img src="${dishImage(DISH_DATA)}" alt="${esc(DISH_DATA.title)}" loading="lazy" /></div>
+          <div class="rest-dod-body">
+            <div class="rest-dod-tag">${ico("chef")} Dish of the Day · by ${esc(DISH_DATA.rest)}</div>
+            <div class="rest-dod-title">${esc(DISH_DATA.title)}</div>
+            <div class="rest-dod-recipe">${esc(DISH_DATA.recipe)}</div>
+            <span class="rest-dod-cta">${ico("arrow")} Order this dish</span>
+          </div>
+        </a>
+      </section>` : ""}
       <div class="filters" style="max-width:1080px;margin:0 auto;padding:0 24px;display:flex;gap:8px;flex-wrap:wrap">
         <button class="chip ${restFilter.cuisine === "all" ? "on" : ""}" onclick="setRestFilter('cuisine','all')">All cuisines</button>
         ${cuisines.map((c) => `<button class="chip ${restFilter.cuisine === c ? "on" : ""}" onclick="setRestFilter('cuisine','${esc(c)}')">${esc(c)}</button>`).join("")}
@@ -1247,6 +1280,17 @@ function renderRestaurantMenu() {
           ${r.hours ? `<span>${ico("clock")} ${esc(r.hours)}</span>` : ""}
         </div>
       </section>
+      ${moduleOn("dishOfDay") && dishRestId(DISH_DATA) === rid ? `
+      <section class="rest-dod" style="max-width:1080px;margin:14px auto;padding:0 24px">
+        <div class="rest-dod-card">
+          <div class="rest-dod-img"><img src="${dishImage(DISH_DATA)}" alt="${esc(DISH_DATA.title)}" loading="lazy" /></div>
+          <div class="rest-dod-body">
+            <div class="rest-dod-tag">${ico("chef")} Dish of the Day · this week</div>
+            <div class="rest-dod-title">${esc(DISH_DATA.title)}</div>
+            <div class="rest-dod-recipe">${esc(DISH_DATA.recipe)}</div>
+          </div>
+        </div>
+      </section>` : ""}
       <div class="build-grid">
         <div class="meals-panel"><div class="meals-count">${menu.length} dishes · ${esc(r.name)}</div><div class="meal-picks">${rows}</div></div>
       </div>
@@ -2385,6 +2429,7 @@ window.meals = meals; window.RESTAURANTS = RESTAURANTS;
 window.homeSearch = homeSearch;
 window.homeFilterType = homeFilterType;
 window.closeModal = closeModal;
+window.heroStart = heroStart; window.heroStop = heroStop; window.heroNext = heroNext; window.heroGo = heroGo;
 window.playAudio = playAudio; window.explainer = explainer;
 window.modalAction = modalAction;
 window.ownerLogin = ownerLogin;
