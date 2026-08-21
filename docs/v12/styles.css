@@ -940,3 +940,46 @@ h1, h2, h3, .h1, .h2, .h3, .fh-name, .dish-title, .chef-name, .rest-name, .gs-ti
 .rest-dishes .kicker { color: #0f766e !important; }
 .rest-full { padding: 20px; }
 .rest-full-head { gap: 16px; }
+
+/* 22) v12 — HIGH-CONTRAST, BIGGER, EASY-TO-READ text (thin weights, darker ink) */
+body { color: #0b1220; font-size: 17px; line-height: 1.55; }
+/* darker muted/grey text everywhere for contrast */
+.muted, .muted.sm, .p-muted, .rest-meta, .meal-rest, .mp-rest, .step-d, .tier-desc,
+.dish-recipe, .chef-line, .feat-d, .gs-sub, .tb-note, .dlv-why, .wp-label,
+.hero-title p, .build-hero p, .p-cta-d, .p-foot, .billrow.muted {
+  color: #1f2937 !important;   /* near-black instead of grey */
+}
+/* bigger body copy */
+.muted, .muted.sm, .p-muted, .rest-meta, .meal-rest, .mp-rest, .step-d, .tier-desc,
+.dish-recipe, .chef-line, .feat-d, .gs-sub, .tb-note, .dlv-why, .billrow.muted {
+  font-size: 16px !important;
+}
+/* restaurant owner (partner) section: thin weights + lighter/bigger text on dark bg */
+.p-brand b { font-size: 22px !important; color: #fff !important; font-weight: 300 !important; }
+.p-brand span { font-size: 14px !important; color: #cbd5e1 !important; }
+.p-navbtn { font-size: 15px !important; font-weight: 300 !important; color: #cbd5e1 !important; }
+.p-navbtn.active { color: #fff !important; background: #1e293b; font-weight: 300 !important; }
+.p-hero h1 { color: #fff !important; font-weight: 300 !important; }
+.p-hero p { color: #e2e8f0 !important; font-size: 17px !important; }
+.p-label, .eyebrow { font-size: 15px !important; font-weight: 300 !important; color: #94a3b8 !important; letter-spacing: .12em; }
+.pstep-t { font-size: 18px !important; font-weight: 300 !important; color: #fff !important; }
+.pstep-d { font-size: 16px !important; color: #cbd5e1 !important; }
+.p-cta-t { font-size: 26px !important; font-weight: 300 !important; color: #fff !important; }
+.p-cta-d { font-size: 16px !important; color: #e2e8f0 !important; }
+.p-foot { font-size: 15px !important; color: #cbd5e1 !important; }
+.p-sum { font-size: 22px !important; color: #fbbf24 !important; font-weight: 300 !important; }
+.p-table-card table, .p-table-card td { font-size: 16px !important; color: #e2e8f0 !important; }
+.p-table-card th { font-size: 13px !important; color: #94a3b8 !important; }
+.pay-row { font-size: 16px !important; color: #e2e8f0 !important; }
+.fleet-count, .fleet-head, .fleet-row { color: #cbd5e1 !important; }
+.ko-cust, .ko-date, .ko-items .billrow { color: #e2e8f0 !important; }
+.admin-label { color: #fff !important; font-weight: 300 !important; }
+.admin-info .muted { color: #cbd5e1 !important; }
+
+/* 23) v12 — buttons/chips higher contrast text */
+.btn, .btn.ghost, .navbtn.ghost, .wp-opt, .tier-chip, .date-chip, .stp-btn {
+  color: #0b1220 !important;
+}
+.btn.primary, .btn.dark, .btn-primary, .p-primary { color: #fff !important; }
+.billrow, .billrow.total, .billrow span { color: #0b1220; }
+.billrow.total .tb-amt { color: #0d9488; font-weight: 600; }
