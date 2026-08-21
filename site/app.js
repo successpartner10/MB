@@ -116,14 +116,18 @@ const RESTAURANTS = [
 ];
 const restName = (id) => (RESTAURANTS.find((r) => r.id === id) || {}).name || "Partner kitchen";
 const restOf = (id) => RESTAURANTS.find((r) => r.id === id) || {};
-/* ---- global Dish of the Day (paid slot, $200/week) ---- */
-const DISH_DATA = {
-  title: "Butter Chicken & Basmati",
-  rest: "Indian Desire",
-  rid: "rest_indian",
-  recipe: "Tandoor-grilled chicken, tomato-makhani sauce, basmati. Serves 2. Pair with naan & a squeeze of lime.",
-  image: "img/dish-butter-chicken.jpg",
-};
+/* ---- global Dish of the Day (4 paid slots, $200/wk each) ---- */
+const DISH_SLOTS = [
+  { title: "Butter Chicken & Basmati", rest: "Indian Desire", rid: "rest_indian", recipe: "Tandoor-grilled chicken, tomato-makhani sauce, basmati. Serves 2. Pair with naan & a squeeze of lime.", image: "img/dish-butter-chicken.jpg" },
+  { title: "Khao Soi", rest: "Pai Northern Thai Kitchen", rid: "rest_pai", recipe: "Northern Thai coconut-curry noodle soup with crispy egg noodles, chicken, and pickled mustard greens.", image: "img/dish-poke.jpg" },
+  { title: "Truffle Fries", rest: "Black and Blue", rid: "rest_black_blue", recipe: "Crispy hand-cut fries tossed in truffle oil, parmesan, and fresh herbs. Serves 2 as a side.", image: "img/chef.jpg" },
+  { title: "Risotto alla Milanese", rest: "Don Alfonso 1890", rid: "rest_don_alfonso", recipe: "Creamy saffron risotto with bone-marrow butter and aged parmesan. Serves 1.", image: "img/featured-chef.jpg" },
+];
+let dishIdx = 0;
+let DISH_DATA = DISH_SLOTS[0];
+function currentDish() { return DISH_SLOTS[dishIdx % DISH_SLOTS.length]; }
+function dishNext() { dishIdx++; navigate(); }
+function dishGo(i) { dishIdx = i; navigate(); }
 function dishRestId(d) { return d.rid || "rest_indian"; }
 function dishImage(d) { return d.image || "img/dish-butter-chicken.jpg"; }
 
@@ -774,7 +778,7 @@ function renderHome() {
     : (RESTAURANTS.find((r) => r.id === "rest_indian") || RESTAURANTS[0]);
   const dish = live.dishOfTheDay
     ? { title: live.dishOfTheDay.title, rest: live.dishOfTheDay.restaurant, recipe: live.dishOfTheDay.recipe, rid: live.dishOfTheDay.restaurantId || "rest_indian", image: "img/dish-butter-chicken.jpg" }
-    : DISH_DATA;
+    : currentDish();
   const chefStory = live.chefStory
     ? { rest: live.chefStory.restaurant, chef: live.chefStory.chef, line: live.chefStory.line }
     : { rest: "Richmond Station", chef: "Carl Heinrich", line: "Top Chef Canada winner, cooks contemporary Canadian with a farm-first ethos at Richmond Station." };
@@ -1222,17 +1226,20 @@ function renderRestaurants() {
         <p>Every kitchen is vetted with live DineSafe inspection status and Google ratings — updated nightly. Pickup available.</p>
       </section>
       ${moduleOn("dishOfDay") ? `
-      <!-- DISH OF THE DAY + recipe (paid slot) — on the restaurant selection page for visibility -->
+      <!-- DISH OF THE DAY + recipe (4 paid slots, $200/wk each) — visible to shoppers -->
       <section class="rest-dod" style="max-width:1080px;margin:14px auto 0;padding:0 24px">
-        <a href="#restaurant-menu?rest=${dishRestId(DISH_DATA)}" class="rest-dod-card">
-          <div class="rest-dod-img"><img src="${dishImage(DISH_DATA)}" alt="${esc(DISH_DATA.title)}" loading="lazy" /></div>
+        ${(() => { const d = currentDish(); return `<a href="#restaurant-menu?rest=${dishRestId(d)}" class="rest-dod-card">
+          <div class="rest-dod-img"><img src="${dishImage(d)}" alt="${esc(d.title)}" loading="lazy" /></div>
           <div class="rest-dod-body">
-            <div class="rest-dod-tag">${ico("chef")} Dish of the Day · by ${esc(DISH_DATA.rest)}</div>
-            <div class="rest-dod-title">${esc(DISH_DATA.title)}</div>
-            <div class="rest-dod-recipe">${esc(DISH_DATA.recipe)}</div>
+            <div class="rest-dod-tag">${ico("chef")} Dish of the Day · by ${esc(d.rest)}</div>
+            <div class="rest-dod-title">${esc(d.title)}</div>
+            <div class="rest-dod-recipe">${esc(d.recipe)}</div>
             <span class="rest-dod-cta">${ico("arrow")} Order this dish</span>
           </div>
-        </a>
+        </a>`; })()}
+        <div class="hero-dots dish-dots">
+          ${DISH_SLOTS.map((_, i) => `<button class="hero-dot ${i === dishIdx % DISH_SLOTS.length ? "on" : ""}" onclick="dishGo(${i})"></button>`).join("")}
+        </div>
       </section>` : ""}
       <div class="filters" style="max-width:1080px;margin:0 auto;padding:0 24px;display:flex;gap:8px;flex-wrap:wrap">
         <button class="chip ${restFilter.cuisine === "all" ? "on" : ""}" onclick="setRestFilter('cuisine','all')">All cuisines</button>
@@ -2430,6 +2437,7 @@ window.homeSearch = homeSearch;
 window.homeFilterType = homeFilterType;
 window.closeModal = closeModal;
 window.heroStart = heroStart; window.heroStop = heroStop; window.heroNext = heroNext; window.heroGo = heroGo;
+window.dishGo = dishGo; window.dishNext = dishNext; window.currentDish = currentDish;
 window.playAudio = playAudio; window.explainer = explainer;
 window.modalAction = modalAction;
 window.ownerLogin = ownerLogin;
@@ -2439,4 +2447,5 @@ window.adminLogout = adminLogout;
 window.loginEmail = loginEmail; window.loginGoogle = loginGoogle; window.logoutUser = logoutUser; window.isLoggedIn = isLoggedIn;
 window.flash = flash;
 if (navigator && navigator.serviceWorker && typeof navigator.serviceWorker.register === "function") { navigator.serviceWorker.register("sw.js").catch(() => {}); }
+heroStart();
 navigate();
