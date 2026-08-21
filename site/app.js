@@ -52,6 +52,9 @@ function ico(name, cls = "") {
     heart: `<path d="M12 21C7 17 3 13.5 3 9.5A4.5 4.5 0 0 1 12 6a4.5 4.5 0 0 1 9 3.5c0 4-4 7.5-9 11.5z"/>`,
     gavel: `<path d="M13 5l6 6M4 16l8-8 4 4-8 8zM2 20h9"/><path d="M15 7l2-2 4 4-2 2z"/>`,
     search: `<circle cx="11" cy="11" r="7"/><path d="M16 16l5 5"/>`,
+    eye: `<path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6-10-6-10-6z"/><circle cx="12" cy="12" r="2.5"/>`,
+    eyeOff: `<path d="M3 3l18 18"/><path d="M10.5 5.2A10 10 0 0 1 12 5c6.5 0 10 6 10 6a15 15 0 0 1-2.5 3.5M6.6 6.6A15 15 0 0 0 2 12s3.5 6 10 6a10 10 0 0 0 3.4-.6"/><path d="M9.9 9.9a2.5 2.5 0 0 0 3.2 3.2"/>`,
+    x: `<path d="M6 6l12 12M18 6L6 18"/>`,
   };
   return S + (paths[name] || `<circle cx="12" cy="12" r="8"/>`) + E;
 }
@@ -343,10 +346,10 @@ const routes = {
   "": renderHome, restaurants: renderRestaurants, build: renderBuild, dashboard: renderDashboard,
   schedule: renderSchedule, track: renderTrack, demo: renderDemo, gives: renderGives,
   "restaurant-menu": renderRestaurantMenu, checkout: renderCheckout, delivery: renderDelivery,
-  partners: renderPartners, kitchen: renderKitchen, fleet: renderFleet, payouts: renderPayouts, auction: renderAuction,
+  partners: renderPartners, kitchen: renderKitchen, fleet: renderFleet, payouts: renderPayouts, auction: renderAuction, menu: renderMenu,
   admin: renderAdmin,
 };
-const PARTNER_ROUTES = ["partners", "kitchen", "fleet", "payouts", "auction"];
+const PARTNER_ROUTES = ["partners", "kitchen", "fleet", "payouts", "auction", "menu"];
 function currentRoute() { const h = location.hash.replace(/^#\/?/, "").split("?")[0]; return routes[h] ? h : ""; }
 function routeParams() { const qs = location.hash.split("?")[1] || ""; const p = {}; qs.split("&").forEach((kv) => { const [k, v] = kv.split("="); if (k) p[k] = decodeURIComponent(v || ""); }); return p; }
 
@@ -735,7 +738,8 @@ function renderAuction() {
           <a href="#fleet" class="p-navbtn" data-nav="fleet">${ico("truck")} Fleet</a>
           <a href="#kitchen" class="p-navbtn" data-nav="kitchen">${ico("pot")} Kitchen</a>
           <a href="#payouts" class="p-navbtn" data-nav="payouts">${ico("wallet")} Payouts</a>
-          <a href="#auction" class="p-navbtn active" data-nav="auction">${ico("gavel")} Auctions</a></nav>
+          <a href="#auction" class="p-navbtn active" data-nav="auction">${ico("gavel")} Auctions</a>
+          <a href="#menu" class="p-navbtn" data-nav="menu">${ico("bag")} Menu</a></nav>
         <a href="#" class="btn p-outline sm">${ico("arrowLeft")} Back to eaters</a></header>
       <section class="p-hero"><div class="eyebrow dark">Daily content auctions · restaurant owners only</div>
         <h1>Bid for the homepage — starting at $50</h1>
@@ -1537,6 +1541,7 @@ function renderPartners() {
           <a href="#kitchen" class="p-navbtn" data-nav="kitchen">${ico("pot")} Kitchen</a>
           <a href="#payouts" class="p-navbtn" data-nav="payouts">${ico("wallet")} Payouts</a>
           <a href="#auction" class="p-navbtn" data-nav="auction">${ico("gavel")} Auctions</a>
+          <a href="#menu" class="p-navbtn" data-nav="menu">${ico("bag")} Menu</a>
         <a href="#" class="btn p-outline sm" onclick="ownerLogout()">${ico("arrowLeft")} Sign out</a></header>
       <section class="p-hero"><div class="eyebrow dark">Get on the GTA's zero-friction meal box</div>
         <h1>Run your kitchen on ${esc(BRAND)}</h1>
@@ -1591,6 +1596,7 @@ function renderFleet() {
           <a href="#kitchen" class="p-navbtn" data-nav="kitchen">${ico("pot")} Kitchen</a>
           <a href="#payouts" class="p-navbtn" data-nav="payouts">${ico("wallet")} Payouts</a>
           <a href="#auction" class="p-navbtn" data-nav="auction">${ico("gavel")} Auctions</a>
+          <a href="#menu" class="p-navbtn" data-nav="menu">${ico("bag")} Menu</a>
         <a href="#" class="btn p-outline sm">${ico("arrowLeft")} Back to eaters</a></header>
       <section class="p-filters">
         <button class="btn p-outline sm">${ico("calendar")} Today ▼</button>
@@ -1651,6 +1657,7 @@ function renderKitchen() {
           <a href="#kitchen" class="p-navbtn active" data-nav="kitchen">${ico("pot")} Kitchen</a>
           <a href="#payouts" class="p-navbtn" data-nav="payouts">${ico("wallet")} Payouts</a>
           <a href="#auction" class="p-navbtn" data-nav="auction">${ico("gavel")} Auctions</a>
+          <a href="#menu" class="p-navbtn" data-nav="menu">${ico("bag")} Menu</a>
         <a href="#" class="btn p-outline sm">${ico("arrowLeft")} Back to eaters</a></header>
       <section class="p-hero"><div class="eyebrow dark">Incoming orders</div>
         <h1>Confirmed orders</h1>
@@ -1659,6 +1666,129 @@ function renderKitchen() {
         ${empty ? `<div class="p-table-card"><div class="muted" style="padding:24px">No orders received yet.</div></div>` : cards}
       </section>
       <footer class="p-foot">Kitchen portal — every confirmed order, with customer, dishes, price, and delivery details.</footer>
+    </div>`;
+}
+
+/* ============================================================================
+   MENU MANAGEMENT — owner imports menu by restaurant name (or adds manually),
+   then updates prices or hides/shows items.
+   ========================================================================== */
+// Store: MENU_STORE[restaurantId] = { name, source:"imported"|"manual", items:[{id,title,price,type,category,hidden}] }
+const MENU_STORE = {};
+let menuRest = "rest_indian";
+function menuItems(rid) {
+  if (!MENU_STORE[rid]) {
+    // Seed from the built-in catalog (acts as the "found" restaurant)
+    const base = meals.filter((m) => m.restaurantId === rid).map((m, i) => ({ id: "mi" + i, title: m.title, price: m.price, type: m.type, category: "Entrée", hidden: false }));
+    MENU_STORE[rid] = { name: restName(rid), source: "imported", items: base };
+  }
+  return MENU_STORE[rid];
+}
+function setMenuRest(rid) { menuRest = rid; navigate(); }
+function menuFindByName() {
+  const inp = document.getElementById("menu-find");
+  const q = (inp ? inp.value : "").trim().toLowerCase();
+  if (!q) { flash("Type a restaurant name first."); return; }
+  const found = RESTAURANTS.find((r) => r.name.toLowerCase().includes(q)) || RESTAURANTS.find((r) => r.cuisine.toLowerCase().includes(q));
+  if (found) {
+    menuRest = found.id;
+    const st = menuItems(found.id);
+    st.source = "imported";
+    flash(`✓ Found ${found.name} — menu imported from Google profile.`);
+  } else {
+    // If not in catalog, create a new manual entry
+    const nid = "rest_" + q.replace(/[^a-z0-9]/g, "");
+    if (!RESTAURANTS.some((r) => r.id === nid)) { RESTAURANTS.push({ id: nid, name: inp.value.trim(), cuisine: "Other", neighborhood: "GTA", radius: 7, dineSafe: "unconditional", hygiene: 97, google: 4.3, reviews: 10, pickup: true, dishes: 6 }); }
+    MENU_STORE[nid] = { name: inp.value.trim(), source: "manual", items: [] };
+    menuRest = nid;
+    flash("✓ Added a new kitchen — now add items manually.");
+  }
+  navigate();
+}
+function menuAddManual() {
+  const title = document.getElementById("mi-title").value.trim();
+  const price = parseFloat(document.getElementById("mi-price").value);
+  const cat = document.getElementById("mi-cat").value || "Entrée";
+  if (!title || !price) { flash("Enter a dish name and price."); return; }
+  const st = menuItems(menuRest);
+  st.items.push({ id: "mi" + Date.now(), title, price, type: "nonveg", category: cat, hidden: false });
+  flash(`✓ Added “${title}” — $${price.toFixed(2)}.`);
+  navigate();
+}
+function menuToggleHidden(rid, mid) {
+  const st = menuItems(rid);
+  const it = st.items.find((x) => x.id === mid);
+  if (it) it.hidden = !it.hidden;
+  navigate();
+}
+function menuDelete(rid, mid) {
+  const st = menuItems(rid);
+  st.items = st.items.filter((x) => x.id !== mid);
+  flash("Item removed.");
+  navigate();
+}
+function menuEditPrice(rid, mid) {
+  const inp = document.getElementById("price-" + mid);
+  const v = parseFloat(inp ? inp.value : 0);
+  const st = menuItems(rid);
+  const it = st.items.find((x) => x.id === mid);
+  if (it && v > 0) { it.price = v; flash("Price updated."); navigate(); }
+}
+function renderMenu() {
+  const rid = menuRest;
+  const st = menuItems(rid);
+  const restBtns = RESTAURANTS.map((r) => `<button class="chip ${rid === r.id ? "on" : ""}" onclick="setMenuRest('${r.id}')">${esc(r.name)}</button>`).join("");
+  const rows = st.items.map((it) => `
+    <div class="menu-row ${it.hidden ? "hidden" : ""}">
+      <div class="mr-main">
+        <div class="mr-title">${esc(it.title)} ${it.hidden ? '<span class="mr-badge hid">hidden</span>' : '<span class="mr-badge">live</span>'}</div>
+        <div class="mr-cat">${esc(it.category)} · ${esc(it.type)}</div>
+      </div>
+      <div class="mr-price"><span>$</span><input id="price-${it.id}" type="number" value="${it.price}" class="mr-input" /><button class="btn ghost sm" onclick="menuEditPrice('${rid}','${it.id}')">${ico("check")} Save</button></div>
+      <div class="mr-actions">
+        <button class="btn ghost sm" onclick="menuToggleHidden('${rid}','${it.id}')">${it.hidden ? ico("eye") + " Show" : ico("eyeOff") + " Hide"}</button>
+        <button class="btn ghost sm" onclick="menuDelete('${rid}','${it.id}')">${ico("x")} Remove</button>
+      </div>
+    </div>`).join("");
+  const visible = st.items.filter((x) => !x.hidden).length;
+  return `
+    <div class="partner-shell">
+      <header class="p-topbar"><div class="p-brand">${ico("store")}<div><b>${esc(BRAND)}</b><span>menu management</span></div></div>
+        <nav class="p-nav"><a href="#partners" class="p-navbtn" data-nav="partners">${ico("home")} Overview</a>
+          <a href="#fleet" class="p-navbtn" data-nav="fleet">${ico("truck")} Fleet</a>
+          <a href="#kitchen" class="p-navbtn" data-nav="kitchen">${ico("pot")} Kitchen</a>
+          <a href="#menu" class="p-navbtn active" data-nav="menu">${ico("bag")} Menu</a>
+          <a href="#payouts" class="p-navbtn" data-nav="payouts">${ico("wallet")} Payouts</a>
+          <a href="#auction" class="p-navbtn" data-nav="auction">${ico("gavel")} Auctions</a>
+        <a href="#" class="btn p-outline sm" onclick="ownerLogout()">${ico("arrowLeft")} Sign out</a></header>
+      <section class="p-hero"><div class="eyebrow dark">Menu management</div>
+        <h1>${esc(st.name)}</h1>
+        <p>Find your restaurant by name to import its menu, or add items manually. Update prices and hide items anytime.</p></section>
+
+      <section class="menu-find card p-dark-card">
+        <div class="mf-label">${ico("search")} Find your restaurant on Google / the web</div>
+        <div class="mf-input"><input id="menu-find" type="text" placeholder="Type a restaurant name, e.g. Indian Desire" /><button class="btn p-primary" onclick="menuFindByName()">${ico("search")} Find & import menu</button></div>
+        <p class="muted sm">We pull the menu, prices &amp; photos from the restaurant's public Google profile. You can edit everything after.</p>
+      </section>
+
+      <div class="menu-tabs"><button class="chip on">Restaurants</button><span class="muted sm">${RESTAURANTS.length} in your account</span></div>
+      <div class="rest-pills">${restBtns}</div>
+
+      <section class="menu-live">
+        <div class="ml-head"><span class="bold">${ico("bag")} Live menu — ${esc(st.name)}</span><span class="ml-count">${visible} live · ${st.items.length - visible} hidden</span></div>
+        ${rows || `<p class="muted" style="padding:20px">No items yet. Add a dish below.</p>`}
+      </section>
+
+      <section class="menu-add card p-dark-card">
+        <div class="mf-label">${ico("plus")} Add a dish manually</div>
+        <div class="ma-grid">
+          <input id="mi-title" type="text" placeholder="Dish name, e.g. Butter Chicken" />
+          <input id="mi-price" type="number" placeholder="Price, e.g. 13" />
+          <select id="mi-cat"><option>Entrée</option><option>Main</option><option>Side</option><option>Drink</option><option>Dessert</option></select>
+          <button class="btn p-primary" onclick="menuAddManual()">${ico("plus")} Add dish</button>
+        </div>
+      </section>
+      <footer class="p-foot">Menu management — import by restaurant name or add manually, then update or hide items.</footer>
     </div>`;
 }
 
@@ -1675,6 +1805,7 @@ function renderPayouts() {
           <a href="#kitchen" class="p-navbtn" data-nav="kitchen">${ico("pot")} Kitchen</a>
           <a href="#payouts" class="p-navbtn active" data-nav="payouts">${ico("wallet")} Payouts</a>
           <a href="#auction" class="p-navbtn" data-nav="auction">${ico("gavel")} Auctions</a>
+          <a href="#menu" class="p-navbtn" data-nav="menu">${ico("bag")} Menu</a>
         <a href="#" class="btn p-outline sm">${ico("arrowLeft")} Back to eaters</a></header>
       <section class="pay-hero"><div class="pay-hero-label">Your membership fee</div><div class="pay-hero-amt">$500</div>
         <div class="pay-hero-sub">Flat $500/month · first month free · no commission, ever · deposited Thu, Aug 20</div></section>
@@ -1754,6 +1885,7 @@ window.setQty = setQty; window.setBuildFilter = setBuildFilter; window.quickComb
 window.boxTotal = boxTotal; window.selectedItems = selectedItems; window.clearBox = clearBox;
 window.orderAdd = orderAdd; window.setTier = setTier; window.clearOrder = clearOrder; window.ORDERS = ORDERS;
 window.placeOrders = placeOrders; window.CONFIRMED_ORDERS = CONFIRMED_ORDERS; window.confirmDelivery = confirmDelivery; window.changeWindow = changeWindow; window.confirmAndPlace = confirmAndPlace; window.setDeliveryDate = setDeliveryDate;
+window.setMenuRest = setMenuRest; window.menuFindByName = menuFindByName; window.menuAddManual = menuAddManual; window.menuToggleHidden = menuToggleHidden; window.menuDelete = menuDelete; window.menuEditPrice = menuEditPrice; window.MENU_STORE = MENU_STORE;
 window.setDeliveryWindow = setDeliveryWindow; window.setCadence = setCadence; window.toggleWeek = toggleWeek; window.advanceTrack = advanceTrack; window.TRACK = TRACK;
 window.setRestFilter = setRestFilter; window.demoNext = demoNext; window.demoPrev = demoPrev;
 window.meals = meals; window.RESTAURANTS = RESTAURANTS;

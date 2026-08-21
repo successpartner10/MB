@@ -995,3 +995,33 @@ body { color: #0b1220; font-size: 17px; line-height: 1.55; }
 .rest-full .rest-meta { font-size: 18px !important; color: #1f2937 !important; }
 .rest-full .dish-chips .dish-chip { font-size: 17px !important; color: #0b1220 !important; }
 .rest-full .rest-dishes .kicker { font-size: 16px !important; }
+
+/* 25) v12 — restaurant MENU management (import by name, manual add, update, hide) */
+.p-dark-card { background: #0f1730; border: 1px solid #1e293b; border-radius: 18px; padding: 20px; margin: 12px 24px; }
+.mf-label { display: flex; align-items: center; gap: 8px; font-weight: 700; color: #fff; margin-bottom: 12px; }
+.mf-label .ic { color: #fbbf24; }
+.mf-input { display: flex; gap: 8px; flex-wrap: wrap; }
+.mf-input input { flex: 1; min-width: 220px; padding: 12px; border: 1px solid #334155; border-radius: 10px; background: #0b1020; color: #fff; font-size: 15px; }
+.menu-tabs { margin: 16px 24px 0; }
+.rest-pills { display: flex; flex-wrap: wrap; gap: 8px; padding: 8px 24px; }
+.rest-pills .chip { color: #e2e8f0; border: 1px solid #334155; background: #111a33; font-size: 13px; }
+.rest-pills .chip.on { background: #0d9488; color: #fff; border-color: #0f766e; }
+.menu-live { background: #0f1730; border: 1px solid #1e293b; border-radius: 18px; margin: 8px 24px; overflow: hidden; }
+.ml-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; background: #111a33; color: #fff; padding: 14px 18px; border-bottom: 1px solid #1e293b; flex-wrap: wrap; }
+.ml-count { color: #94a3b8; font-size: 13px; font-weight: 600; }
+.menu-row { display: flex; align-items: center; gap: 12px; padding: 14px 18px; border-bottom: 1px solid #1e293b; flex-wrap: wrap; }
+.menu-row:last-child { border-bottom: none; }
+.menu-row.hidden { opacity: .55; }
+.mr-main { flex: 1; min-width: 160px; }
+.mr-title { color: #fff; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+.mr-badge { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: .04em; padding: 2px 8px; border-radius: 999px; }
+.mr-badge { background: #064e3b; color: #6ee7b7; }
+.mr-badge.hid { background: #422006; color: #fbbf24; }
+.mr-cat { color: #94a3b8; font-size: 13px; margin-top: 3px; }
+.mr-price { display: flex; align-items: center; gap: 6px; color: #e2e8f0; }
+.mr-price > span { font-size: 16px; font-weight: 800; }
+.mr-input { width: 70px; padding: 8px; border: 1px solid #334155; border-radius: 8px; background: #0b1020; color: #fff; font-size: 15px; font-weight: 700; }
+.mr-actions { display: flex; gap: 6px; }
+.ma-grid { display: grid; grid-template-columns: 2fr 1fr 1fr auto; gap: 8px; }
+.ma-grid input, .ma-grid select { padding: 11px; border: 1px solid #334155; border-radius: 10px; background: #0b1020; color: #fff; font-size: 15px; }
+@media (max-width: 760px){ .ma-grid { grid-template-columns: 1fr; } .menu-row { flex-direction: column; align-items: stretch; } }
