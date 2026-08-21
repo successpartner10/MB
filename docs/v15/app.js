@@ -924,7 +924,7 @@ function renderGives() {
       ${consumerTopbar("gives")}
       <section class="build-hero">
         <div class="eyebrow">Supper Club Gives</div>
-        <h1>Feeding our community, transparently</h1>
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><h1 style="margin:0">Feeding our community, transparently</h1>${explainer("audio/howto.mp3")}</div>
         <p>Every week, a restaurant + a sponsor + Supper Club Direct each give $500. Here's the full, searchable record — no fine print.</p>
         <div class="gives-totals">
           <div><span class="gt-num">${totalMeals.toLocaleString()}</span><span class="gt-l">meals given</span></div>
@@ -1179,7 +1179,7 @@ function renderRestaurantMenu() {
         <div class="eyebrow">${esc(r.cuisine)} · ${esc(r.neighborhood)}${r.price ? " · " + esc(r.price) : ""}</div>
         <h1>${esc(r.name)}</h1>
         <p>${googleHtml(r)} ${dineSafeHtml(r)}</p>
-        <div class="min-banner">${ico("info")} Every weekly order meets a $${MIN_ORDER} minimum · delivered in one weekly drop on your day.</div>
+        <div class="min-banner">${ico("info")} Every weekly order meets a $${MIN_ORDER} minimum · delivered in one weekly drop on your day. ${explainer("audio/howto.mp3")}</div>
         <div class="rest-profile">
           ${r.address ? `<span>${ico("pin")} ${esc(r.address)}</span>` : ""}
           ${r.phone ? `<a href="tel:${esc(r.phone.replace(/[^0-9+]/g, ""))}">${ico("tap")} ${esc(r.phone)}</a>` : ""}
@@ -1283,7 +1283,7 @@ function renderCheckout() {
     <div class="consumer-shell">
       ${consumerTopbar("checkout")}
       <section class="build-hero">
-        <div class="eyebrow">Checkout · your weekly orders</div><h1>Review, choose a window, confirm.</h1>
+        <div class="eyebrow">Checkout · your weekly orders</div><div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><h1 style="margin:0">Review, choose a window, confirm.</h1>${explainer("audio/delivery.mp3")}</div>
         <p>Each order is delivered separately from its kitchen. Pick your delivery window and confirm below.</p></section>
       <section class="checkout-orders" style="max-width:720px;margin:0 auto 16px">
         ${empty ? `<p class="muted">No weekly orders yet. <a href="#restaurants">Pick a kitchen</a> and build your first order.</p>` : orderBlocks}
@@ -1794,7 +1794,7 @@ function renderSchedule() {
     <div class="mobile"><header class="topbar"><a href="#" class="brand">${ico("sparkle")}<div><b>${esc(BRAND)}</b></div></a>
       <a href="#dashboard" class="navbtn ghost sm">${ico("arrowLeft")} Back</a></header>
       <section class="card block"><div class="kicker">${ico("calendar")} Delivery schedule</div>
-        <div class="h2">Your next 4 weeks</div><p class="muted sm">Skip any week up to 3 days before its Sunday 11:59 PM cutoff.</p></section>
+        <div class="h2">Your next 4 weeks ${explainer("audio/howto.mp3")}</div><p class="muted sm">Skip any week up to 3 days before its Sunday 11:59 PM cutoff.</p></section>
       <div class="sched-list">${rows}</div>
       <section class="card block"><div class="kicker">${ico("bolt")} Auto-selection</div>
         <p class="muted sm">Don't choose? We pick meals from your dietary badges before each cutoff.</p></section>
@@ -1988,7 +1988,7 @@ function renderKitchen() {
           <a href="#menu" class="p-navbtn" data-nav="menu">${ico("bag")} Menu</a>
         <a href="#" class="btn p-outline sm">${ico("arrowLeft")} Back to eaters</a></header>
       <section class="p-hero"><div class="eyebrow dark">Incoming orders</div>
-        <h1>Confirmed orders</h1>
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><h1 style="margin:0">Confirmed orders</h1>${explainer("audio/owner.mp3")}</div>
         <p>${orders.length ? `${orders.length} order${orders.length === 1 ? "" : "s"} received, earliest delivery first.` : "No orders yet — they'll appear here the moment a customer confirms."}</p></section>
       <section class="k-list">
         ${empty ? `<div class="p-table-card"><div class="muted" style="padding:24px">No orders received yet.</div></div>` : cards}

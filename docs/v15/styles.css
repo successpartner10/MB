@@ -1181,3 +1181,25 @@ a, .navbtn.link, .navbtn.ghost, .btn.ghost, .tier-chip, .date-chip, .wp-opt, .ch
 .explainer-btn:hover { transform: scale(1.08); box-shadow: 0 6px 16px rgba(13,148,136,.4); }
 .explainer-btn .ic { width: 16px; height: 16px; }
 .wa-title .explainer-btn, .pay-hero-label .explainer-btn, .p-hero h1 + .explainer-btn { margin-left: 4px; }
+
+/* 40) v15 — more OBVIOUS audio explainer button (labeled pill, pulsing) */
+.explainer-btn {
+  width: auto;
+  height: auto;
+  padding: 8px 14px;
+  gap: 6px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 800;
+  background: linear-gradient(135deg,#14b8a6,#0d9488);
+  box-shadow: 0 4px 14px rgba(13,148,136,.4);
+  animation: explainerPulse 2s infinite;
+}
+.explainer-btn::after { content: "Listen"; }
+.explainer-btn:hover { animation: none; transform: scale(1.05); }
+.explainer-btn .ic { width: 15px; height: 15px; }
+@keyframes explainerPulse {
+  0%,100% { box-shadow: 0 0 0 0 rgba(13,148,136,.4); }
+  50% { box-shadow: 0 0 0 6px rgba(13,148,136,.08); }
+}
+.wa-title .explainer-btn, .pay-hero-label .explainer-btn { margin-left: 8px; }
