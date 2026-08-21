@@ -983,3 +983,15 @@ body { color: #0b1220; font-size: 17px; line-height: 1.55; }
 .btn.primary, .btn.dark, .btn-primary, .p-primary { color: #fff !important; }
 .billrow, .billrow.total, .billrow span { color: #0b1220; }
 .billrow.total .tb-amt { color: #0d9488; font-weight: 600; }
+
+/* 24) v12 — top nav links darker+bigger; restaurant names/dishes larger */
+.consumer-nav .navbtn, .consumer-nav .navbtn.link, .consumer-nav .navbtn.ghost {
+  color: #0b1220 !important;          /* dark ink, not grey */
+  font-size: 17px !important;
+  font-weight: 500 !important;
+}
+.consumer-nav .navbtn.link .ic, .consumer-nav .navbtn.ghost .ic { color: #0d9488; }
+.rest-full-head .rest-name.lg, .rest-full .rest-name.lg { font-size: 30px !important; font-weight: 500 !important; color: #0b1220 !important; }
+.rest-full .rest-meta { font-size: 18px !important; color: #1f2937 !important; }
+.rest-full .dish-chips .dish-chip { font-size: 17px !important; color: #0b1220 !important; }
+.rest-full .rest-dishes .kicker { font-size: 16px !important; }
