@@ -791,7 +791,6 @@ function renderHome() {
         { dish: "Carne Asada Bowl", rest: "Taco Toro", orders: 149 },
       ];
   // social-proof stats (anonymous, on-platform)
-  const GTA_TOTAL_MEALS = "2,400";
   const GTA_REORDER_PCT = 82;
 
   return `
@@ -824,35 +823,25 @@ function renderHome() {
       ${moduleOn("featured") ? renderHero() : ""}
 
       ${moduleOn("whatAte") && settingOn("showWhatAte") ? `
-      <!-- WHAT THE GTA ATE — 4-stat social-proof strip (anonymous, on-platform) -->
+      <!-- WHAT THE GTA ATE — ranked top-3 with % (anonymous, on-platform) -->
       <section class="content-sec gta-strip">
         <div class="kicker">${ico("chart")} What the GTA ate last week</div>
-        <div class="gta-grid">
-          <div class="gta-stat"><span class="gta-num">${(() => { const total = whatAte.reduce((a, w) => a + w.orders, 0); return total ? Math.round((whatAte[0].orders / total) * 100) + "%" : "—"; })()}</span><span class="gta-l">of orders were our #1 dish</span></div>
-          <div class="gta-stat"><span class="gta-num">${GTA_TOTAL_MEALS}</span><span class="gta-l">meals delivered this week</span></div>
-          <div class="gta-stat"><span class="gta-num">${GTA_REORDER_PCT}%</span><span class="gta-l">of customers reorder weekly</span></div>
-          <div class="gta-stat"><span class="gta-num">5–7pm</span><span class="gta-l">our busiest delivery window</span></div>
+        <div class="gta-ranked">
+          ${(() => {
+            const total = whatAte.reduce((a, w) => a + w.orders, 0) || 1;
+            return whatAte.slice(0, 3).map((w, i) => {
+              const pct = Math.round((w.orders / total) * 100);
+              return `<div class="gta-rank">
+                <span class="gta-rank-num">${i + 1}</span>
+                <span class="gta-rank-dish">${esc(w.dish)}</span>
+                <span class="gta-rank-rest">${esc(w.rest)}</span>
+                <span class="gta-rank-bar"><span style="width:${pct}%"></span></span>
+                <span class="gta-rank-pct">${pct}%</span>
+              </div>`;
+            }).join("");
+          })()}
         </div>
-      </section>` : ""}
-
-      ${moduleOn("gallery") ? `
-      <!-- REAL DISH PHOTOS from partner kitchens (GTA cuisines) -->
-      <section class="content-sec">
-        <div class="kicker">${ico("chef")} Fresh from the kitchens · this week's specials</div>
-        <div class="dish-gallery">
-          <div class="dg-item"><img src="img/dish-butter-chicken.jpg" alt="Indian Desire" /><span class="dg-label">Indian Desire</span></div>
-          <div class="dg-item"><img src="img/dish-poke.jpg" alt="Kobu Noodle & Rice" /><span class="dg-label">Kobu</span></div>
-          <div class="dg-item"><img src="img/dish-veggie-bowl.jpg" alt="Green Table" /><span class="dg-label">Green Table</span></div>
-          <div class="dg-item"><img src="img/chef-2.jpg" alt="Sweet Basil" /><span class="dg-label">Sweet Basil</span></div>
-          <div class="dg-item"><img src="img/chef-3.jpg" alt="Seoul Food Co." /><span class="dg-label">Seoul Food Co.</span></div>
-        </div>
-      </section>` : ""}
-
-      ${moduleOn("kitchens") ? `
-      <section class="top-rest">
-        <div class="kicker" style="margin:0 0 12px">${ico("store")} Partner kitchens</div>
-        <div class="top-grid">${top}</div>
-        <a href="#restaurants" class="btn ghost sm" style="margin-top:14px">View all ${visibleRestaurants().length} restaurants ${ico("arrow")}</a>
+        <div class="gta-reorder">${GTA_REORDER_PCT}% of customers reorder weekly</div>
       </section>` : ""}
 
       <footer class="foot">${versionBadge()}

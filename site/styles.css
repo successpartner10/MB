@@ -1211,7 +1211,8 @@ a, .navbtn.link, .navbtn.ghost, .btn.ghost, .tier-chip, .date-chip, .wp-opt, .ch
 .hero-slide-tag { font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; color: #6ee7b7; }
 .hero-slide-title { font-size: 26px; font-weight: 900; margin: 4px 0; }
 .hero-slide-sub { font-size: 14px; opacity: .95; }
-.hero-slide-cta { display: inline-flex; align-items: center; gap: 6px; margin-top: 12px; background: #0d9488; color: #fff; font-weight: 800; padding: 10px 16px; border-radius: 12px; width: fit-content; }
+.hero-slide-cta { display: inline-flex; align-items: center; gap: 5px; margin-top: 10px; background: rgba(13,148,136,.55); color: #fff; font-weight: 700; font-size: 12.5px; padding: 7px 12px; border-radius: 999px; width: fit-content; backdrop-filter: blur(2px); border: 1px solid rgba(255,255,255,.35); }
+.hero-slide-cta .ic { width: 13px; height: 13px; }
 .hero-dots { display: flex; justify-content: center; gap: 8px; margin-top: 12px; }
 .hero-dot { width: 10px; height: 10px; border-radius: 999px; border: none; background: #cbd5e1; cursor: pointer; transition: all .2s; }
 .hero-dot.on { background: #0d9488; width: 22px; }
@@ -1242,3 +1243,15 @@ a, .navbtn.link, .navbtn.ghost, .btn.ghost, .tier-chip, .date-chip, .wp-opt, .ch
 .gta-num { display: block; font-size: 26px; font-weight: 900; color: #0d9488; letter-spacing: -.02em; }
 .gta-l { display: block; font-size: 13px; color: #1f2937; margin-top: 4px; font-weight: 500; }
 @media (max-width: 640px){ .gta-grid { grid-template-columns: repeat(2, 1fr); } }
+
+/* 44) v17 — "What the GTA ate" RANKED top-3 list with % */
+.gta-ranked { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+.gta-rank { display: flex; align-items: center; gap: 12px; background: #fff; border: 1px solid #cbd5e1; border-radius: 12px; padding: 10px 14px; }
+.gta-rank-num { width: 26px; height: 26px; border-radius: 999px; background: #0d9488; color: #fff; font-weight: 900; display: grid; place-items: center; font-size: 13px; flex: none; }
+.gta-rank-dish { font-weight: 800; color: #000; min-width: 160px; }
+.gta-rank-rest { color: #1f2937; font-size: 13px; min-width: 130px; }
+.gta-rank-bar { flex: 1; height: 8px; background: #e2e8f0; border-radius: 999px; overflow: hidden; }
+.gta-rank-bar span { display: block; height: 100%; background: linear-gradient(90deg,#14b8a6,#0d9488); border-radius: 999px; }
+.gta-rank-pct { font-weight: 900; color: #0d9488; min-width: 40px; text-align: right; }
+.gta-reorder { margin-top: 10px; font-size: 13px; color: #1f2937; font-weight: 600; }
+@media (max-width: 640px){ .gta-rank-rest { display: none; } .gta-rank-dish { min-width: 0; flex: 1; } }
