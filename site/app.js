@@ -911,14 +911,18 @@ function renderCheckout() {
   }).join("");
   const orderBlocks = draftBlocks + confirmedBlocks;
   const d = fmtDate(nextDeliveryDate());
+  const dateBtns = deliveryDates().map((dd, i) => {
+    const on = i === chosenDateIdx;
+    return `<button class="date-chip ${on ? "on" : ""}" onclick="setDeliveryDate(${i})"><span class="dc-d">${dd.getDate()}</span><span class="dc-w">${dd.toLocaleDateString("en-CA", { weekday: "short" })}</span></button>`;
+  }).join("");
   const winBlock = `
     <section class="card block" style="max-width:720px;margin:0 auto 16px">
-      <div class="kicker">${ico("truck")} Delivery</div>
-      <div class="h2">${d}</div>
+      <div class="kicker">${ico("truck")} Choose delivery date &amp; time</div>
       <div class="muted">${ico("pin")} 120 Bay St, Unit 1402 · Concierge</div>
+      <div class="date-pick" style="margin-top:10px"><span class="wp-label">${ico("calendar")} Delivery date</span><div class="date-opts">${dateBtns}</div></div>
       <div class="window-pick" style="margin-top:10px"><span class="wp-label">${ico("clock")} 2-hour window</span><div class="wp-opts">
         ${DELIVERY_WINDOWS.map((w) => `<button class="wp-opt ${chosenWindow === w.id ? "on" : ""}" onclick="setDeliveryWindow('${w.id}')">${w.label}</button>`).join("")}</div></div>
-      ${windowConfirmed ? `<div class="confirm-banner">${ico("check")} Window confirmed — ${deliveryWindowSlot()} on ${d}. <button class="btn ghost sm" onclick="changeWindow()">Change</button></div>` : ""}
+      ${windowConfirmed ? `<div class="confirm-banner">${ico("check")} Delivery confirmed — ${deliveryWindowSlot()} on ${d}. <button class="btn ghost sm" onclick="changeWindow()">Change</button></div>` : ""}
     </section>`;
   const confirmBlock = placed ? `
     <section class="card block confirm-card" style="max-width:720px;margin:0 auto 16px">
@@ -1297,7 +1301,15 @@ function renderBuild() {
    DASHBOARD
    ========================================================================== */
 let chosenWindow = "5-7";
+let chosenDateIdx = 0; // index into available delivery dates (earliest first)
 let cadence = "weekly";
+function deliveryDates() {
+  const out = [];
+  for (let i = 1; i <= 7; i++) { const d = new Date(); d.setDate(d.getDate() + i); out.push(d); }
+  return out;
+}
+function chosenDeliveryDate() { const ds = deliveryDates(); return ds[Math.min(chosenDateIdx, ds.length - 1)]; }
+function setDeliveryDate(idx) { chosenDateIdx = idx; windowConfirmed = true; navigate(); }
 let windowConfirmed = false;
 function deliveryWindowSlot() { return (DELIVERY_WINDOWS.find((w) => w.id === chosenWindow) || DELIVERY_WINDOWS[0]).slot; }
 function orderSummary() {
@@ -1330,7 +1342,7 @@ function orderSummaryText() {
   const parts = s.lines.map((l) => `${l.rest} — $${l.sub.toFixed(2)}`).join(", ");
   return `My Week. Fully Catered.\n\n${s.lines.map((l) => `• ${l.rest}: ${l.items.map((m) => `${s.lines.find(x=>x.rest===l.rest).items}`).length}`).join("\n")}\n\nTotal: $${s.total.toFixed(2)}\nDelivery: ${fmtDate(nextDeliveryDate())}, ${deliveryWindowSlot()}`;
 }
-function nextDeliveryDate() { const d = new Date(); d.setDate(d.getDate() + 4); return d; }
+function nextDeliveryDate() { return chosenDeliveryDate(); }
 function calendarLink() {
   const start = nextDeliveryDate(); const s = new Date(start); s.setHours(17,0,0);
   const e = new Date(start); e.setHours(19,0,0);
@@ -1741,7 +1753,7 @@ window.moduleOn = moduleOn;
 window.setQty = setQty; window.setBuildFilter = setBuildFilter; window.quickCombo = quickCombo; window.applyBudget = applyBudget; window.buildState = buildState;
 window.boxTotal = boxTotal; window.selectedItems = selectedItems; window.clearBox = clearBox;
 window.orderAdd = orderAdd; window.setTier = setTier; window.clearOrder = clearOrder; window.ORDERS = ORDERS;
-window.placeOrders = placeOrders; window.CONFIRMED_ORDERS = CONFIRMED_ORDERS; window.confirmDelivery = confirmDelivery; window.changeWindow = changeWindow; window.confirmAndPlace = confirmAndPlace;
+window.placeOrders = placeOrders; window.CONFIRMED_ORDERS = CONFIRMED_ORDERS; window.confirmDelivery = confirmDelivery; window.changeWindow = changeWindow; window.confirmAndPlace = confirmAndPlace; window.setDeliveryDate = setDeliveryDate;
 window.setDeliveryWindow = setDeliveryWindow; window.setCadence = setCadence; window.toggleWeek = toggleWeek; window.advanceTrack = advanceTrack; window.TRACK = TRACK;
 window.setRestFilter = setRestFilter; window.demoNext = demoNext; window.demoPrev = demoPrev;
 window.meals = meals; window.RESTAURANTS = RESTAURANTS;
