@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en-CA">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0d9488" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; script-src 'self' 'unsafe-inline'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'" />
+  <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
+  <meta name="description" content="Supper Club Direct — curated weekly meals for the GTA. Register, choose your kitchen, get delivery. Live DineSafe status, ratings, pickup &amp; delivery. Offline-capable PWA." />
+  <title>Supper Club Direct — Curated Weekly Meals (GTA)</title>
+
+  <!-- Raleway — brand typeface (retina-crisp, Apple-clean) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@100;200;300;400;500&display=swap" rel="stylesheet" />
+
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="icon" href="icon-192.png" />
+  <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="Minimal Bites" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="toast" role="status" aria-live="polite"></div>
+  <main id="app"></main>
+
+  <noscript>
+    <div style="max-width:560px;margin:60px auto;text-align:center;font-family:sans-serif">
+      <h1>Minimal Bites</h1>
+      <p>This demo needs JavaScript enabled to render the subscriber dashboard and partner portal.</p>
+    </div>
+  </noscript>
+
+  <script src="app.js"></script>
+</body>
+</html>
