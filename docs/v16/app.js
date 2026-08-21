@@ -782,9 +782,6 @@ function renderHome() {
   const dish = live.dishOfTheDay
     ? { title: live.dishOfTheDay.title, rest: live.dishOfTheDay.restaurant, recipe: live.dishOfTheDay.recipe, rid: live.dishOfTheDay.restaurantId || "rest_indian", image: "img/dish-butter-chicken.jpg" }
     : currentDish();
-  const chefStory = live.chefStory
-    ? { rest: live.chefStory.restaurant, chef: live.chefStory.chef, line: live.chefStory.line }
-    : { rest: "Richmond Station", chef: "Carl Heinrich", line: "Top Chef Canada winner, cooks contemporary Canadian with a farm-first ethos at Richmond Station." };
   const whatAte = (live.whatTorontoAte && live.whatTorontoAte.length)
     ? live.whatTorontoAte.map((w) => ({ dish: w.dish, rest: w.restaurant, orders: w.orders }))
     : [
@@ -793,6 +790,9 @@ function renderHome() {
         { dish: "Lemon Herb Salmon", rest: "Sweet Basil", orders: 176 },
         { dish: "Carne Asada Bowl", rest: "Taco Toro", orders: 149 },
       ];
+  // social-proof stats (anonymous, on-platform)
+  const GTA_TOTAL_MEALS = "2,400";
+  const GTA_REORDER_PCT = 82;
 
   return `
     <div class="consumer-shell">
@@ -823,40 +823,16 @@ function renderHome() {
 
       ${moduleOn("featured") ? renderHero() : ""}
 
-      ${moduleOn("chefStory") ? `
-      <!-- CHEF STORY OF THE DAY — daily auction winner -->
-      <section class="content-sec">
-        <div class="kicker">Chef story · ${esc(chefStory.rest)}</div>
-        <div class="chef-card">
-          <div class="chef-avatar"><img src="img/chef.jpg" alt="${esc(chefStory.chef)}" /></div>
-          <div><div class="chef-name">${esc(chefStory.chef)}</div><div class="chef-line">${esc(chefStory.line)}</div></div>
-        </div>
-      </section>` : ""}
-
       ${moduleOn("whatAte") && settingOn("showWhatAte") ? `
-      <!-- WHAT THE GTA ATE (top 3 from on-platform orders) -->
-      <section class="content-sec">
-        <div class="kicker">${ico("chart")} What the GTA ate last week · <em>ranked from on-platform orders</em></div>
-        <div class="top-dishes">
-          ${(() => {
-            const total = whatAte.reduce((a, w) => a + w.orders, 0);
-            return whatAte.slice(0, 3).map((w, i) => {
-              const pct = total ? Math.round((w.orders / total) * 100) : 0;
-              return `<div class="top-dish"><span class="td-rank">${i + 1}</span><span class="td-name">${esc(w.dish)}</span><span class="td-rest">${esc(w.rest)}</span><span class="td-orders">${w.orders} orders · ${pct}%</span></div>`;
-            }).join("");
-          })()}
+      <!-- WHAT THE GTA ATE — 4-stat social-proof strip (anonymous, on-platform) -->
+      <section class="content-sec gta-strip">
+        <div class="kicker">${ico("chart")} What the GTA ate last week</div>
+        <div class="gta-grid">
+          <div class="gta-stat"><span class="gta-num">${(() => { const total = whatAte.reduce((a, w) => a + w.orders, 0); return total ? Math.round((whatAte[0].orders / total) * 100) + "%" : "—"; })()}</span><span class="gta-l">of orders were our #1 dish</span></div>
+          <div class="gta-stat"><span class="gta-num">${GTA_TOTAL_MEALS}</span><span class="gta-l">meals delivered this week</span></div>
+          <div class="gta-stat"><span class="gta-num">${GTA_REORDER_PCT}%</span><span class="gta-l">of customers reorder weekly</span></div>
+          <div class="gta-stat"><span class="gta-num">5–7pm</span><span class="gta-l">our busiest delivery window</span></div>
         </div>
-      </section>` : ""}
-
-      ${moduleOn("gives") && settingOn("showGives") ? `
-      <!-- SUPPER CLUB GIVES strip → links to ledger -->
-      <section class="gives-strip">
-        <div class="gs-icon">${ico("heart")}</div>
-        <div>
-          <div class="gs-title">Supper Club Gives</div>
-          <div class="gs-sub">Supper Club Direct + a restaurant + a sponsor each give $500 this week to feed a local shelter.</div>
-        </div>
-        <a href="#gives" class="btn dark sm">See the ledger ${ico("arrow")}</a>
       </section>` : ""}
 
       ${moduleOn("gallery") ? `
@@ -879,20 +855,8 @@ function renderHome() {
         <a href="#restaurants" class="btn ghost sm" style="margin-top:14px">View all ${visibleRestaurants().length} restaurants ${ico("arrow")}</a>
       </section>` : ""}
 
-      ${settingOn("auctionEnabled") ? `
-      <section class="week-auction">
-        <div class="wa-head">
-          <div class="wa-title">${ico("gavel")} Sliding Scale ${explainer("audio/sliding.mp3")}</div>
-          <div class="wa-sub">Best price when we hit the numbers · closes Monday · delivers Wednesday</div>
-        </div>
-        <div class="wa-grid">
-          ${WEEK_AUCTION.map((a) => slidingCard(a)).join("")}
-        </div>
-      </section>` : ""}
-
       <footer class="foot">${versionBadge()}
         <span class="admin-foot">· <a href="#admin" style="opacity:.6">Platform admin</a></span></footer>
-      <div class="owner-mini"><a href="#partners">${ico("store")} Restaurant owners — deliver & run your kitchen on ${esc(BRAND)}</a></div>
     </div>`;
 }
 
