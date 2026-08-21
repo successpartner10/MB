@@ -608,7 +608,7 @@ input, select, textarea, .login-input, .budget-input input, .gives-search input,
    ========================================================================== */
 
 /* 1) Typography — Raleway brand font, clean & larger (kept across the whole app) */
-body { font-family: "Raleway", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-weight: 400; letter-spacing: -0.01em; -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
+body { font-family: "Raleway", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-weight: 200; letter-spacing: -0.01em; -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
 h1,h2,h3,.h2,.h3,.fh-name,.dish-title,.chef-name,.rest-name,.gs-title,.step-t,.pstep-t { letter-spacing: -0.025em; font-weight: 700; }
 body { background: #f5f5f7; } /* Apple grey */
 
@@ -905,3 +905,21 @@ h3, .h3 { font-size: 21px !important; font-weight: 800; }
 .date-chip.on { border-color: #0d9488; background: linear-gradient(135deg,#14b8a6,#0d9488) !important; box-shadow: 0 6px 18px rgba(13,148,136,.3); }
 .date-chip.on .dc-d { color: #fff; }
 .date-chip.on .dc-w { color: #eafff8; }
+
+/* 20) v12 — THIN / EXTRA-LIGHT Raleway only (elegant, refined) */
+body, p, .muted, .card, .step, .feature, .rest-card, .rest-full, .dish-card, .chef-card,
+.meal-pick, .filters-panel, .billrow, .yb-name, .yb-price, .ko-cust, .ko-date, .dlv-how, .dlv-why,
+.mp-meta, .meal-meta, .rest-meta, .hero-title p, .build-hero p, .p-hero p, .p-cta-d, .p-foot,
+.dish-recipe, .chef-line, .step-d, .feat-d, .fp-d, .gs-sub, .meal-rest, .tb-note, .tier-desc {
+  font-weight: 200 !important;
+}
+h1, h2, h3, .h1, .h2, .h3, .fh-name, .dish-title, .chef-name, .rest-name, .gs-title, .step-t, .pstep-t,
+.meal-title, .mp-title, .oc-brand, .ko-id, .cta-bold, .p-cta-t {
+  font-weight: 300 !important;
+}
+.eyebrow, .kicker, .p-label, .share-label, .yb-title {
+  font-weight: 300 !important; letter-spacing: .12em;
+}
+.btn, .navbtn, .p-navbtn, .tier-chip, .wp-opt, .date-chip, .chip {
+  font-weight: 300 !important;
+}
