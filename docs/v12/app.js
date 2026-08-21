@@ -92,6 +92,26 @@ const RESTAURANTS = [
   { id: "rest_fish_fable", name: "Fish & Fable", cuisine: "Seafood", neighborhood: "St. Lawrence", postal: "M5E", dineSafe: "unconditional", hygiene: 100, google: 4.7, reviews: 354, pickup: true, radius: 6, dishes: 8 },
   { id: "rest_green_table", name: "Green Table", cuisine: "Vegan / plant", neighborhood: "Leslieville", postal: "M4M", dineSafe: "unconditional", hygiene: 97, google: 4.5, reviews: 288, pickup: true, radius: 7, dishes: 8 },
   { id: "rest_oat_cart", name: "The Oat Cart", cuisine: "Breakfast / bakery", neighborhood: "Liberty Village", postal: "M6K", dineSafe: "unconditional", hygiene: 96, google: 4.6, reviews: 342, pickup: true, radius: 6, dishes: 8 },
+  /* ---- Toronto fine-dining & neighbourhood kitchens (Google-profile data) ---- */
+  { id: "rest_alo_canoe", name: "Alo Canoe Restaurant and Bar", cuisine: "Modern French", neighborhood: "Queen West", postal: "M5V 2B2", address: "483 Queen St W, Toronto, ON M5V 2B2", phone: "(416) 260-3335", hours: "Lun–Ven 11:30–14:30 · 17:00–22:00, Sam–Dim 10:00–14:00 · 17:00–22:00", price: "$$$$", dineSafe: "unconditional", hygiene: 100, google: 4.7, reviews: 3120, pickup: true, radius: 6, dishes: 8 },
+  { id: "rest_edulis", name: "Edulis Restaurant", cuisine: "French / Spanish", neighborhood: "Niagara", postal: "M6J 1L3", address: "169 Niagara St, Toronto, ON M6J 1L3", phone: "(416) 703-4222", hours: "Mar–Dim 12:00–14:30 · 17:30–22:00", price: "$$$$", dineSafe: "unconditional", hygiene: 100, google: 4.9, reviews: 1180, pickup: true, radius: 6, dishes: 6 },
+  { id: "rest_bar_isabel", name: "Bar Isabel", cuisine: "Spanish", neighborhood: "Palmerston", postal: "M6G 1C7", address: "797 College St, Toronto, ON M6G 1C7", phone: "(416) 532-2222", hours: "Mar–Lun 17:00–23:00, Sam–Dim 12:00–23:00", price: "$$$", dineSafe: "unconditional", hygiene: 99, google: 4.7, reviews: 2440, pickup: true, radius: 6, dishes: 8 },
+  { id: "rest_20_victoria", name: "Restaurant 20 Victoria", cuisine: "Contemporary Canadian", neighborhood: "Financial District", postal: "M5C 1N8", address: "20 Victoria St, Toronto, ON M5C 1N8", phone: "(416) 362-9599", hours: "Lun–Ven 11:30–14:30 · 17:00–22:00, Sam 17:00–22:00", price: "$$$$", dineSafe: "unconditional", hygiene: 99, google: 4.7, reviews: 880, pickup: true, radius: 6, dishes: 8 },
+  { id: "rest_giulietta", name: "Giulietta", cuisine: "Italian", neighborhood: "College St", postal: "M6H 1E1", address: "972 College St, Toronto, ON M6H 1E1", phone: "(416) 588-3323", hours: "Lun–Ven 17:00–22:00, Sam–Dim 17:00–22:00", price: "$$$", dineSafe: "unconditional", hygiene: 99, google: 4.7, reviews: 1310, pickup: true, radius: 6, dishes: 8 },
+  { id: "rest_don_alfonso", name: "Don Alfonso 1890", cuisine: "Italian fine dining", neighborhood: "King West", postal: "M5V 1H8", address: "438 King St W, Toronto, ON M5V 1H8", phone: "(416) 597-8940", hours: "Mar–Dim 17:00–22:00", price: "$$$$", dineSafe: "unconditional", hygiene: 100, google: 4.7, reviews: 940, pickup: true, radius: 6, dishes: 8 },
+  { id: "rest_osteria_giulia", name: "Osteria Giulia", cuisine: "Italian", neighborhood: "Avenue Rd", postal: "M5R 2H5", address: "134 Avenue Rd, Toronto, ON M5R 2H5", phone: "(416) 964-8686", hours: "Lun–Dim 17:00–22:30", price: "$$$$", dineSafe: "unconditional", hygiene: 100, google: 4.8, reviews: 1120, pickup: true, radius: 6, dishes: 8 },
+  { id: "rest_quetzal", name: "Quetzal", cuisine: "Mexican", neighborhood: "College St", postal: "M5T 2A8", address: "419 College St, Toronto, ON M5T 2A8", phone: "(416) 792-7745", hours: "Lun–Ven 17:00–22:00, Sam–Dim 17:00–23:00", price: "$$$$", dineSafe: "unconditional", hygiene: 99, google: 4.7, reviews: 1680, pickup: true, radius: 6, dishes: 8 },
+  { id: "rest_mamakas", name: "Mamakas Taverna", cuisine: "Greek", neighborhood: "Ossington", postal: "M6J 2Z2", address: "80 Ossington Ave, Toronto, ON M6J 2Z2", phone: "(416) 537-3548", hours: "Lun–Dim 17:00–22:00, Sam–Dim 12:00–22:00", price: "$$$", dineSafe: "unconditional", hygiene: 98, google: 4.6, reviews: 1450, pickup: true, radius: 6, dishes: 8 },
+  { id: "rest_bar_raval", name: "Bar Raval", cuisine: "Spanish tapas", neighborhood: "Palmerston", postal: "M6G 1C7", address: "505 College St, Toronto, ON M6G 1C7", phone: "(416) 530-2000", hours: "Lun–Ven 16:00–02:00, Sam–Dim 12:00–02:00", price: "$$$", dineSafe: "unconditional", hygiene: 98, google: 4.7, reviews: 2100, pickup: true, radius: 6, dishes: 8 },
+  { id: "rest_dreyfus", name: "Dreyfus", cuisine: "French-American", neighborhood: "Harbord", postal: "M5S 1B1", address: "96 Harbord St, Toronto, ON M5S 1B1", phone: "(416) 323-1281", hours: "Mar–Sam 17:00–22:00, Dim 17:00–21:00", price: "$$$$", dineSafe: "unconditional", hygiene: 99, google: 4.7, reviews: 590, pickup: true, radius: 6, dishes: 8 },
+  { id: "rest_actinolite", name: "Actinolite Restaurant", cuisine: "Canadian seasonal", neighborhood: "Queen West", postal: "M6J 1J3", address: "971 Queen St W, Toronto, ON M6J 1J3", phone: "(416) 913-2997", hours: "Mar–Dim 17:30–22:00", price: "$$$$", dineSafe: "unconditional", hygiene: 99, google: 4.7, reviews: 760, pickup: true, radius: 6, dishes: 8 },
+  { id: "rest_danico", name: "DaNico", cuisine: "Italian", neighborhood: "Davenport", postal: "M4V 2C9", address: "444 Davenport Rd, Toronto, ON M4V 2C9", phone: "(416) 519-5233", hours: "Lun–Dim 17:00–22:00", price: "$$$", dineSafe: "unconditional", hygiene: 98, google: 4.7, reviews: 340, pickup: true, radius: 6, dishes: 8 },
+  { id: "rest_bar_prima", name: "Bar Prima", cuisine: "Italian aperitivo", neighborhood: "King West", postal: "M5V 2E9", address: "600 King St W, Toronto, ON M5V 2E9", phone: "(416) 360-0433", hours: "Lun–Dim 11:30–22:00", price: "$$$", dineSafe: "unconditional", hygiene: 98, google: 4.6, reviews: 620, pickup: true, radius: 6, dishes: 8 },
+  { id: "rest_pai", name: "Pai Northern Thai Kitchen", cuisine: "Northern Thai", neighborhood: "Kensington", postal: "M5V 2C4", address: "18 Duncan St, Toronto, ON M5V 2C4", phone: "(416) 901-4724", hours: "Lun–Dim 11:30–22:00, Ven–Sam 11:30–23:00", price: "$$", dineSafe: "unconditional", hygiene: 98, google: 4.7, reviews: 3600, pickup: true, radius: 6, dishes: 9 },
+  { id: "rest_rd", name: "R&D", cuisine: "Modern Chinese", neighborhood: "Spadina", postal: "M5T 2E7", address: "241 Spadina Ave, Toronto, ON M5T 2E7", phone: "(416) 586-0000", hours: "Lun–Ven 11:30–15:00 · 17:00–22:00, Sam–Dim 12:00–22:00", price: "$$$", dineSafe: "unconditional", hygiene: 97, google: 4.5, reviews: 1500, pickup: true, radius: 6, dishes: 8 },
+  { id: "rest_black_blue", name: "Black and Blue", cuisine: "Steakhouse", neighborhood: "Entertainment District", postal: "M5V 1N3", address: "588 King St W, Toronto, ON M5V 1N3", phone: "(416) 977-7500", hours: "Lun–Dim 11:30–23:00", price: "$$$", dineSafe: "unconditional", hygiene: 98, google: 4.3, reviews: 2800, pickup: true, radius: 7, dishes: 8 },
+  { id: "rest_inspire", name: "Inspire Restaurant", cuisine: "Contemporary Canadian", neighborhood: "Yorkville", postal: "M4W 3A6", address: "18 King St E, Toronto, ON M5C 1C4", phone: "(416) 363-6000", hours: "Lun–Ven 11:30–22:00, Sam 17:00–22:00", price: "$$$$", dineSafe: "unconditional", hygiene: 98, google: 4.6, reviews: 610, pickup: true, radius: 6, dishes: 8 },
+  { id: "rest_peters", name: "Peter's Fine Dining Steak and Seafood", cuisine: "Steak / seafood", neighborhood: "North York", postal: "M2N 5R9", address: "5434 Yonge St, Toronto, ON M2N 5R9", phone: "(416) 226-1771", hours: "Lun–Dim 17:00–22:00, Dim 16:00–21:00", price: "$$$$", dineSafe: "unconditional", hygiene: 98, google: 4.6, reviews: 1230, pickup: true, radius: 8, dishes: 8 },
 ];
 const restName = (id) => (RESTAURANTS.find((r) => r.id === id) || {}).name || "Partner kitchen";
 const restOf = (id) => RESTAURANTS.find((r) => r.id === id) || {};
@@ -209,6 +229,119 @@ const D = {
     ["Breakfast Burrito", 12, "nonveg", ["HIGH_PROTEIN"], 540, 30], ["Acai Bowl", 11, "veg", ["VEGAN"], 390, 8],
     ["Turkey & Egg Sandwich", 12, "nonveg", ["HIGH_PROTEIN"], 500, 32], ["Greek Yogurt Parfait", 9, "veg", ["VEGETARIAN"], 340, 18],
     ["Smoked Salmon Toast", 13, "nonveg", ["GLUTEN_FREE"], 420, 26], ["Garden Veggie Wrap", 10, "veg", ["VEGAN"], 410, 13],
+  ],
+  rest_alo_canoe: [
+    ["Foie Gras Torchon", 32, "nonveg", ["BALANCED"], 520, 16], ["Duo of Local Trout", 39, "nonveg", ["GLUTEN_FREE"], 480, 42],
+    ["Dry-Aged Duck", 48, "nonveg", ["HIGH_PROTEIN"], 640, 52], ["Lobster & Shellfish", 58, "nonveg", ["GLUTEN_FREE"], 560, 40],
+    ["Risotto of the Day", 36, "veg", ["VEGETARIAN"], 520, 12], ["Chocolate Marquise", 18, "veg", ["VEGETARIAN"], 420, 8],
+    ["House Sourdough", 10, "veg", ["VEGETARIAN"], 320, 8], ["Wine Pairing Tasting", 95, "veg", ["VEGAN"], 200, 2],
+  ],
+  rest_edulis: [
+    ["Mushroom & Black Truffle Toast", 26, "veg", ["VEGETARIAN"], 460, 10], ["Local Oysters", 28, "nonveg", ["GLUTEN_FREE"], 340, 18],
+    ["Pan-Seared Scallops", 42, "nonveg", ["GLUTEN_FREE"], 480, 36], ["Roasted Heritage Chicken", 45, "nonveg", ["HIGH_PROTEIN"], 560, 50],
+    ["Butter-Basted Lobster", 55, "nonveg", ["GLUTEN_FREE"], 520, 42], ["Seasonal Market Fish", 44, "nonveg", ["GLUTEN_FREE"], 470, 40],
+  ],
+  rest_bar_isabel: [
+    ["Pan con Tomate", 12, "veg", ["VEGETARIAN"], 280, 4], ["Croquetas de Jamón", 16, "nonveg", ["BALANCED"], 360, 12],
+    ["Grilled Octopus", 24, "nonveg", ["GLUTEN_FREE"], 420, 30], ["Beef Tongue", 22, "nonveg", ["HIGH_PROTEIN"], 480, 38],
+    ["Secreto Ibérico", 34, "nonveg", ["HIGH_PROTEIN"], 560, 44], ["Squid Ink Fideuà", 28, "nonveg", ["BALANCED"], 520, 30],
+    ["Gambas al Ajillo", 22, "nonveg", ["GLUTEN_FREE"], 400, 26], ["Basque Cheesecake", 14, "veg", ["VEGETARIAN"], 380, 10],
+  ],
+  rest_20_victoria: [
+    ["Charcuterie Board", 28, "nonveg", ["BALANCED"], 460, 24], ["Wagyu Beef Tartare", 24, "nonveg", ["HIGH_PROTEIN"], 420, 34],
+    ["Smoked Trout", 26, "nonveg", ["GLUTEN_FREE"], 380, 30], ["Confit Pork Belly", 34, "nonveg", ["HIGH_PROTEIN"], 580, 40],
+    ["Hand-Cut Pappardelle", 27, "veg", ["VEGETARIAN"], 520, 16], ["Dry-Aged Striploin", 52, "nonveg", ["HIGH_PROTEIN"], 680, 55],
+    ["Seasonal Vegetables", 18, "veg", ["VEGAN"], 320, 8], ["Crème Caramel", 13, "veg", ["VEGETARIAN"], 360, 8],
+  ],
+  rest_giulietta: [
+    ["Marinara Pizza", 16, "veg", ["VEGETARIAN"], 520, 16], ["Margherita", 18, "veg", ["VEGETARIAN"], 560, 18],
+    ["Funghi Pizza", 21, "veg", ["VEGETARIAN"], 540, 16], ["Tagliatelle al Ragu", 24, "nonveg", ["BALANCED"], 580, 34],
+    ["Cacio e Pepe", 22, "veg", ["VEGETARIAN"], 540, 18], ["Arancini", 13, "veg", ["VEGETARIAN"], 360, 10],
+    ["Rigatoni Amatriciana", 23, "nonveg", ["BALANCED"], 560, 28], ["Tiramisu", 12, "veg", ["VEGETARIAN"], 380, 8],
+  ],
+  rest_don_alfonso: [
+    ["Handmade Gnocchi", 32, "veg", ["VEGETARIAN"], 540, 12], ["Risotto alla Milanese", 34, "veg", ["VEGETARIAN"], 560, 14],
+    ["Lobster Ravioli", 46, "nonveg", ["BALANCED"], 520, 32], ["Agnolotti", 36, "veg", ["VEGETARIAN"], 500, 12],
+    ["Branzino", 48, "nonveg", ["GLUTEN_FREE"], 480, 42], ["Wagyu Filet", 65, "nonveg", ["HIGH_PROTEIN"], 640, 52],
+    ["Selection of Artisan Cheese", 24, "veg", ["VEGETARIAN"], 360, 14], ["Zabaglione", 16, "veg", ["VEGETARIAN"], 360, 8],
+  ],
+  rest_osteria_giulia: [
+    ["Pappardelle al Cinghiale", 26, "nonveg", ["BALANCED"], 560, 32], ["Bucatini all'Amatriciana", 24, "nonveg", ["BALANCED"], 540, 26],
+    ["Spaghetti alle Vongole", 27, "nonveg", ["GLUTEN_FREE"], 500, 24], ["Tortellini in Brodo", 23, "veg", ["VEGETARIAN"], 480, 14],
+    ["Whole Grilled Branzino", 42, "nonveg", ["GLUTEN_FREE"], 460, 40], ["Veal Milanese", 38, "nonveg", ["HIGH_PROTEIN"], 580, 46],
+    ["Burrata", 18, "veg", ["VEGETARIAN"], 380, 12], ["Panna Cotta", 12, "veg", ["VEGETARIAN"], 340, 8],
+  ],
+  rest_quetzal: [
+    ["Fresh Nixtamal Tortillas", 14, "veg", ["VEGAN"], 360, 6], ["Guacamole & Totopos", 16, "veg", ["VEGAN"], 380, 6],
+    ["Pescado Zarandeado", 38, "nonveg", ["GLUTEN_FREE"], 520, 40], ["Al Pastor", 24, "nonveg", ["BALANCED"], 520, 30],
+    ["Carne a la Tampiqueña", 34, "nonveg", ["HIGH_PROTEIN"], 620, 48], ["Queso Fundido", 18, "veg", ["VEGETARIAN"], 440, 16],
+    ["Mole Negro", 28, "nonveg", ["BALANCED"], 560, 34], ["Flan de Cajeta", 13, "veg", ["VEGETARIAN"], 380, 8],
+  ],
+  rest_mamakas: [
+    ["Grilled Octopus", 24, "nonveg", ["GLUTEN_FREE"], 420, 30], ["Spanakopita", 14, "veg", ["VEGETARIAN"], 440, 12],
+    ["Lamb Ribs", 28, "nonveg", ["HIGH_PROTEIN"], 560, 40], ["Moussaka", 22, "veg", ["VEGETARIAN"], 520, 18],
+    ["Tzatziki & Pita", 12, "veg", ["VEGETARIAN"], 380, 8], ["Grilled Whole Fish", 36, "nonveg", ["GLUTEN_FREE"], 460, 40],
+    ["Pastitsio", 23, "nonveg", ["BALANCED"], 560, 30], ["Baklava", 11, "veg", ["VEGETARIAN"], 360, 8],
+  ],
+  rest_bar_raval: [
+    ["Tosta de Boquerones", 13, "nonveg", ["BALANCED"], 320, 12], ["Patatas Bravas", 11, "veg", ["VEGAN"], 380, 6],
+    ["Gambas al Ajillo", 19, "nonveg", ["GLUTEN_FREE"], 400, 26], ["Pincho de Tortilla", 12, "veg", ["VEGETARIAN"], 360, 10],
+    ["Chistorra", 15, "nonveg", ["BALANCED"], 420, 20], ["Oysters", 18, "nonveg", ["GLUTEN_FREE"], 320, 14],
+    ["Jamón Ibérico", 26, "nonveg", ["BALANCED"], 380, 22], ["Crema Catalana", 12, "veg", ["VEGETARIAN"], 360, 8],
+  ],
+  rest_dreyfus: [
+    ["Chicken Liver Mousse", 16, "nonveg", ["BALANCED"], 360, 14], ["Frozen Foie Gras", 24, "nonveg", ["BALANCED"], 380, 12],
+    ["Wagyu Tartare", 26, "nonveg", ["HIGH_PROTEIN"], 440, 36], ["Duck au Poivre", 38, "nonveg", ["HIGH_PROTEIN"], 600, 46],
+    ["Roasted Trout", 32, "nonveg", ["GLUTEN_FREE"], 460, 40], ["Steak Frites", 40, "nonveg", ["HIGH_PROTEIN"], 640, 50],
+    ["Croque Madame", 20, "nonveg", ["BALANCED"], 520, 24], ["Floating Island", 13, "veg", ["VEGETARIAN"], 360, 8],
+  ],
+  rest_actinolite: [
+    ["Seasonal Tasting Menu", 85, "veg", ["VEGETARIAN"], 1200, 40], ["Foraged Mushroom Toast", 18, "veg", ["VEGETARIAN"], 360, 8],
+    ["Pan-Roasted Venison", 42, "nonveg", ["HIGH_PROTEIN"], 600, 50], ["Market Fish", 38, "nonveg", ["GLUTEN_FREE"], 460, 42],
+    ["Local Cheese Plate", 20, "veg", ["VEGETARIAN"], 420, 16], ["Apple & Cider Dessert", 14, "veg", ["VEGETARIAN"], 340, 6],
+    ["Heritage Grain Bowl", 22, "veg", ["VEGAN"], 480, 14], ["Seasonal Roots", 16, "veg", ["VEGAN"], 340, 6],
+  ],
+  rest_danico: [
+    ["Fritto Misto", 18, "nonveg", ["GLUTEN_FREE"], 420, 22], ["Tagliatelle al Tartufo", 32, "veg", ["VEGETARIAN"], 560, 14],
+    ["Rigatoni al Ragu", 26, "nonveg", ["BALANCED"], 580, 32], ["Burrata di Puglia", 19, "veg", ["VEGETARIAN"], 400, 12],
+    ["Branzino al Limone", 40, "nonveg", ["GLUTEN_FREE"], 460, 42], ["Osso Buco", 46, "nonveg", ["HIGH_PROTEIN"], 660, 50],
+    ["Gnocchi al Pesto", 24, "veg", ["VEGETARIAN"], 520, 12], ["Affogato", 10, "veg", ["VEGETARIAN"], 260, 6],
+  ],
+  rest_bar_prima: [
+    ["Spritz di Aperol", 12, "veg", ["VEGAN"], 180, 0], ["Risotto al Funghi", 24, "veg", ["VEGETARIAN"], 540, 12],
+    ["Vitello Tonnato", 20, "nonveg", ["BALANCED"], 460, 30], ["Cicchetti Selection", 16, "nonveg", ["BALANCED"], 380, 16],
+    ["Rigatoni alla Vodka", 23, "veg", ["VEGETARIAN"], 560, 18], ["Pizza Prima", 19, "veg", ["VEGETARIAN"], 540, 16],
+    ["Carpaccio di Manzo", 22, "nonveg", ["HIGH_PROTEIN"], 420, 34], ["Tiramisù", 12, "veg", ["VEGETARIAN"], 380, 8],
+  ],
+  rest_pai: [
+    ["Khao Soi", 19, "nonveg", ["BALANCED"], 560, 24], ["Pad Thai", 18, "nonveg", ["BALANCED"], 540, 22],
+    ["Tom Yum Soup", 12, "nonveg", ["SPICY", "GLUTEN_FREE"], 320, 12], ["Green Curry", 19, "nonveg", ["SPICY"], 520, 26],
+    ["Mango Sticky Rice", 9, "veg", ["VEGETARIAN"], 340, 6], ["Crying Tiger Beef", 22, "nonveg", ["SPICY", "HIGH_PROTEIN"], 540, 38],
+    ["Papaya Salad", 12, "veg", ["VEGAN", "SPICY"], 320, 6], ["Northern Sausage", 16, "nonveg", ["BALANCED"], 420, 22],
+  ],
+  rest_rd: [
+    ["Peking Duck", 42, "nonveg", ["HIGH_PROTEIN"], 620, 40], ["Xiao Long Bao", 16, "nonveg", ["BALANCED"], 380, 12],
+    ["Dan Dan Noodles", 18, "nonveg", ["SPICY"], 520, 22], ["Kung Pao Chicken", 20, "nonveg", ["SPICY", "HIGH_PROTEIN"], 540, 38],
+    ["Mapo Tofu", 17, "veg", ["VEGAN", "SPICY"], 460, 12], ["Wok-Fried Greens", 14, "veg", ["VEGAN"], 340, 6],
+    ["Char Siu", 24, "nonveg", ["BALANCED"], 520, 32], ["Egg Fried Rice", 12, "veg", ["VEGETARIAN"], 460, 12],
+  ],
+  rest_black_blue: [
+    ["Classic Caesar Salad", 15, "nonveg", ["BALANCED"], 420, 10], ["Oysters on the Half Shell", 21, "nonveg", ["GLUTEN_FREE"], 320, 16],
+    ["Tomahawk Steak (40oz)", 125, "nonveg", ["HIGH_PROTEIN"], 1200, 90], ["Ribeye (16oz)", 62, "nonveg", ["HIGH_PROTEIN"], 820, 58],
+    ["Wagyu Striploin", 95, "nonveg", ["HIGH_PROTEIN"], 880, 60], ["Lobster Mac & Cheese", 24, "nonveg", ["BALANCED"], 540, 22],
+    ["Truffle Fries", 13, "veg", ["VEGETARIAN"], 460, 8], ["Crème Brûlée", 12, "veg", ["VEGETARIAN"], 380, 8],
+  ],
+  rest_inspire: [
+    ["Canadian Beet Salad", 16, "veg", ["VEGAN"], 360, 8], ["Seared Scallops", 28, "nonveg", ["GLUTEN_FREE"], 420, 34],
+    ["BC Sablefish", 42, "nonveg", ["GLUTEN_FREE"], 500, 42], ["Ontario Pork Belly", 34, "nonveg", ["HIGH_PROTEIN"], 580, 40],
+    ["AAA Beef Tenderloin", 48, "nonveg", ["HIGH_PROTEIN"], 640, 50], ["Wild Mushroom Risotto", 26, "veg", ["VEGETARIAN"], 540, 14],
+    ["Lobster Bisque", 18, "nonveg", ["BALANCED"], 380, 12], ["Maple Crème Brûlée", 13, "veg", ["VEGETARIAN"], 380, 8],
+  ],
+  rest_peters: [
+    ["Caesar Salad", 14, "nonveg", ["BALANCED"], 420, 10], ["Lobster Bisque", 16, "nonveg", ["BALANCED"], 380, 12],
+    ["NY Striploin (12oz)", 55, "nonveg", ["HIGH_PROTEIN"], 760, 52], ["Filet Mignon (8oz)", 58, "nonveg", ["HIGH_PROTEIN"], 700, 48],
+    ["Atlantic Lobster Tail", 49, "nonveg", ["GLUTEN_FREE"], 460, 36], ["Jumbo Shrimp Scampi", 32, "nonveg", ["BALANCED"], 520, 38],
+    ["Garlic Mashed Potatoes", 10, "veg", ["VEGETARIAN"], 380, 8], ["Cheesecake", 12, "veg", ["VEGETARIAN"], 420, 10],
   ],
 };
 // Build a flat meals array from D
@@ -405,6 +538,17 @@ function setModule(key, on) {
   try { localStorage.setItem("scd_modules", JSON.stringify(m)); } catch {}
   navigate();
 }
+/* ---- restaurant visibility (admin can uncheck to hide from customers) ---- */
+const HIDDEN_REST_KEY = "scd_hidden_rest";
+function hiddenRests() { try { return JSON.parse(localStorage.getItem(HIDDEN_REST_KEY) || "[]"); } catch { return []; } }
+function restVisible(id) { return !hiddenRests().includes(id); }
+function visibleRestaurants() { return RESTAURANTS.filter((r) => restVisible(r.id)); }
+function setRestVisible(id, on) {
+  let h = hiddenRests();
+  if (on) h = h.filter((x) => x !== id); else if (!h.includes(id)) h.push(id);
+  try { localStorage.setItem(HIDDEN_REST_KEY, JSON.stringify(h)); } catch {}
+  navigate();
+}
 function renderLogin() {
   return `
     <div class="partner-shell">
@@ -478,7 +622,7 @@ function renderHome() {
     ["3", "Get delivery", "One box, one bill, weekly or monthly. All-inclusive.", "truck"],
   ].map(([n, t, d, ic]) => `<div class="step"><div class="step-num">${n}</div><div class="step-body"><div class="step-head">${ico(ic)}<span>${t}</span></div><div class="step-d">${d}</div></div></div>`).join("");
 
-  const homeRestaurants = RESTAURANTS.filter((r) => {
+  const homeRestaurants = visibleRestaurants().filter((r) => {
     if (homeFilter.q && !(r.name.toLowerCase().includes(homeFilter.q) || r.cuisine.toLowerCase().includes(homeFilter.q))) return false;
     if (homeFilter.type === "high-protein") { const hp = meals.filter((m) => m.restaurantId === r.id && m.badges.includes("HIGH_PROTEIN")).length; if (!hp) return false; }
     if (homeFilter.type === "vegetarian") { const vg = meals.filter((m) => m.restaurantId === r.id && m.type === "veg").length; if (!vg) return false; }
@@ -486,7 +630,7 @@ function renderHome() {
     if (homeFilter.type === "under-13") { const cheap = meals.some((m) => m.restaurantId === r.id && m.price <= 12); if (!cheap) return false; }
     return true;
   }).slice(0, 6);
-  const top = (homeRestaurants.length ? homeRestaurants : RESTAURANTS.slice(0, 6)).map((r) => `
+  const top = (homeRestaurants.length ? homeRestaurants : visibleRestaurants().slice(0, 6)).map((r) => `
     <div class="rest-card ${r.dineSafe !== "unconditional" ? "warn" : ""}">
       <div class="rest-avatar">${esc(r.name[0])}</div>
       <div class="rest-info"><div class="rest-name">${esc(r.name)}</div>
@@ -623,7 +767,7 @@ function renderHome() {
       <section class="top-rest">
         <div class="kicker" style="margin:0 0 12px">${ico("store")} Partner kitchens</div>
         <div class="top-grid">${top}</div>
-        <a href="#restaurants" class="btn ghost sm" style="margin-top:14px">View all ${RESTAURANTS.length} restaurants ${ico("arrow")}</a>
+        <a href="#restaurants" class="btn ghost sm" style="margin-top:14px">View all ${visibleRestaurants().length} restaurants ${ico("arrow")}</a>
       </section>` : ""}
 
       <footer class="foot">${versionBadge()}
@@ -766,8 +910,8 @@ function renderAuction() {
 let restFilter = { cuisine: "all", area: "all", diet: "all" };
 let homeFilter = { type: "all", q: "" }; // homepage search + bold chips
 function renderRestaurants() {
-  const cuisines = [...new Set(RESTAURANTS.map((r) => r.cuisine))];
-  const list = RESTAURANTS.filter((r) => {
+  const cuisines = [...new Set(visibleRestaurants().map((r) => r.cuisine))];
+  const list = visibleRestaurants().filter((r) => {
     if (restFilter.cuisine !== "all" && r.cuisine !== restFilter.cuisine) return false;
     if (restFilter.area !== "all" && r.radius < (restFilter.area === "nearby" ? 6 : 7)) return false;
     if (restFilter.diet !== "all" && !r.dishes) return false;
@@ -818,7 +962,7 @@ function setRestFilter(field, val) { restFilter[field] = val; navigate(); }
 function renderRestaurantMenu() {
   const p = routeParams();
   const rid = p.rest || RESTAURANTS[0].id;
-  const r = RESTAURANTS.find((x) => x.id === rid) || RESTAURANTS[0];
+  const r = RESTAURANTS.find((x) => x.id === rid) || visibleRestaurants()[0];
   const o = getOrder(rid);
   const menu = meals.filter((m) => m.restaurantId === r.id);
   const tot = orderTotals(rid);
@@ -842,9 +986,15 @@ function renderRestaurantMenu() {
       <header class="topbar"><a href="#restaurants" class="brand">${ico("arrowLeft")}<div><b>${esc(BRAND)}</b></div></a>
         <a href="#restaurants" class="navbtn ghost sm">${ico("store")} All restaurants</a></header>
       <section class="build-hero">
-        <div class="eyebrow">${esc(r.cuisine)} · ${esc(r.neighborhood)}</div>
+        <div class="eyebrow">${esc(r.cuisine)} · ${esc(r.neighborhood)}${r.price ? " · " + esc(r.price) : ""}</div>
         <h1>${esc(r.name)}</h1>
-        <p>${googleHtml(r)} ${dineSafeHtml(r)}</p></section>
+        <p>${googleHtml(r)} ${dineSafeHtml(r)}</p>
+        <div class="rest-profile">
+          ${r.address ? `<span>${ico("pin")} ${esc(r.address)}</span>` : ""}
+          ${r.phone ? `<a href="tel:${esc(r.phone.replace(/[^0-9+]/g, ""))}">${ico("tap")} ${esc(r.phone)}</a>` : ""}
+          ${r.hours ? `<span>${ico("clock")} ${esc(r.hours)}</span>` : ""}
+        </div>
+      </section>
       <section class="order-tier">
         <div class="ot-label">${ico("calendar")} Your weekly order from ${esc(r.name)} — pick a plan</div>
         <div class="ot-tiers">${tierBtns}</div>
@@ -1233,7 +1383,7 @@ function applyBudget() {
 }
 function clearBox() { buildState.selected = {}; budgetState.continue = false; flash("Box cleared."); navigate(); }
 function renderBuild() {
-  const cuisines = [...new Set(RESTAURANTS.map((r) => r.cuisine))];
+  const cuisines = [...new Set(visibleRestaurants().map((r) => r.cuisine))];
   const totals = buildTotals();
   const budget = budgetValue();
   const list = buildMeals();
@@ -1859,19 +2009,31 @@ function renderAdmin() {
       </label>
     </div>`;
   }).join("");
+  const restRows = RESTAURANTS.map((r) => {
+    const on = restVisible(r.id);
+    return `<div class="admin-row">
+      <div class="admin-info"><div class="admin-label">${esc(r.name)} <span class="muted sm">· ${esc(r.cuisine)}</span></div><div class="muted sm">${esc(r.address || r.neighborhood)} · ${r.google.toFixed(1)}★ (${r.reviews.toLocaleString()})</div></div>
+      <label class="switch">
+        <input type="checkbox" ${on ? "checked" : ""} onchange="setRestVisible('${r.id}', this.checked)" />
+        <span class="slider"></span>
+      </label>
+    </div>`;
+  }).join("");
   return `
     <div class="partner-shell">
       <header class="p-topbar"><div class="p-brand">${ico("gear")}<div><b>${esc(BRAND)}</b><span>platform admin · owner only</span></div></div>
-        <nav class="p-nav"><a href="#admin" class="p-navbtn active" data-nav="admin">${ico("gear")} Modules</a></nav>
+        <nav class="p-nav"><a href="#admin" class="p-navbtn active" data-nav="admin">${ico("gear")} Admin</a></nav>
         <a href="#" class="btn p-outline sm" onclick="adminLogout()">${ico("arrowLeft")} Sign out</a></header>
-      <section class="p-hero"><div class="eyebrow dark">Module control</div>
-        <h1>Enable or disable features</h1>
-        <p>Every module is ON by default. Toggle any off to hide it from the app. Changes save instantly and persist.</p></section>
+      <section class="p-hero"><div class="eyebrow dark">Platform control</div>
+        <h1>Enable features &amp; restaurants</h1>
+        <p>Toggle features and hide/show any restaurant. Uncheck a restaurant to remove it from the customer app. Changes save instantly.</p></section>
       <section class="admin-board">
-        <div class="admin-head">Module</div>
+        <div class="admin-head">Features</div>
         ${rows}
+        <div class="admin-head">Restaurants (uncheck to hide from customers)</div>
+        ${restRows}
       </section>
-      <footer class="p-foot">Admin panel — control which features are live. Default: all ON.</footer>
+      <footer class="p-foot">Admin panel — control features and restaurant visibility. Default: all ON.</footer>
     </div>`;
 }
 
@@ -1886,6 +2048,7 @@ window.boxTotal = boxTotal; window.selectedItems = selectedItems; window.clearBo
 window.orderAdd = orderAdd; window.setTier = setTier; window.clearOrder = clearOrder; window.ORDERS = ORDERS;
 window.placeOrders = placeOrders; window.CONFIRMED_ORDERS = CONFIRMED_ORDERS; window.confirmDelivery = confirmDelivery; window.changeWindow = changeWindow; window.confirmAndPlace = confirmAndPlace; window.setDeliveryDate = setDeliveryDate;
 window.setMenuRest = setMenuRest; window.menuFindByName = menuFindByName; window.menuAddManual = menuAddManual; window.menuToggleHidden = menuToggleHidden; window.menuDelete = menuDelete; window.menuEditPrice = menuEditPrice; window.MENU_STORE = MENU_STORE;
+window.setRestVisible = setRestVisible; window.restVisible = restVisible; window.visibleRestaurants = visibleRestaurants;
 window.setDeliveryWindow = setDeliveryWindow; window.setCadence = setCadence; window.toggleWeek = toggleWeek; window.advanceTrack = advanceTrack; window.TRACK = TRACK;
 window.setRestFilter = setRestFilter; window.demoNext = demoNext; window.demoPrev = demoPrev;
 window.meals = meals; window.RESTAURANTS = RESTAURANTS;
