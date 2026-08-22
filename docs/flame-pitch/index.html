@@ -49,6 +49,16 @@
   .btn { display:inline-block; background:linear-gradient(135deg,#14b8a6,#0d9488); color:#fff; font-weight:800; padding:14px 28px; border-radius:14px; text-decoration:none; font-size:17px; box-shadow:0 8px 24px rgba(13,148,136,.35); }
   .foot { text-align:center; padding:30px; color:var(--muted); font-size:13px; }
   .disclaimer { background:#fff7ed; border:1px solid #fdba74; color:#9a3412; font-size:12px; padding:10px 14px; border-radius:10px; margin:16px 0; }
+  /* connect section */
+  .connect { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-top:14px; }
+  @media(max-width:760px){ .connect{ grid-template-columns:1fr; } }
+  .connect-card { background:#fff; border:1px solid var(--line); border-radius:16px; padding:20px; }
+  .connect-card .ch { display:flex; align-items:center; gap:10px; font-size:17px; font-weight:900; margin-bottom:8px; }
+  .connect-card .ch .cico { width:34px; height:34px; border-radius:10px; display:grid; place-items:center; color:#fff; font-weight:900; font-size:16px; }
+  .connect-card p { color:var(--muted); font-size:14px; margin-bottom:8px; }
+  .connect-card .use { background:#f0fdfa; border:1px solid #99f6e4; border-radius:10px; padding:10px; font-size:13px; color:#0f766e; }
+  .connect-card .use b { display:block; margin-bottom:2px; }
+  .wa { background:#25D366; } .gg { background:#4285F4; } .ig { background:linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888); }
 </style>
 </head>
 <body>
@@ -59,6 +69,7 @@
         <a href="#solutions">Solutions</a>
         <a href="#kitchens">Our Kitchens</a>
         <a href="#gallery">Gallery</a>
+        <a href="#connect">Connect</a>
         <a href="#start">Get Started</a>
       </nav>
       <div class="topbar-contact">11330 Santa Monica Blvd, Los Angeles, CA 90025</div>
@@ -153,6 +164,30 @@
       </div>
     </section>
 
+    <!-- CONNECT -->
+    <section id="connect">
+      <div class="kicker">Connect with Flame</div>
+      <div class="h2">Reach your regulars where they already are</div>
+      <div class="sub">Your weekly sofreh lives where your customers live — their phone, their reviews, their feed.</div>
+      <div class="connect">
+        <div class="connect-card">
+          <div class="ch"><span class="cico wa">✆</span> WhatsApp</div>
+          <p>Send the weekly menu + order link straight to your regulars' phones.</p>
+          <div class="use"><b>How to use it</b>Set up a "Flame Weekly" broadcast list. Every Sunday, send the week's sofreh menu with a one-tap order link — no app needed.</div>
+        </div>
+        <div class="connect-card">
+          <div class="ch"><span class="cico gg">G</span> Google Profile</div>
+          <p>Your menu, hours, reviews and pickup info all in one place customers trust.</p>
+          <div class="use"><b>How to use it</b>List the weekly sofreh on your Google Business Profile with a "Order weekly" link. New customers finding you on Google can subscribe in one tap.</div>
+        </div>
+        <div class="connect-card">
+          <div class="ch"><span class="cico ig">◎</span> Instagram</div>
+          <p>Show the food, the chefs, and the weekly box — appetite is visual.</p>
+          <div class="use"><b>How to use it</b>Post the week's sofreh box with a "Link in bio to subscribe." Run a weekly "first box free" offer to your followers — they're already your fans.</div>
+        </div>
+      </div>
+    </section>
+
     <!-- CTA -->
     <section id="start">
       <div class="cta">
@@ -164,6 +199,6 @@
     </section>
   </div>
 
-  <div class="foot">🔥 Flame International · 11330 Santa Monica Blvd, Los Angeles, CA 90025 · Flame Weekly Family Sofreh Pilot</div>
+  <div class="foot">🔥 Flame International · 11330 Santa Monica Blvd, Los Angeles, CA 90025 · WhatsApp · Google · @flameinternational · Flame Weekly Family Sofreh Pilot</div>
 </body>
 </html>
