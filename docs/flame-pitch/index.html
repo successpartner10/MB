@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Flame International — Weekly Lunch & Tiffin Subscription</title>
+<style>
+  :root { --brand:#0d9488; --brand-d:#0f766e; --ink:#0b1220; --muted:#1f2937; --line:#cbd5e1; --bg:#f5f5f7; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:"Segoe UI",-apple-system,sans-serif; background:var(--bg); color:var(--ink); line-height:1.5; }
+  .wrap { max-width:1000px; margin:0 auto; padding:0 24px; }
+  /* hero */
+  .hero { position:relative; height:380px; background-size:cover; background-position:center; display:flex; align-items:flex-end; }
+  .hero-overlay { position:absolute; inset:0; background:linear-gradient(to top, rgba(11,18,32,.9), rgba(11,18,32,.2)); }
+  .hero-inner { position:relative; z-index:2; padding:32px 24px 40px; max-width:1000px; margin:0 auto; width:100%; color:#fff; }
+  .hero-tag { font-size:12px; font-weight:800; text-transform:uppercase; letter-spacing:.1em; color:#6ee7b7; }
+  .hero-title { font-size:clamp(30px,5vw,46px); font-weight:900; margin:8px 0; }
+  .hero-sub { font-size:18px; opacity:.95; max-width:640px; }
+  /* section */
+  section { padding:40px 0; }
+  .h2 { font-size:28px; font-weight:900; letter-spacing:-.02em; margin-bottom:8px; }
+  .sub { color:var(--muted); font-size:16px; margin-bottom:20px; max-width:720px; }
+  .kicker { font-size:12px; font-weight:800; letter-spacing:.12em; text-transform:uppercase; color:var(--brand); margin-bottom:6px; }
+  /* the money card */
+  .money { background:linear-gradient(135deg,#0f766e,#0d9488); color:#fff; border-radius:20px; padding:32px; display:grid; grid-template-columns:1fr 1fr; gap:24px; }
+  .money-num { font-size:44px; font-weight:900; line-height:1; }
+  .money-l { font-size:15px; opacity:.95; margin-top:6px; }
+  .money-item { background:rgba(255,255,255,.08); border-radius:14px; padding:20px; }
+  @media(max-width:640px){ .money{ grid-template-columns:1fr; } }
+  /* cards */
+  .grid3 { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
+  @media(max-width:760px){ .grid3{ grid-template-columns:1fr; } }
+  .card { background:#fff; border:1px solid var(--line); border-radius:16px; padding:20px; box-shadow:0 1px 2px rgba(0,0,0,.04),0 8px 24px rgba(0,0,0,.06); }
+  .card .ic { width:26px; height:26px; color:var(--brand); }
+  .card b { font-size:17px; display:block; margin:8px 0 4px; }
+  .card p { color:var(--muted); font-size:14px; }
+  /* brands */
+  .brands { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
+  @media(max-width:760px){ .brands{ grid-template-columns:1fr; } }
+  .brand-card { background:#fff; border-radius:16px; overflow:hidden; border:1px solid var(--line); }
+  .brand-card img { width:100%; height:140px; object-fit:cover; }
+  .brand-card div { padding:14px; }
+  .brand-card b { font-size:16px; }
+  .brand-card span { display:block; color:var(--muted); font-size:13px; margin-top:4px; }
+  /* cta */
+  .cta { text-align:center; background:#fff; border:1px solid var(--line); border-radius:20px; padding:36px; }
+  .btn { display:inline-block; background:linear-gradient(135deg,#14b8a6,#0d9488); color:#fff; font-weight:800; padding:14px 26px; border-radius:14px; text-decoration:none; font-size:17px; box-shadow:0 8px 24px rgba(13,148,136,.35); }
+  .foot { text-align:center; padding:30px; color:var(--muted); font-size:13px; }
+  .disclaimer { background:#fff7ed; border:1px solid #fdba74; color:#9a3412; font-size:12px; padding:10px 14px; border-radius:10px; margin:16px 0; }
+</style>
+</head>
+<body>
+  <div class="hero" style="background-image:url('img/flame-international-kabob-house-mediterr-2.jpg')">
+    <div class="hero-overlay"></div>
+    <div class="hero-inner">
+      <div class="hero-tag">Flame International · Pilot Proposal</div>
+      <div class="hero-title">Turn your 3 kitchens into a weekly lunch &amp; tiffin engine.</div>
+      <div class="hero-sub">Predictable recurring revenue. Cook to order, zero waste. One batched weekly drop — no per-order couriers.</div>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <!-- THE MONEY -->
+    <section>
+      <div class="kicker">The number that matters</div>
+      <div class="h2">$2,400 / month of predictable revenue — before a single walk-in</div>
+      <div class="sub">Your regulars subscribe ahead. You cook to their exact number. No chasing takeout, no leftover food, no cash-flow gap.</div>
+      <div class="money">
+        <div class="money-item"><div class="money-num">40</div><div class="money-l">weekly lunch subscribers</div></div>
+        <div class="money-item"><div class="money-num">$60</div><div class="money-l">per subscriber / week</div></div>
+        <div class="money-item"><div class="money-num">$2,400</div><div class="money-l">recurring revenue every month</div></div>
+        <div class="money-item"><div class="money-num">0%</div><div class="money-l">food waste — you cook what's committed</div></div>
+      </div>
+    </section>
+
+    <!-- WHY IT WORKS -->
+    <section>
+      <div class="kicker">What you get</div>
+      <div class="h2">Weekly commitment, not daily chaos</div>
+      <div class="grid3">
+        <div class="card"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 7h12l1 13H5z"/><path d="M9 10V6a3 3 0 0 1 6 0v4"/><path d="M9 16l2 2 4-4"/></svg><b>Weekly tiffin box</b><p>Customers commit to a weekly lunch set — you build to their number, delivered in one weekly drop.</p></div>
+        <div class="card"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 8l8-4 8 4v9l-8 4-8-4z"/><path d="M4 8l8 4 8-4"/><path d="M12 12v9"/></svg><b>Cook to order, zero waste</b><p>Pre-committed volume means you prep exactly what's sold — no leftovers, no guesswork.</p></div>
+        <div class="card"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 6h11v10H3z"/><path d="M14 9h4l3 3v4h-7"/><circle cx="7" cy="18" r="1.8"/><circle cx="17" cy="18" r="1.8"/></svg><b>One batched delivery</b><p>One scheduled drop (or pickup) per week — not paying a courier on every single order.</p></div>
+      </div>
+    </section>
+
+    <!-- 3 BRANDS -->
+    <section>
+      <div class="kicker">Built for all 3 of your brands</div>
+      <div class="h2">One platform, three kitchens</div>
+      <div class="sub">Each brand runs its own weekly menu + subscriptions, with a shared dashboard and payouts.</div>
+      <div class="brands">
+        <div class="brand-card"><img src="img/flame-international-kabob-house-mediterr-1.jpg" alt="Fiamma Ristorante"><div><b>Fiamma Ristorante</b><span>Mediterranean dinner &amp; weekly family boxes</span></div></div>
+        <div class="brand-card"><img src="img/flame-international-kabob-house-mediterr-3.jpg" alt="Flame Bakery"><div><b>Flame Bakery</b><span>Fresh-baked weekly bread &amp; pastry subscriptions</span></div></div>
+        <div class="brand-card"><img src="img/buddha-bowl-poke-bowl-healthy-meal-resta-1.jpg" alt="Flame Hookah Garden"><div><b>Flame Hookah Garden</b><span>Outdoor dining + event &amp; catering weekly drops</span></div></div>
+      </div>
+    </section>
+
+    <!-- HOW IT WORKS -->
+    <section>
+      <div class="kicker">How it works</div>
+      <div class="h2">Three simple steps</div>
+      <div class="grid3">
+        <div class="card"><b>1 · Customers subscribe</b><p>Sign up for a weekly lunch/tiffin set. Paid ahead — no chasing.</p></div>
+        <div class="card"><b>2 · You cook to the count</b><p>We show exactly how many to prep. Nothing wasted.</p></div>
+        <div class="card"><b>3 · One weekly drop (or pickup)</b><p>Batched delivery or pickup — low delivery cost, no courier per order.</p></div>
+      </div>
+    </section>
+
+    <!-- CTA -->
+    <section>
+      <div class="cta">
+        <div class="h2" style="margin-bottom:8px">Want a free pilot week?</div>
+        <p class="sub" style="margin:0 auto 20px">We'll set up a pilot at your busiest location — Fiamma Ristorante. No cost for the first week. If your regulars don't love it, no obligation.</p>
+        <a class="btn" href="#">Set up my free pilot week</a>
+      </div>
+      <div class="disclaimer">Pilot pitch concept prepared for Flame International (3 locations: Fiamma Ristorante · Flame Bakery · Flame Hookah Garden). Numbers are illustrative estimates — actuals depend on your menu pricing and subscriber volume. Imagery from Flame International's public site / Doordash. This is a proposal, not a binding offer.</div>
+    </section>
+  </div>
+
+  <div class="foot">Prepared for Flame International · Weekly Lunch &amp; Tiffin Subscription Pilot</div>
+</body>
+</html>
