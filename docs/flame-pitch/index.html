@@ -3,47 +3,68 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Flame Weekly Family Sofreh — 3 Ways to Grow Your 3 Kitchens</title>
+<title>Flame International — Flame Weekly Family Sofreh</title>
 <style>
   :root { --brand:#0d9488; --brand-d:#0f766e; --ink:#0b1220; --muted:#1f2937; --line:#cbd5e1; --bg:#f5f5f7; --amber:#f59e0b; }
   * { box-sizing:border-box; margin:0; padding:0; }
+  html { scroll-behavior:smooth; }
   body { font-family:"Segoe UI",-apple-system,sans-serif; background:var(--bg); color:var(--ink); line-height:1.5; }
-  .wrap { max-width:1000px; margin:0 auto; padding:0 24px; }
-  .hero { position:relative; height:360px; background-size:cover; background-position:center; display:flex; align-items:flex-end; }
-  .hero-overlay { position:absolute; inset:0; background:linear-gradient(to top, rgba(11,18,32,.92), rgba(11,18,32,.25)); }
-  .hero-inner { position:relative; z-index:2; padding:32px 24px 40px; max-width:1000px; margin:0 auto; width:100%; color:#fff; }
+  .wrap { max-width:1080px; margin:0 auto; padding:0 24px; }
+  /* top bar */
+  .topbar { background:#0b1220; color:#fff; padding:12px 0; position:sticky; top:0; z-index:50; }
+  .topbar-inner { max-width:1080px; margin:0 auto; padding:0 24px; display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; }
+  .topbar-brand { font-weight:900; color:#6ee7b7; }
+  .topnav { display:flex; gap:16px; flex-wrap:wrap; }
+  .topnav a { color:#cbd5e1; text-decoration:none; font-size:14px; font-weight:600; }
+  .topnav a:hover { color:#6ee7b7; }
+  .topbar-contact { font-size:12px; color:#94a3b8; }
+  /* hero */
+  .hero { position:relative; height:400px; background-size:cover; background-position:center; display:flex; align-items:flex-end; }
+  .hero-overlay { position:absolute; inset:0; background:linear-gradient(to top, rgba(11,18,32,.92), rgba(11,18,32,.2)); }
+  .hero-inner { position:relative; z-index:2; padding:32px 24px 40px; max-width:1080px; margin:0 auto; width:100%; color:#fff; }
   .hero-tag { font-size:12px; font-weight:800; text-transform:uppercase; letter-spacing:.1em; color:#6ee7b7; }
-  .hero-title { font-size:clamp(28px,5vw,44px); font-weight:900; margin:8px 0; }
+  .hero-title { font-size:clamp(30px,5vw,48px); font-weight:900; margin:8px 0; }
   .hero-sub { font-size:18px; opacity:.95; max-width:680px; }
-  section { padding:40px 0; }
-  .h2 { font-size:26px; font-weight:900; letter-spacing:-.02em; margin-bottom:6px; }
-  .sub { color:var(--muted); font-size:16px; margin-bottom:18px; max-width:760px; }
+  section { padding:44px 0; }
+  .h2 { font-size:28px; font-weight:900; letter-spacing:-.02em; margin-bottom:6px; }
+  .sub { color:var(--muted); font-size:16px; margin-bottom:20px; max-width:760px; }
   .kicker { font-size:12px; font-weight:800; letter-spacing:.12em; text-transform:uppercase; color:var(--brand); margin-bottom:6px; }
-  /* pains */
   .pain-card { background:#fff; border:1px solid var(--line); border-left:4px solid var(--amber); border-radius:12px; padding:16px 18px; margin-bottom:12px; }
-  .pain-card b { color:var(--ink); }
-  .pain-card p { color:var(--muted); font-size:15px; margin-top:2px; }
-  /* idea cards */
-  .idea { background:#fff; border:1px solid var(--line); border-radius:18px; padding:24px; margin-bottom:20px; box-shadow:0 1px 2px rgba(0,0,0,.04),0 8px 24px rgba(0,0,0,.06); }
-  .idea-badge { display:inline-block; background:linear-gradient(135deg,#14b8a6,#0d9488); color:#fff; font-size:11px; font-weight:800; padding:4px 10px; border-radius:999px; margin-bottom:8px; text-transform:uppercase; letter-spacing:.05em; }
-  .idea-title { font-size:21px; font-weight:900; }
-  .idea-pain { color:var(--muted); font-size:14px; margin:6px 0 12px; }
+  .pain-card b { color:var(--ink); } .pain-card p { color:var(--muted); font-size:15px; margin-top:2px; }
+  .solution { background:#fff; border:1px solid var(--line); border-radius:18px; padding:24px; margin-bottom:20px; box-shadow:0 1px 2px rgba(0,0,0,.04),0 8px 24px rgba(0,0,0,.06); }
+  .sol-badge { display:inline-block; background:linear-gradient(135deg,#14b8a6,#0d9488); color:#fff; font-size:11px; font-weight:800; padding:4px 10px; border-radius:999px; margin-bottom:8px; text-transform:uppercase; letter-spacing:.05em; }
+  .sol-title { font-size:21px; font-weight:900; }
+  .sol-pain { color:var(--muted); font-size:14px; margin:6px 0 12px; }
   .math { background:#f0fdfa; border:1px solid #99f6e4; border-radius:12px; padding:14px 16px; font-size:15px; }
-  .math b { color:var(--brand-d); }
-  .math .row { display:flex; justify-content:space-between; padding:3px 0; }
-  .math .big { font-size:18px; font-weight:900; color:var(--brand-d); border-top:1px solid #99f6e4; margin-top:6px; padding-top:6px; }
+  .math b { color:var(--brand-d); } .math .row { display:flex; justify-content:space-between; padding:3px 0; } .math .big { font-size:18px; font-weight:900; color:var(--brand-d); border-top:1px solid #99f6e4; margin-top:6px; padding-top:6px; }
+  /* gallery */
+  .gallery { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-top:14px; }
+  @media(max-width:760px){ .gallery{ grid-template-columns:repeat(2,1fr); } }
+  .gallery img { width:100%; height:160px; object-fit:cover; border-radius:12px; }
+  .brands { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-top:14px; }
+  @media(max-width:760px){ .brands{ grid-template-columns:1fr; } }
+  .brand-card { background:#fff; border-radius:14px; padding:16px; border:1px solid var(--line); }
+  .brand-card b { font-size:16px; } .brand-card span { display:block; color:var(--muted); font-size:13px; margin-top:4px; }
   .cta { text-align:center; background:#fff; border:1px solid var(--line); border-radius:20px; padding:36px; }
   .btn { display:inline-block; background:linear-gradient(135deg,#14b8a6,#0d9488); color:#fff; font-weight:800; padding:14px 28px; border-radius:14px; text-decoration:none; font-size:17px; box-shadow:0 8px 24px rgba(13,148,136,.35); }
   .foot { text-align:center; padding:30px; color:var(--muted); font-size:13px; }
   .disclaimer { background:#fff7ed; border:1px solid #fdba74; color:#9a3412; font-size:12px; padding:10px 14px; border-radius:10px; margin:16px 0; }
-  .brands { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-top:14px; }
-  @media(max-width:760px){ .brands{ grid-template-columns:1fr; } }
-  .brand-card { background:#fff; border-radius:14px; padding:16px; border:1px solid var(--line); }
-  .brand-card b { font-size:16px; }
-  .brand-card span { display:block; color:var(--muted); font-size:13px; margin-top:4px; }
 </style>
 </head>
 <body>
+  <div class="topbar">
+    <div class="topbar-inner">
+      <div class="topbar-brand">🔥 FLAME INTERNATIONAL</div>
+      <nav class="topnav">
+        <a href="#solutions">Solutions</a>
+        <a href="#kitchens">Our Kitchens</a>
+        <a href="#gallery">Gallery</a>
+        <a href="#start">Get Started</a>
+      </nav>
+      <div class="topbar-contact">11330 Santa Monica Blvd, Los Angeles, CA 90025</div>
+    </div>
+  </div>
+
   <div class="hero" style="background-image:url('img/flame-international-kabob-house-mediterr-2.jpg')">
     <div class="hero-overlay"></div>
     <div class="hero-inner">
@@ -55,25 +76,24 @@
 
   <div class="wrap">
     <!-- PAINS -->
-    <section>
+    <section id="solutions">
       <div class="kicker">We built this for your exact pain</div>
       <div class="h2">The things that hold your kitchen back</div>
-      <div class="pain-card"><b>Lunch business is low-key</b><p>Most of your revenue comes from a few peak dinner hours. The middle of the day is empty — and that's wasted kitchen capacity.</p></div>
-      <div class="pain-card"><b>Delivery is expensive</b><p>DoorDash-style per-order couriers eat your margin. Every single order pays a driver.</p></div>
-      <div class="pain-card"><b>Food is unpredictable</b><p>You don't know how much to prep, so you throw food away — or run out. Both cost you money.</p></div>
-      <div class="pain-card"><b>No recurring income</b><p>You chase one-off orders. There's no guaranteed weekly revenue you can plan your staff and buying around.</p></div>
+      <div class="pain-card"><b>Lunch business is low-key</b><p>Most revenue comes from peak dinner hours. Mid-day is empty — wasted kitchen capacity.</p></div>
+      <div class="pain-card"><b>Delivery is expensive</b><p>Per-order couriers eat your margin. Every single order pays a driver.</p></div>
+      <div class="pain-card"><b>Food is unpredictable</b><p>You don't know how much to prep, so you throw food away — or run out.</p></div>
+      <div class="pain-card"><b>No recurring income</b><p>You chase one-off orders. No guaranteed weekly revenue to plan staff and buying around.</p></div>
     </section>
 
-    <!-- 3 IDEAS -->
+    <!-- 3 SOLUTIONS -->
     <section>
-      <div class="kicker">Three ways to fix it</div>
-      <div class="h2">Pick one, or start with all three</div>
+      <div class="kicker">Three solutions</div>
+      <div class="h2">How we fix each problem</div>
 
-      <!-- IDEA 1 -->
-      <div class="idea">
-        <span class="idea-badge">Idea 1 · The core</span>
-        <div class="idea-title">Weekly Family Sofreh — the lunch subscription</div>
-        <div class="idea-pain"><b>Fixes:</b> low-key lunch, unpredictable food, no recurring income.</div>
+      <div class="solution">
+        <span class="sol-badge">Solution 1 · The core</span>
+        <div class="sol-title">Weekly Family Sofreh — the lunch subscription</div>
+        <div class="sol-pain"><b>Fixes:</b> low-key lunch, unpredictable food, no recurring income.</div>
         <div class="math">
           <div class="row"><span>Lunch Kabob Box (chicken koobideh + rice + salad)</span><b>$15</b></div>
           <div class="row"><span>× 5 days a week</span><b>$75</b></div>
@@ -81,39 +101,34 @@
           <div class="row"><span>× 4 weeks</span><b>$12,000/mo</b></div>
           <div class="big">$12,000/month of predictable lunch revenue — before dinner even starts</div>
         </div>
-        <p class="sub" style="margin:12px 0 0;font-size:14px">Subscribers pay ahead. You know the exact count, so you cook to order — near-zero waste.</p>
       </div>
 
-      <!-- IDEA 2 -->
-      <div class="idea">
-        <span class="idea-badge">Idea 2 · Slash delivery cost</span>
-        <div class="idea-title">One batched weekly drop, not 40 couriers</div>
-        <div class="idea-pain"><b>Fixes:</b> expensive delivery.</div>
+      <div class="solution">
+        <span class="sol-badge">Solution 2 · Slash delivery cost</span>
+        <div class="sol-title">One batched weekly drop, not 40 couriers</div>
+        <div class="sol-pain"><b>Fixes:</b> expensive delivery.</div>
         <div class="math">
           <div class="row"><span>Per-order courier × 40</span><b>≈ $6 each = $240</b></div>
           <div class="row"><span>One batched route for 40 boxes</span><b>≈ $60 total</b></div>
-          <div class="big">You save ~$180 per drop — and your customers can pick up for free too</div>
+          <div class="big">You save ~$180 per drop — and customers can pick up for free too</div>
         </div>
-        <p class="sub" style="margin:12px 0 0;font-size:14px">Weekly batching means one driver, one route, one drop. Your delivery cost drops ~75%.</p>
       </div>
 
-      <!-- IDEA 3 -->
-      <div class="idea">
-        <span class="idea-badge">Idea 3 · Pre-sell the week</span>
-        <div class="idea-title">Sliding Scale — cook exactly what's sold</div>
-        <div class="idea-pain"><b>Fixes:</b> food waste, unpredictable demand.</div>
+      <div class="solution">
+        <span class="sol-badge">Solution 3 · Pre-sell the week</span>
+        <div class="sol-title">Sliding Scale — cook exactly what's sold</div>
+        <div class="sol-pain"><b>Fixes:</b> food waste, unpredictable demand.</div>
         <div class="math">
-          <div class="row"><span>You set: "Koobideh at $25 → $19 if 60 commit"</span><b>custom</b></div>
+          <div class="row"><span>You set: "Koobideh $25 → $19 if 60 commit"</span><b>custom</b></div>
           <div class="row"><span>Customers commit + pay ahead</span><b>100% pre-funded</b></div>
           <div class="row"><span>You cook only what's committed</span><b>0% waste</b></div>
-          <div class="big">Turn leftover risk into guaranteed sales — priced to move volume only when there's real demand</div>
+          <div class="big">Turn leftover risk into guaranteed sales — priced to move volume only on real demand</div>
         </div>
-        <p class="sub" style="margin:12px 0 0;font-size:14px">You never cook blind again. The price only drops when enough people actually commit.</p>
       </div>
     </section>
 
-    <!-- 3 BRANDS -->
-    <section>
+    <!-- KITCHENS -->
+    <section id="kitchens">
       <div class="kicker">Runs all 3 of your locations</div>
       <div class="h2">One system, three kitchens</div>
       <div class="sub">Each brand runs its own weekly menu + subscriptions under one dashboard.</div>
@@ -124,17 +139,31 @@
       </div>
     </section>
 
+    <!-- GALLERY -->
+    <section id="gallery">
+      <div class="kicker">From your kitchens</div>
+      <div class="h2">What your weekly sofreh looks like</div>
+      <div class="gallery">
+        <img src="img/flame-international-kabob-house-mediterr-1.jpg" alt="Kabob platter">
+        <img src="img/flame-international-kabob-house-mediterr-3.jpg" alt="Mediterranean dining">
+        <img src="img/buddha-bowl-poke-bowl-healthy-meal-resta-1.jpg" alt="Healthy bowl">
+        <img src="img/chef-cooking-restaurant-kitchen-professi-1.jpg" alt="Chef cooking">
+        <img src="img/butter-chicken-curry-indian-dish-closeup-1.jpg" alt="Curry dish">
+        <img src="img/flame-international-kabob-house-mediterr-2.jpg" alt="Flame dining">
+      </div>
+    </section>
+
     <!-- CTA -->
-    <section>
+    <section id="start">
       <div class="cta">
         <div class="h2" style="margin-bottom:8px">Start with a free pilot week</div>
         <p class="sub" style="margin:0 auto 20px">We'll set up a free pilot at your busiest location — Fiamma Ristorante. First week is on us. If your regulars don't love it, no obligation.</p>
         <a class="btn" href="#">Set up my free pilot week</a>
       </div>
-      <div class="disclaimer">Pilot proposal for Flame International (Fiamma Ristorante · Flame Bakery · Flame Hookah Garden). Pricing/math are illustrative estimates based on your public menu (chicken kabob ~$25–$15 takeout, family platters $40+). Actual figures depend on your final menu pricing and subscriber volume. This is a proposal, not a binding offer.</div>
+      <div class="disclaimer">Pilot proposal for Flame International · 11330 Santa Monica Blvd, Los Angeles, CA 90025 (Fiamma Ristorante · Flame Bakery · Flame Hookah Garden). Pricing/math are illustrative estimates based on your public menu. This is a proposal, not a binding offer.</div>
     </section>
   </div>
 
-  <div class="foot">Prepared for Flame International · Flame Weekly Family Sofreh Pilot</div>
+  <div class="foot">🔥 Flame International · 11330 Santa Monica Blvd, Los Angeles, CA 90025 · Flame Weekly Family Sofreh Pilot</div>
 </body>
 </html>
