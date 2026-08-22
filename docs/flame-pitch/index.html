@@ -59,6 +59,16 @@
   .connect-card .use { background:#f0fdfa; border:1px solid #99f6e4; border-radius:10px; padding:10px; font-size:13px; color:#0f766e; }
   .connect-card .use b { display:block; margin-bottom:2px; }
   .wa { background:#25D366; } .gg { background:#4285F4; } .ig { background:linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888); }
+  /* growth matrix */
+  .matrix { margin-top:18px; }
+  .matrix-row { display:grid; grid-template-columns:150px 1fr 1fr 1fr; gap:12px; margin-bottom:12px; }
+  @media(max-width:760px){ .matrix-row{ grid-template-columns:1fr; } }
+  .matrix-row .chan { font-weight:900; font-size:16px; display:flex; align-items:center; gap:8px; }
+  .matrix-row .chan .cico { width:28px; height:28px; border-radius:8px; display:grid; place-items:center; color:#fff; font-weight:900; }
+  .matrix-head, .matrix-cell { background:#fff; border:1px solid var(--line); border-radius:10px; padding:12px; font-size:13px; }
+  .matrix-head { font-weight:900; text-align:center; color:var(--brand-d); background:#f0fdfa; }
+  .matrix-cell b { color:var(--ink); display:block; margin-bottom:2px; font-size:13px; }
+  .matrix-cell span { color:var(--muted); font-size:12px; }
 </style>
 </head>
 <body>
@@ -184,6 +194,36 @@
           <div class="ch"><span class="cico ig">◎</span> Instagram</div>
           <p>Show the food, the chefs, and the weekly box — appetite is visual.</p>
           <div class="use"><b>How to use it</b>Post the week's sofreh box with a "Link in bio to subscribe." Run a weekly "first box free" offer to your followers — they're already your fans.</div>
+        </div>
+      </div>
+
+      <!-- INTEGRATED GROWTH MATRIX -->
+      <div class="matrix">
+        <div class="kicker">Integrated growth plan</div>
+        <div class="h2" style="font-size:22px">3 channels × 3 solutions</div>
+        <div class="matrix-row">
+          <div class="matrix-head">Channel</div>
+          <div class="matrix-head">Solution 1 · Weekly Sofreh</div>
+          <div class="matrix-head">Solution 2 · Batched Drop</div>
+          <div class="matrix-head">Solution 3 · Sliding Scale</div>
+        </div>
+        <div class="matrix-row">
+          <div class="chan"><span class="cico wa">✆</span> WhatsApp</div>
+          <div class="matrix-cell"><b>1 · Subscribe broadcast</b><span>Weekly menu + subscribe link to all regulars' phones.</span></div>
+          <div class="matrix-cell"><b>2 · Delivery day reminder</b><span>Text "your sofreh arrives Wed 5-7pm" + pickup option.</span></div>
+          <div class="matrix-cell"><b>3 · Group-buy nudge</b><span>"Only 12 more to hit $19 — lock your box."</span></div>
+        </div>
+        <div class="matrix-row">
+          <div class="chan"><span class="cico gg">G</span> Google</div>
+          <div class="matrix-cell"><b>1 · Profile subscribe button</b><span>"Order weekly" link on your Google profile converts new customers.</span></div>
+          <div class="matrix-cell"><b>2 · Pickup & hours</b><span>List pickup window so customers know they can grab & go.</span></div>
+          <div class="matrix-cell"><b>3 · Reviews drive pre-orders</b><span>Positive reviews feed trust → more people commit ahead.</span></div>
+        </div>
+        <div class="matrix-row">
+          <div class="chan"><span class="cico ig">◎</span> Instagram</div>
+          <div class="matrix-cell"><b>1 · Subscribe in bio</b><span>Weekly box photo + "link in bio to subscribe."</span></div>
+          <div class="matrix-cell"><b>2 · Drop-day story</b><span>Show the batched delivery / boxes leaving the kitchen.</span></div>
+          <div class="matrix-cell"><b>3 · "Unlock the price" posts</b><span>Announce the group price only when enough commit — urgency + FOMO.</span></div>
         </div>
       </div>
     </section>
